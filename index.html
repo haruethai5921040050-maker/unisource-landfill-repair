@@ -304,7 +304,6 @@
 
     <!-- JAVASCRIPT & API FETCH LOGIC -->
     <script>
-        // ใส่ลิงก์ Web App URL ของ Apps Script ตรงนี้
         const API_URL = "https://script.google.com/macros/s/AKfycby81fbiE_6bYcaA4Fjufs8Ltr_5snpaWF3b5y3zzor4sq3rrkKk8hqiNQVwMJvPO9gMeA/exec";
 
         let currentUser = null;
@@ -1012,7 +1011,7 @@
                             <div class="text-[11px] text-slate-400">${v.plateNumber} (👤 ${v.driverName})</div>
                         </td>`;
                     for (let d = 1; d <= daysInMonth; d++) {
-                        // ปรับปรุงเงื่อนไขตรงนี้ให้ดึงสถานะจริง (CM, PM, พร้อมใช้งาน) มาแสดงในปฏิทินทันที
+                        // ค้นหารายการซ่อมในวันนั้นๆ แบบตรงเป๊ะ (รองรับสถานะ CM, PM และแสดงสาเหตุซ่อมใต้สถานะ)
                         const matched = repairs.find(r => {
                             if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
                             const rDate = new Date(r.startTime);
@@ -1021,14 +1020,15 @@
 
                         if (matched) {
                             let displayStatus = matched.repairStatus || 'พร้อมใช้งาน';
-                            
+                            let causeText = matched.repairCause && matched.repairCause !== '-' ? matched.repairCause : '';
+
                             let statusCls = 'text-emerald-600 font-normal';
                             if (displayStatus === 'CM') statusCls = 'text-red-600 font-normal';
                             if (displayStatus === 'PM') statusCls = 'text-[#FF9900] font-normal';
 
                             bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle">
-                                <div class="text-xs ${statusCls}">${displayStatus}</div>
-                                <div class="text-[9px] text-slate-400 truncate max-w-[50px]" title="${matched.repairCause}">${matched.repairCause || ''}</div>
+                                <div class="text-xs font-bold ${statusCls}">${displayStatus}</div>
+                                <div class="text-[9px] text-slate-500 truncate max-w-[50px]" title="${causeText}">${causeText}</div>
                             </td>`;
                         } else {
                             bodyHtml += `<td class="p-1 border-r border-slate-200 text-center text-slate-300">-</td>`;

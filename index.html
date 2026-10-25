@@ -173,7 +173,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: MONTHLY SUMMARY CALENDAR (แสดงชื่อ ทะเบียน และคนขับชัดเจน ขนาดปกติอ่านง่าย) -->
+            <!-- TAB 3: MONTHLY SUMMARY CALENDAR -->
             <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน (ปฏิทินซ่อม 1-31)</h2>
@@ -271,8 +271,12 @@
         function getDatetimeISO(daysOffset = 0) {
             const now = new Date();
             now.setDate(now.getDate() + daysOffset);
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            return now.toISOString().slice(0, 16);
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -345,7 +349,7 @@
                 }
             } catch (err) {
                 errorDiv.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ API";
-                errorDiv.classList.remove('hidden');
+                errorDiv.classList.add('hidden');
             }
         }
 
@@ -940,8 +944,14 @@
                     for (let d = 1; d <= daysInMonth; d++) {
                         const matched = repairs.find(r => {
                             if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
-                            var rDate = new Date(r.startTime);
-                            return !isNaN(rDate.getTime()) && rDate.getDate() === d && (rDate.getMonth() + 1) === month && rDate.getFullYear() === year;
+                            
+                            var parts = r.startDateISO.split('-');
+                            if (parts.length !== 3) return false;
+                            var rYear = parseInt(parts[0], 10);
+                            var rMonth = parseInt(parts[1], 10);
+                            var rDay = parseInt(parts[2], 10);
+
+                            return rDay === d && rMonth === month && rYear === year;
                         });
 
                         if (matched) {

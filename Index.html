@@ -49,14 +49,8 @@
             
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">เลือกบทบาทผู้ใช้งาน</label>
-                    <select id="loginRole" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#4682B4] focus:outline-none bg-slate-50">
-                        <option value="">-- เลือกบทบาท --</option>
-                        <option value="Admin">Admin</option>
-                        <option value="Asst Maintenance">Asst Maintenance</option>
-                        <option value="Officer Maintenance">Officer Maintenance</option>
-                        <option value="Transport">Transport</option>
-                    </select>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้งาน (Username)</label>
+                    <input type="text" id="loginRole" required placeholder="กรอก Username เช่น Admin" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#4682B4] focus:outline-none bg-slate-50">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน</label>
@@ -243,17 +237,11 @@
     <div id="exportReportModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-xl shadow-2xl overflow-hidden max-w-2xl w-full p-6 space-y-4 max-h-[90vh] flex flex-col">
             <h3 class="font-bold text-base text-slate-800">ตัวอย่างรูปภาพรายงานรวมประจำวัน</h3>
-            <div id="reportPreviewContainer" class="border border-slate-300 rounded-lg p-2 overflow-auto bg-slate-50 flex-1">
-                <!-- พรีวิวรูปภาพ -->
-            </div>
+            <div id="reportPreviewContainer" class="border border-slate-300 rounded-lg p-2 overflow-auto bg-slate-50 flex-1"></div>
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 shrink-0">
                 <button onclick="closeExportModal()" class="px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg text-xs font-medium">ปิด</button>
-                <button onclick="exportReportImageAction('save')" class="px-4 py-2 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded-lg text-xs font-medium shadow">
-                    Save รูป
-                </button>
-                <button onclick="exportReportImageAction('copy')" class="px-4 py-2 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded-lg text-xs font-medium shadow">
-                    Copy รูป
-                </button>
+                <button onclick="exportReportImageAction('save')" class="px-4 py-2 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded-lg text-xs font-medium shadow">Save รูป</button>
+                <button onclick="exportReportImageAction('copy')" class="px-4 py-2 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded-lg text-xs font-medium shadow">Copy รูป</button>
             </div>
         </div>
     </div>
@@ -314,8 +302,11 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT & API FETCH LOGIC -->
     <script>
+        // ใส่ลิงก์ Web App URL ของ Apps Script ตรงนี้[cite: 8]
+        const API_URL = "https://script.google.com/macros/s/AKfycby81fbiE_6bYcaA4Fjufs8Ltr_5snpaWF3b5y3zzor4sq3rrkKk8hqiNQVwMJvPO9gMeA/exec";
+
         let currentUser = null;
         let globalVehicles = [];
         let globalRepairs = [];
@@ -328,10 +319,8 @@
             toast.className = `pointer-events-auto px-4 py-3 rounded-lg shadow-lg text-xs font-normal text-white flex items-center gap-2 transition-all duration-300 transform translate-y-[-10px] opacity-0 ${
                 type === 'success' ? 'bg-emerald-600' : 'bg-red-600'
             }`;
-            
             toast.innerHTML = `<span>${message}</span>`;
             container.appendChild(toast);
-            
             setTimeout(() => { toast.classList.remove('translate-y-[-10px]', 'opacity-0'); }, 10);
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-[-10px]');
@@ -344,7 +333,6 @@
             const days = Math.floor(totalMinutes / (24 * 60));
             const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
             const mins = totalMinutes % 60;
-
             let result = '';
             if (days > 0) result += `${days} วัน `;
             if (hours > 0) result += `${hours} ชม. `;
@@ -388,7 +376,6 @@
         function updatePlanTargetUI() {
             const lblToday = document.getElementById('lblTargetToday');
             const lblTomorrow = document.getElementById('lblTargetTomorrow');
-            
             if (currentPlanTarget === 'today') {
                 lblToday.className = 'cursor-pointer px-2.5 py-1 rounded transition bg-[#4682B4] text-white font-normal';
                 lblTomorrow.className = 'cursor-pointer px-2.5 py-1 rounded transition text-slate-600 font-normal';
@@ -398,37 +385,40 @@
             }
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const role = document.getElementById('loginRole').value;
             const password = document.getElementById('loginPassword').value;
             const errorDiv = document.getElementById('loginError');
 
-            google.script.run
-                .withSuccessHandler(function(res) {
-                    if (res.success) {
-                        currentUser = { role: res.role, fullName: res.fullName };
-                        localStorage.setItem('unisource_user', JSON.stringify(currentUser));
-                        document.getElementById('loginOverlay').classList.add('hidden');
-                        document.getElementById('appContainer').classList.remove('hidden');
-                        
-                        document.getElementById('userInitial').innerText = res.fullName.charAt(0);
-                        document.getElementById('userNameDisplay').innerText = res.fullName;
-                        document.getElementById('userRoleDisplay').innerText = res.role;
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "login", role: role, password: password })
+                });
+                let result = await res.json();
 
-                        showToast("เข้าสู่ระบบสำเร็จ", "success");
-                        updatePlanTargetUI();
-                        loadVehiclesView();
-                    } else {
-                        errorDiv.innerText = res.message;
-                        errorDiv.classList.remove('hidden');
-                    }
-                })
-                .withFailureHandler(function(err) {
-                    errorDiv.innerText = "เกิดข้อผิดพลาด: " + err.message;
-                    errorDiv.classList.add('hidden');
-                })
-                .loginUser(role, password);
+                if (result.success) {
+                    currentUser = { role: result.role, fullName: result.fullName };
+                    localStorage.setItem('unisource_user', JSON.stringify(currentUser));
+                    document.getElementById('loginOverlay').classList.add('hidden');
+                    document.getElementById('appContainer').classList.remove('hidden');
+                    
+                    document.getElementById('userInitial').innerText = result.fullName.charAt(0);
+                    document.getElementById('userNameDisplay').innerText = result.fullName;
+                    document.getElementById('userRoleDisplay').innerText = result.role;
+
+                    showToast("เข้าสู่ระบบสำเร็จ", "success");
+                    updatePlanTargetUI();
+                    loadVehiclesView();
+                } else {
+                    errorDiv.innerText = result.message;
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ API";
+                errorDiv.classList.remove('hidden');
+            }
         }
 
         function handleLogout() {
@@ -457,11 +447,15 @@
             if (tabId === 'monthlySummary') initMonthlySummaryView();
         }
 
-        function loadVehiclesView() {
-            google.script.run.withSuccessHandler(function(vehicles) {
+        async function loadVehiclesView() {
+            try {
+                let res = await fetch(`${API_URL}?action=getVehicles`);
+                let vehicles = await res.json();
                 globalVehicles = vehicles;
                 renderVehicleTable();
-            }).getVehicles();
+            } catch (err) {
+                showToast("ไม่สามารถดึงข้อมูลรถได้", "error");
+            }
         }
 
         function renderVehicleCard(v) {
@@ -535,13 +529,13 @@
             }
         }
 
-        function saveRow(vehNum, plate, driver) {
+        async function saveRow(vehNum, plate, driver) {
             let recorderVal = document.getElementById(`recorder-${vehNum}`).value.trim();
             if (!recorderVal) {
                 recorderVal = currentUser ? currentUser.fullName : 'ไม่ระบุชื่อ';
             }
 
-            const data = {
+            const payload = {
                 vehicleNumber: vehNum,
                 plateNumber: plate,
                 driverName: driver,
@@ -554,19 +548,24 @@
                 recorder: recorderVal
             };
 
-            google.script.run
-                .withSuccessHandler(function(res) {
-                    if (res.success) {
-                        showToast("บันทึกเรียบร้อย", "success");
-                        loadRepairsView();
-                    } else {
-                        showToast(res.message, "error");
-                    }
-                })
-                .saveRepairRow(data, currentUser.fullName, currentUser.role);
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "saveRepair", payload: payload, userName: currentUser.fullName, userRole: currentUser.role })
+                });
+                let result = await res.json();
+                if (result.success) {
+                    showToast("บันทึกเรียบร้อย", "success");
+                    loadRepairsView();
+                } else {
+                    showToast(result.message, "error");
+                }
+            } catch (err) {
+                showToast("เกิดข้อผิดพลาดในการบันทึก", "error");
+            }
         }
 
-        function saveAllRows() {
+        async function saveAllRows() {
             let itemsToSave = [];
             globalVehicles.forEach(v => {
                 let recorderVal = document.getElementById(`recorder-${v.vehicleNumber}`).value.trim();
@@ -588,16 +587,21 @@
                 });
             });
 
-            google.script.run
-                .withSuccessHandler(function(res) {
-                    if (res.success) {
-                        showToast("บันทึกเรียบร้อย", "success");
-                        loadRepairsView();
-                    } else {
-                        showToast(res.message, "error");
-                    }
-                })
-                .saveMultipleRepairs(itemsToSave, currentUser.fullName, currentUser.role);
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "saveMultipleRepairs", payload: itemsToSave, userName: currentUser.fullName, userRole: currentUser.role })
+                });
+                let result = await res.json();
+                if (result.success) {
+                    showToast("บันทึกเรียบร้อย", "success");
+                    loadRepairsView();
+                } else {
+                    showToast(result.message, "error");
+                }
+            } catch (err) {
+                showToast("เกิดข้อผิดพลาดในการบันทึก", "error");
+            }
         }
 
         function openSingleReport(vehNum, plate, driver, garage, cause, remark, recorder, startDateText, approvalStatus) {
@@ -645,7 +649,7 @@
                     canvas.toBlob(blob => {
                         const item = new ClipboardItem({ "image/png": blob });
                         navigator.clipboard.write([item]).then(() => {
-                            showToast("คัดลอกรูปภาพไปยังคลิปบอร์ดแล้ว (สามารถกดวางได้ทันที)", "success");
+                            showToast("คัดลอกรูปภาพไปยังคลิปบอร์ดแล้ว", "success");
                         }).catch(err => {
                             showToast("ไม่สามารถคัดลอกรูปภาพได้", "error");
                         });
@@ -660,7 +664,6 @@
         function generateReportPreview() {
             showToast("กำลังสร้างรูปภาพตัวอย่างรายงาน...", "success");
             const captureArea = document.getElementById('reportCaptureArea');
-            
             updateReportTimestamp();
 
             const rows = captureArea.querySelectorAll('.vehicle-row-item');
@@ -677,7 +680,6 @@
                 if (!recorder) recorder = currentUser ? currentUser.fullName : '-';
 
                 row.querySelector('.status-text').innerText = status;
-                
                 const formattedStart = startInput ? new Date(startInput).toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'}) : new Date().toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'});
                 const formattedEnd = endInput ? new Date(endInput).toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'}) : new Date().toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'});
 
@@ -700,7 +702,6 @@
             }).then(canvas => {
                 captureArea.classList.remove('capturing');
                 generatedReportCanvas = canvas;
-                
                 const previewContainer = document.getElementById('reportPreviewContainer');
                 previewContainer.innerHTML = '';
                 canvas.style.width = '100%';
@@ -722,7 +723,6 @@
 
         function exportReportImageAction(actionType) {
             if (!generatedReportCanvas) return;
-
             if (actionType === 'save') {
                 const link = document.createElement('a');
                 link.download = `Unisource_Vehicle_Status_Report_${new Date().toISOString().slice(0,10)}.png`;
@@ -771,7 +771,6 @@
             }
 
             htmlContent += `</table></body></html>`;
-
             const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -781,31 +780,39 @@
             showToast("Export ไฟล์ Excel สำเร็จ", "success");
         }
 
-        function deleteRepair(repairID) {
-            google.script.run
-                .withSuccessHandler(function(res) {
-                    if (res.success) {
-                        showToast("ลบเรียบร้อย", "success");
-                        loadRepairsView();
-                    } else {
-                        showToast(res.message, "error");
-                    }
-                })
-                .deleteRepairRecord(repairID, currentUser.fullName, currentUser.role);
+        async function deleteRepair(repairID) {
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "deleteRepair", repairID: repairID, userName: currentUser.fullName, userRole: currentUser.role })
+                });
+                let result = await res.json();
+                if (result.success) {
+                    showToast("ลบเรียบร้อย", "success");
+                    loadRepairsView();
+                } else {
+                    showToast(result.message, "error");
+                }
+            } catch (err) {
+                showToast("ไม่สามารถลบรายการได้", "error");
+            }
         }
 
-        function loadRepairsView() {
-            google.script.run.withSuccessHandler(function(repairs) {
+        async function loadRepairsView() {
+            try {
+                let res = await fetch(`${API_URL}?action=getRepairs`);
+                let repairs = await res.json();
                 globalRepairs = repairs.reverse();
                 renderRepairsTable(globalRepairs);
-            }).getRepairs();
+            } catch (err) {
+                showToast("ไม่สามารถดึงข้อมูลรายการซ่อมได้", "error");
+            }
         }
 
         function renderRepairsTable(repairs) {
             let html = '';
             repairs.forEach(r => {
                 if (r.approvalStatus === 'ยกเลิก/ลบแล้ว') return;
-
                 const defaultDT = getDatetimeISO(0);
 
                 let statusColor = 'text-emerald-600 font-normal';
@@ -873,34 +880,39 @@
             }
         }
 
-        function savePostStatus(repairID) {
+        async function savePostStatus(repairID) {
             const postStatus = document.getElementById(`postStatus-${repairID}`).value;
             const endTime = postStatus === 'เสร็จพร้อมรับงาน' ? document.getElementById(`postEnd-${repairID}`).value : null;
             const btn = document.getElementById(`postBtn-${repairID}`);
 
-            google.script.run.withSuccessHandler(function(res) {
-                if (res.success) {
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "updatePostRepair", repairID: repairID, postStatus: postStatus, endTime: endTime, userName: currentUser.fullName, userRole: currentUser.role })
+                });
+                let result = await res.json();
+                if (result.success) {
                     showToast("บันทึกเรียบร้อย", "success");
                     if (btn) btn.style.display = 'none';
                     loadRepairsView();
                 } else {
-                    showToast(res.message, "error");
+                    showToast(result.message, "error");
                 }
-            }).updatePostRepair(repairID, postStatus, endTime, currentUser.fullName, currentUser.role);
+            } catch (err) {
+                showToast("ไม่สามารถอัปเดตสถานะได้", "error");
+            }
         }
 
         function filterRepairs() {
             const keyword = document.getElementById('searchInput').value.toLowerCase();
             const dateVal = document.getElementById('dateFilter').value;
             const selectedStatuses = Array.from(document.querySelectorAll('.status-chk:checked')).map(cb => cb.value);
-
             const rows = document.querySelectorAll('.repair-row');
 
             rows.forEach(row => {
                 const searchData = row.getAttribute('data-search').toLowerCase();
                 const rowStatus = row.getAttribute('data-status');
                 const rowDate = row.getAttribute('data-date');
-
                 const matchKeyword = searchData.includes(keyword);
                 const matchStatus = selectedStatuses.includes(rowStatus);
                 const matchDate = !dateVal || rowDate === dateVal;
@@ -913,34 +925,49 @@
             });
         }
 
-        function updateApproval(repairID) {
+        async function updateApproval(repairID) {
             const status = document.getElementById(`app-${repairID}`).value;
-            google.script.run.withSuccessHandler(function(res) {
-                if (res.success) {
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "approveRepair", repairID: repairID, status: status, userName: currentUser.fullName, userRole: currentUser.role })
+                });
+                let result = await res.json();
+                if (result.success) {
                     showToast("บันทึกเรียบร้อย", "success");
                     loadRepairsView();
                 } else {
-                    showToast(res.message, "error");
+                    showToast(result.message, "error");
                     loadRepairsView();
                 }
-            }).approveRepair(repairID, status, currentUser.fullName, currentUser.role);
+            } catch (err) {
+                showToast("ไม่สามารถอัปเดตการอนุมัติได้", "error");
+                loadRepairsView();
+            }
         }
 
-        function ackRepair(repairID, isChecked) {
-            google.script.run.withSuccessHandler(function(res) {
-                if (res.success) {
+        async function ackRepair(repairID, isChecked) {
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "acknowledgeRepair", repairID: repairID, isChecked: isChecked, userName: currentUser.fullName, userRole: currentUser.role })
+                });
+                let result = await res.json();
+                if (result.success) {
                     showToast("บันทึกเรียบร้อย", "success");
                 } else {
-                    showToast(res.message, "error");
+                    showToast(result.message, "error");
                     loadRepairsView();
                 }
-            }).acknowledgeRepair(repairID, isChecked, currentUser.fullName, currentUser.role);
+            } catch (err) {
+                showToast("ไม่สามารถบันทึกได้", "error");
+                loadRepairsView();
+            }
         }
 
         function initMonthlySummaryView() {
             const monthSel = document.getElementById('selectMonth');
             const yearSel = document.getElementById('selectYear');
-            
             const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
             let mHtml = '';
             months.forEach((m, i) => { mHtml += `<option value="${i+1}">${m}</option>`; });
@@ -954,14 +981,12 @@
             }
             yearSel.innerHTML = yHtml;
             yearSel.value = currentYear;
-
             loadMonthlySummary();
         }
 
-        function loadMonthlySummary() {
+        async function loadMonthlySummary() {
             const month = parseInt(document.getElementById('selectMonth').value);
             const year = parseInt(document.getElementById('selectYear').value);
-            
             const daysInMonth = new Date(year, month, 0).getDate();
 
             let headerHtml = `<tr><th class="p-2 border-r border-slate-200">ทะเบียนรถ</th>`;
@@ -971,43 +996,48 @@
             headerHtml += `</tr>`;
             document.getElementById('calendarHeader').innerHTML = headerHtml;
 
-            google.script.run.withSuccessHandler(function(vehicles) {
-                google.script.run.withSuccessHandler(function(repairs) {
-                    let bodyHtml = '';
-                    vehicles.forEach(v => {
-                        bodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
-                            <td class="p-2 border-r border-slate-200 whitespace-nowrap text-left">
-                                <div class="font-normal text-slate-800">${v.vehicleNumber}</div>
-                                <div class="text-[11px] text-slate-400">${v.plateNumber} (👤 ${v.driverName})</div>
+            try {
+                let [vRes, rRes] = await Promise.all([
+                    fetch(`${API_URL}?action=getVehicles`),
+                    fetch(`${API_URL}?action=getRepairs`)
+                ]);
+                let vehicles = await vRes.json();
+                let repairs = await rRes.json();
+
+                let bodyHtml = '';
+                vehicles.forEach(v => {
+                    bodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
+                        <td class="p-2 border-r border-slate-200 whitespace-nowrap text-left">
+                            <div class="font-normal text-slate-800">${v.vehicleNumber}</div>
+                            <div class="text-[11px] text-slate-400">${v.plateNumber} (👤 ${v.driverName})</div>
+                        </td>`;
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const matched = repairs.find(r => {
+                            if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
+                            const rDate = new Date(r.startTime);
+                            return rDate.getDate() === d && (rDate.getMonth() + 1) === month && rDate.getFullYear() === year;
+                        });
+
+                        if (matched) {
+                            let displayStatus = (matched.repairStatus === 'RDY' || matched.repairStatus === 'พร้อมใช้งาน') ? 'พร้อมใช้งาน' : matched.repairStatus;
+                            let statusCls = 'text-emerald-600 font-normal';
+                            if (displayStatus === 'CM') statusCls = 'text-red-600 font-normal';
+                            if (displayStatus === 'PM') statusCls = 'text-[#FF9900] font-normal';
+
+                            bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle">
+                                <div class="text-xs ${statusCls}">${displayStatus}</div>
+                                <div class="text-[9px] text-slate-400 truncate max-w-[50px]" title="${matched.repairCause}">${matched.repairCause || ''}</div>
                             </td>`;
-                        
-                        for (let d = 1; d <= daysInMonth; d++) {
-                            const matched = repairs.find(r => {
-                                if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
-                                const rDate = new Date(r.startTime);
-                                return rDate.getDate() === d && (rDate.getMonth() + 1) === month && rDate.getFullYear() === year;
-                            });
-
-                            if (matched) {
-                                let displayStatus = (matched.repairStatus === 'RDY' || matched.repairStatus === 'พร้อมใช้งาน') ? 'พร้อมใช้งาน' : matched.repairStatus;
-                                
-                                let statusCls = 'text-emerald-600 font-normal';
-                                if (displayStatus === 'CM') statusCls = 'text-red-600 font-normal';
-                                if (displayStatus === 'PM') statusCls = 'text-[#FF9900] font-normal';
-
-                                bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle">
-                                    <div class="text-xs ${statusCls}">${displayStatus}</div>
-                                    <div class="text-[9px] text-slate-400 truncate max-w-[50px]" title="${matched.repairCause}">${matched.repairCause || ''}</div>
-                                </td>`;
-                            } else {
-                                bodyHtml += `<td class="p-1 border-r border-slate-200 text-center text-slate-300">-</td>`;
-                            }
+                        } else {
+                            bodyHtml += `<td class="p-1 border-r border-slate-200 text-center text-slate-300">-</td>`;
                         }
-                        bodyHtml += `</tr>`;
-                    });
-                    document.getElementById('calendarBody').innerHTML = bodyHtml || `<tr><td colspan="${daysInMonth + 1}" class="p-4 text-center text-slate-400">ไม่พบข้อความข้อมูล</td></tr>`;
-                }).getRepairs();
-            }).getVehicles();
+                    }
+                    bodyHtml += `</tr>`;
+                });
+                document.getElementById('calendarBody').innerHTML = bodyHtml || `<tr><td colspan="${daysInMonth + 1}" class="p-4 text-center text-slate-400">ไม่พบข้อมูล</td></tr>`;
+            } catch (err) {
+                showToast("ไม่สามารถโหลดข้อมูลสรุปประจำเดือนได้", "error");
+            }
         }
     </script>
 </body>

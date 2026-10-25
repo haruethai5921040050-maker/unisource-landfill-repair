@@ -304,7 +304,7 @@
 
     <!-- JAVASCRIPT & API FETCH LOGIC -->
     <script>
-        // ใส่ลิงก์ Web App URL ของ Apps Script ตรงนี้[cite: 8]
+        // ใส่ลิงก์ Web App URL ของ Apps Script ตรงนี้
         const API_URL = "https://script.google.com/macros/s/AKfycby81fbiE_6bYcaA4Fjufs8Ltr_5snpaWF3b5y3zzor4sq3rrkKk8hqiNQVwMJvPO9gMeA/exec";
 
         let currentUser = null;
@@ -417,7 +417,7 @@
                 }
             } catch (err) {
                 errorDiv.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ API";
-                errorDiv.classList.remove('hidden');
+                errorDiv.classList.add('hidden');
             }
         }
 
@@ -1012,6 +1012,7 @@
                             <div class="text-[11px] text-slate-400">${v.plateNumber} (👤 ${v.driverName})</div>
                         </td>`;
                     for (let d = 1; d <= daysInMonth; d++) {
+                        // ปรับปรุงเงื่อนไขตรงนี้ให้ดึงสถานะจริง (CM, PM, พร้อมใช้งาน) มาแสดงในปฏิทินทันที
                         const matched = repairs.find(r => {
                             if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
                             const rDate = new Date(r.startTime);
@@ -1019,7 +1020,8 @@
                         });
 
                         if (matched) {
-                            let displayStatus = (matched.repairStatus === 'RDY' || matched.repairStatus === 'พร้อมใช้งาน') ? 'พร้อมใช้งาน' : matched.repairStatus;
+                            let displayStatus = matched.repairStatus || 'พร้อมใช้งาน';
+                            
                             let statusCls = 'text-emerald-600 font-normal';
                             if (displayStatus === 'CM') statusCls = 'text-red-600 font-normal';
                             if (displayStatus === 'PM') statusCls = 'text-[#FF9900] font-normal';

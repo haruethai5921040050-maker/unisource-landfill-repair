@@ -35,10 +35,8 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- LOGIN SCREEN -->
     <div id="loginOverlay" class="fixed inset-0 z-50 bg-[#000066] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 border-t-4 border-[#4682B4]">
             <div class="text-center mb-8">
@@ -64,10 +62,7 @@
         </div>
     </div>
 
-    <!-- MAIN APP LAYOUT -->
     <div id="appContainer" class="flex flex-col h-screen w-screen overflow-hidden hidden">
-        
-        <!-- TOP HEADER NAVBAR -->
         <header class="bg-[#000066] text-white h-16 px-6 flex items-center justify-between shadow-md shrink-0 border-b border-blue-900" style="background-color: #000066 !important;">
             <div class="flex items-center gap-6">
                 <div>
@@ -75,18 +70,11 @@
                     <p class="text-[#FF9900] text-[10px] font-bold tracking-widest uppercase text-center">LAND FILL</p>
                 </div>
                 <nav class="hidden md:flex items-center gap-2 ml-6">
-                    <a href="#" onclick="switchTab('vehicles')" id="nav-vehicles" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-[#FF9900]">
-                        สถานะรถ
-                    </a>
-                    <a href="#" onclick="switchTab('repairs')" id="nav-repairs" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-[#FF9900]">
-                        บันทึกเหตุการณ์ซ่อม
-                    </a>
-                    <a href="#" onclick="switchTab('monthlySummary')" id="nav-monthlySummary" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-[#FF9900]">
-                        สรุปแผนซ่อมประจำเดือน
-                    </a>
+                    <a href="#" onclick="switchTab('vehicles')" id="nav-vehicles" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-[#FF9900]">สถานะรถ</a>
+                    <a href="#" onclick="switchTab('repairs')" id="nav-repairs" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-[#FF9900]">บันทึกเหตุการณ์ซ่อม</a>
+                    <a href="#" onclick="switchTab('monthlySummary')" id="nav-monthlySummary" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-[#FF9900]">สรุปแผนซ่อมประจำเดือน</a>
                 </nav>
             </div>
-
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-blue-900" style="background-color: rgba(0,0,102,0.8);">
                     <div class="w-7 h-7 rounded-full bg-[#4682B4] text-white flex items-center justify-center font-bold text-xs" id="userInitial">U</div>
@@ -95,16 +83,11 @@
                         <p class="text-[#FF9900]" id="userRoleDisplay">Role</p>
                     </div>
                 </div>
-                <button onclick="handleLogout()" class="text-xs font-normal text-red-400 hover:text-red-300 transition">
-                    ออกจากระบบ
-                </button>
+                <button onclick="handleLogout()" class="text-xs font-normal text-red-400 hover:text-red-300 transition">ออกจากระบบ</button>
             </div>
         </header>
 
-        <!-- CONTENT AREA -->
         <main class="flex-1 flex flex-col overflow-hidden bg-slate-100 p-6">
-            
-            <!-- TAB 1: VEHICLE STATUS -->
             <div id="view-vehicles" class="space-y-4 view-section flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 flex-wrap gap-3">
                     <div class="flex items-center gap-4">
@@ -121,19 +104,12 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="exportToExcel('vehicles')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-normal shadow transition">
-                            Export Excel
-                        </button>
-                        <button onclick="generateReportPreview()" class="bg-[#4682B4] hover:bg-[#3b6d96] text-white px-3.5 py-2 rounded-lg text-xs font-normal shadow transition">
-                            บันทึกรูปภาพรายงานรวม
-                        </button>
-                        <button onclick="saveAllRows()" class="bg-[#000066] hover:bg-[#0b0b52] text-white px-4 py-2 rounded-lg text-xs font-normal shadow transition">
-                            บันทึกทั้งหมด
-                        </button>
+                        <button onclick="exportToExcel('vehicles')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-normal shadow transition">Export Excel</button>
+                        <button onclick="generateReportPreview()" class="bg-[#4682B4] hover:bg-[#3b6d96] text-white px-3.5 py-2 rounded-lg text-xs font-normal shadow transition">บันทึกรูปภาพรายงานรวม</button>
+                        <button onclick="saveAllRows()" class="bg-[#000066] hover:bg-[#0b0b52] text-white px-4 py-2 rounded-lg text-xs font-normal shadow transition">บันทึกทั้งหมด</button>
                     </div>
                 </div>
 
-                <!-- CAPTURE AREA FOR REPORT IMAGE -->
                 <div id="reportCaptureArea" class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-auto p-3">
                     <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
                         <span class="text-sm font-bold text-[#000066]">รายงานสรุปสถานะรถประจำวัน (Unisource Land Fill)</span>
@@ -160,34 +136,21 @@
                 </div>
             </div>
 
-            <!-- TAB 2: REPAIRS REPORT & APPROVAL -->
             <div id="view-repairs" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 gap-4 flex-wrap">
                     <h2 class="font-medium text-slate-800 text-base">รายการบันทึกการซ่อมและการอนุมัติ</h2>
                     <div class="flex items-center gap-3 flex-wrap">
-                        <button onclick="exportToExcel('repairs')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-normal shadow transition">
-                            Export Excel
-                        </button>
+                        <button onclick="exportToExcel('repairs')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-normal shadow transition">Export Excel</button>
                         <div class="flex items-center gap-1.5 text-xs text-slate-500">
                             <span>วันที่เริ่มซ่อม:</span>
                             <input type="date" id="dateFilter" onchange="filterRepairs()" class="px-2.5 py-1 rounded-lg border border-slate-300 text-xs bg-white outline-none" />
                         </div>
                         <input type="text" id="searchInput" onkeyup="filterRepairs()" placeholder="ค้นหาข้อมูล..." class="px-3 py-1 rounded-lg border border-slate-300 text-xs w-48 bg-white outline-none" />
-                        
                         <div class="flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-lg border border-slate-200 text-xs">
                             <span class="text-slate-400 font-normal">สถานะ:</span>
-                            <label class="inline-flex items-center gap-1 cursor-pointer text-emerald-600 font-normal">
-                                <input type="checkbox" value="พร้อมใช้งาน" checked onchange="filterRepairs()" class="status-chk rounded text-emerald-600 w-3.5 h-3.5">
-                                พร้อมใช้งาน
-                            </label>
-                            <label class="inline-flex items-center gap-1 cursor-pointer text-red-600 font-normal">
-                                <input type="checkbox" value="CM" checked onchange="filterRepairs()" class="status-chk rounded text-red-600 w-3.5 h-3.5">
-                                CM
-                            </label>
-                            <label class="inline-flex items-center gap-1 cursor-pointer text-[#FF9900] font-normal">
-                                <input type="checkbox" value="PM" checked onchange="filterRepairs()" class="status-chk rounded text-[#FF9900] w-3.5 h-3.5">
-                                PM
-                            </label>
+                            <label class="inline-flex items-center gap-1 cursor-pointer text-emerald-600 font-normal"><input type="checkbox" value="พร้อมใช้งาน" checked onchange="filterRepairs()" class="status-chk rounded text-emerald-600 w-3.5 h-3.5"> พร้อมใช้งาน</label>
+                            <label class="inline-flex items-center gap-1 cursor-pointer text-red-600 font-normal"><input type="checkbox" value="CM" checked onchange="filterRepairs()" class="status-chk rounded text-red-600 w-3.5 h-3.5"> CM</label>
+                            <label class="inline-flex items-center gap-1 cursor-pointer text-[#FF9900] font-normal"><input type="checkbox" value="PM" checked onchange="filterRepairs()" class="status-chk rounded text-[#FF9900] w-3.5 h-3.5"> PM</label>
                         </div>
                     </div>
                 </div>
@@ -210,26 +173,23 @@
                 </div>
             </div>
 
-            <!-- TAB 3: MONTHLY SUMMARY CALENDAR -->
+            <!-- TAB 3: MONTHLY SUMMARY CALENDAR (คอลัมน์ชื่อรถแคบลง และเพิ่มพื้นที่ให้วันที่ 1-31) -->
             <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน (ปฏิทินซ่อม 1-31)</h2>
                     <div class="flex items-center gap-3">
-                        <button onclick="exportToExcel('monthly')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-normal shadow transition">
-                            Export Excel
-                        </button>
+                        <button onclick="exportToExcel('monthly')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-normal shadow transition">Export Excel</button>
                         <select id="selectMonth" onchange="loadMonthlySummary()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-700 outline-none"></select>
                         <select id="selectYear" onchange="loadMonthlySummary()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-700 outline-none"></select>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-auto">
-                    <table class="w-full text-center border-collapse text-xs">
+                    <table class="w-full text-center border-collapse text-xs table-fixed">
                         <thead id="calendarHeader" class="bg-slate-50 text-slate-700 border-b border-slate-200 sticky top-0 z-10"></thead>
                         <tbody id="calendarBody" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
-
         </main>
     </div>
 
@@ -252,46 +212,16 @@
             <div id="singleReportContent" class="bg-white p-4 border border-slate-300 rounded-lg text-xs text-slate-800">
                 <div class="text-center font-bold text-sm bg-[#000066] text-white py-2 rounded mb-3 tracking-wide">แจ้งซ่อมรถเสีย</div>
                 <table class="w-full border-collapse border border-slate-300 text-xs">
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold w-1/3 text-center">วันที่</td>
-                        <td class="border border-slate-300 p-2 text-center" id="s_date">-</td>
-                    </tr>
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">สถานะ</td>
-                        <td class="border border-slate-300 p-2 text-center font-bold text-red-600" id="s_status">-</td>
-                    </tr>
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">พนักงานขับรถ</td>
-                        <td class="border border-slate-300 p-2 text-center" id="s_driver">-</td>
-                    </tr>
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">ป้ายทะเบียน</td>
-                        <td class="border border-slate-300 p-2 text-center" id="s_plate">-</td>
-                    </tr>
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">รถเบอร์</td>
-                        <td class="border border-slate-300 p-2 text-center font-bold" id="s_veh">-</td>
-                    </tr>
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">อู่ / ศูนย์ซ่อม</td>
-                        <td class="border border-slate-300 p-2 text-center text-[#4682B4] font-medium" id="s_garage">-</td>
-                    </tr>
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">สาเหตุการซ่อม</td>
-                        <td class="border border-slate-300 p-2 text-center" id="s_cause">-</td>
-                    </tr>
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">หมายเหตุ</td>
-                        <td class="border border-slate-300 p-2 text-center" id="s_remark">-</td>
-                    </tr>
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">ผู้บันทึก</td>
-                        <td class="border border-slate-300 p-2 text-center" id="s_recorder">-</td>
-                    </tr>
-                    <tr>
-                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">หัวหน้าซ่อมอนุมัติ</td>
-                        <td class="border border-slate-300 p-2 text-center font-bold" id="s_approval">-</td>
-                    </tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold w-1/3 text-center">วันที่</td><td class="border border-slate-300 p-2 text-center" id="s_date">-</td></tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">สถานะ</td><td class="border border-slate-300 p-2 text-center font-bold text-red-600" id="s_status">-</td></tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">พนักงานขับรถ</td><td class="border border-slate-300 p-2 text-center" id="s_driver">-</td></tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">ป้ายทะเบียน</td><td class="border border-slate-300 p-2 text-center" id="s_plate">-</td></tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">รถเบอร์</td><td class="border border-slate-300 p-2 text-center font-bold" id="s_veh">-</td></tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">อู่ / ศูนย์ซ่อม</td><td class="border border-slate-300 p-2 text-center text-[#4682B4] font-medium" id="s_garage">-</td></tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">สาเหตุการซ่อม</td><td class="border border-slate-300 p-2 text-center" id="s_cause">-</td></tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">หมายเหตุ</td><td class="border border-slate-300 p-2 text-center" id="s_remark">-</td></tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">ผู้บันทึก</td><td class="border border-slate-300 p-2 text-center" id="s_recorder">-</td></tr>
+                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">หัวหน้าซ่อมอนุมัติ</td><td class="border border-slate-300 p-2 text-center font-bold" id="s_approval">-</td></tr>
                 </table>
             </div>
             <div class="bg-slate-50 p-3 flex justify-end gap-2 border-t border-slate-200">
@@ -304,7 +234,7 @@
 
     <!-- JAVASCRIPT & API FETCH LOGIC -->
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycby81fbiE_6bYcaA4Fjufs8Ltr_5snpaWF3b5y3zzor4sq3rrkKk8hqiNQVwMJvPO9gMeA/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxeGD7tjEPBiLCnHJ7QluwBW8CqpB38k1uIvQf-gpYJIVRCSXZF4I8FKUY4NY3lQeOLZQ/exec";
 
         let currentUser = null;
         let globalVehicles = [];
@@ -416,7 +346,7 @@
                 }
             } catch (err) {
                 errorDiv.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ API";
-                errorDiv.classList.add('hidden');
+                errorDiv.classList.remove('hidden');
             }
         }
 
@@ -530,9 +460,7 @@
 
         async function saveRow(vehNum, plate, driver) {
             let recorderVal = document.getElementById(`recorder-${vehNum}`).value.trim();
-            if (!recorderVal) {
-                recorderVal = currentUser ? currentUser.fullName : 'ไม่ระบุชื่อ';
-            }
+            if (!recorderVal) recorderVal = currentUser ? currentUser.fullName : 'ไม่ระบุชื่อ';
 
             const payload = {
                 vehicleNumber: vehNum,
@@ -568,9 +496,7 @@
             let itemsToSave = [];
             globalVehicles.forEach(v => {
                 let recorderVal = document.getElementById(`recorder-${v.vehicleNumber}`).value.trim();
-                if (!recorderVal) {
-                    recorderVal = currentUser ? currentUser.fullName : 'ไม่ระบุชื่อ';
-                }
+                if (!recorderVal) recorderVal = currentUser ? currentUser.fullName : 'ไม่ระบุชื่อ';
 
                 itemsToSave.push({
                     vehicleNumber: v.vehicleNumber,
@@ -746,8 +672,7 @@
             <head><meta charset="UTF-8"></head><body>`;
 
             if (tabType === 'vehicles') {
-                htmlContent += `<table border="1"><tr style="background-color:#000066; color:#FFFFFF; font-weight:bold;">
-                    <th>ลำดับ</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะ</th><th>อู่ซ่อม</th><th>สาเหตุ</th><th>หมายเหตุ</th><th>ผู้บันทึก</th></tr>`;
+                htmlContent += `<table border="1"><tr style="background-color:#000066; color:#FFFFFF; font-weight:bold;"><th>ลำดับ</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะ</th><th>อู่ซ่อม</th><th>สาเหตุ</th><th>หมายเหตุ</th><th>ผู้บันทึก</th></tr>`;
                 globalVehicles.forEach((v, index) => {
                     const status = document.getElementById(`status-${v.vehicleNumber}`).value;
                     const garage = document.getElementById(`garage-${v.vehicleNumber}`).value || '-';
@@ -755,12 +680,10 @@
                     const remark = document.getElementById(`remark-${v.vehicleNumber}`).value || '-';
                     let recorder = document.getElementById(`recorder-${v.vehicleNumber}`).value || '';
                     if(!recorder) recorder = currentUser ? currentUser.fullName : '-';
-
                     htmlContent += `<tr><td>${index + 1}</td><td>${v.vehicleNumber}</td><td>${v.plateNumber}</td><td>${v.driverName}</td><td>${status}</td><td>${garage}</td><td>${cause}</td><td>${remark}</td><td>${recorder}</td></tr>`;
                 });
             } else if (tabType === 'repairs') {
-                htmlContent += `<table border="1"><tr style="background-color:#000066; color:#FFFFFF; font-weight:bold;">
-                    <th>วันเวลาเริ่มซ่อม</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะซ่อม</th><th>อู่ซ่อม</th><th>สาเหตุ</th><th>หมายเหตุ</th><th>สถานะหลังซ่อม</th><th>อนุมัติ</th></tr>`;
+                htmlContent += `<table border="1"><tr style="background-color:#000066; color:#FFFFFF; font-weight:bold;"><th>วันเวลาเริ่มซ่อม</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะซ่อม</th><th>อู่ซ่อม</th><th>สาเหตุ</th><th>หมายเหตุ</th><th>สถานะหลังซ่อม</th><th>อนุมัติ</th></tr>`;
                 globalRepairs.forEach(r => {
                     if (r.approvalStatus === 'ยกเลิก/ลบแล้ว') return;
                     htmlContent += `<tr><td>${r.startDateText}</td><td>${r.vehicleNumber}</td><td>${r.plateNumber}</td><td>${r.driverName}</td><td>${r.repairStatus}</td><td>${r.garage}</td><td>${r.repairCause}</td><td>${r.remark}</td><td>${r.postRepairStatus}</td><td>${r.approvalStatus}</td></tr>`;
@@ -988,9 +911,10 @@
             const year = parseInt(document.getElementById('selectYear').value);
             const daysInMonth = new Date(year, month, 0).getDate();
 
-            let headerHtml = `<tr><th class="p-2 border-r border-slate-200">ทะเบียนรถ</th>`;
+            // กำหนดให้คอลัมน์ชื่อรถแคบลง (เช่น width: 90px) เพื่อให้พื้นที่วัน 1-31 กว้างขึ้นเต็มที่
+            let headerHtml = `<tr><th class="p-1.5 border-r border-slate-200 w-[90px] text-[11px]">ทะเบียนรถ</th>`;
             for (let d = 1; d <= daysInMonth; d++) {
-                headerHtml += `<th class="p-1 border-r border-slate-200 w-10">${d}</th>`;
+                headerHtml += `<th class="p-0.5 border-r border-slate-200 text-[10px]">${d}</th>`;
             }
             headerHtml += `</tr>`;
             document.getElementById('calendarHeader').innerHTML = headerHtml;
@@ -1006,16 +930,15 @@
                 let bodyHtml = '';
                 vehicles.forEach(v => {
                     bodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
-                        <td class="p-2 border-r border-slate-200 whitespace-nowrap text-left">
-                            <div class="font-normal text-slate-800">${v.vehicleNumber}</div>
-                            <div class="text-[11px] text-slate-400">${v.plateNumber} (👤 ${v.driverName})</div>
+                        <td class="p-1.5 border-r border-slate-200 text-left overflow-hidden">
+                            <div class="font-bold text-slate-800 text-[11px] truncate">${v.vehicleNumber}</div>
+                            <div class="text-[9px] text-slate-400 truncate">${v.plateNumber}</div>
                         </td>`;
                     for (let d = 1; d <= daysInMonth; d++) {
-                        // ค้นหารายการซ่อมในวันนั้นๆ แบบตรงเป๊ะ (รองรับสถานะ CM, PM และแสดงสาเหตุซ่อมใต้สถานะ)
                         const matched = repairs.find(r => {
                             if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
                             const rDate = new Date(r.startTime);
-                            return rDate.getDate() === d && (rDate.getMonth() + 1) === month && rDate.getFullYear() === year;
+                            return !isNaN(rDate.getTime()) && rDate.getDate() === d && (rDate.getMonth() + 1) === month && rDate.getFullYear() === year;
                         });
 
                         if (matched) {
@@ -1023,15 +946,15 @@
                             let causeText = matched.repairCause && matched.repairCause !== '-' ? matched.repairCause : '';
 
                             let statusCls = 'text-emerald-600 font-normal';
-                            if (displayStatus === 'CM') statusCls = 'text-red-600 font-normal';
-                            if (displayStatus === 'PM') statusCls = 'text-[#FF9900] font-normal';
+                            if (displayStatus === 'CM') statusCls = 'text-red-600 font-bold';
+                            if (displayStatus === 'PM') statusCls = 'text-[#FF9900] font-bold';
 
-                            bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle">
-                                <div class="text-xs font-bold ${statusCls}">${displayStatus}</div>
-                                <div class="text-[9px] text-slate-500 truncate max-w-[50px]" title="${causeText}">${causeText}</div>
+                            bodyHtml += `<td class="p-0.5 border-r border-slate-200 text-center bg-slate-50 align-middle overflow-hidden">
+                                <div class="text-[10px] ${statusCls}">${displayStatus}</div>
+                                <div class="text-[8px] text-slate-500 truncate" title="${causeText}">${causeText}</div>
                             </td>`;
                         } else {
-                            bodyHtml += `<td class="p-1 border-r border-slate-200 text-center text-slate-300">-</td>`;
+                            bodyHtml += `<td class="p-0.5 border-r border-slate-200 text-center text-slate-300 text-[10px]">-</td>`;
                         }
                     }
                     bodyHtml += `</tr>`;

@@ -173,7 +173,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: MONTHLY SUMMARY CALENDAR (แสดงชื่อรถและทะเบียนชัดเจน ขนาดอ่านง่ายตามปกติ) -->
+            <!-- TAB 3: MONTHLY SUMMARY CALENDAR (แสดงชื่อ ทะเบียน และคนขับชัดเจน ขนาดปกติอ่านง่าย) -->
             <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน (ปฏิทินซ่อม 1-31)</h2>
@@ -914,7 +914,6 @@
             const year = parseInt(document.getElementById('selectYear').value);
             const daysInMonth = new Date(year, month, 0).getDate();
 
-            // คอลัมน์ชื่อรถและทะเบียนขนาดมาตรฐาน อ่านง่าย ชัดเจน ไม่เล็กเกินไป
             let headerHtml = `<tr><th class="p-2 border-r border-slate-200 w-48 text-left">ทะเบียนรถ / พนักงานขับรถ</th>`;
             for (let d = 1; d <= daysInMonth; d++) {
                 headerHtml += `<th class="p-1 border-r border-slate-200 w-10 text-center">${d}</th>`;
@@ -941,7 +940,7 @@
                     for (let d = 1; d <= daysInMonth; d++) {
                         const matched = repairs.find(r => {
                             if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
-                            const rDate = new Date(r.startTime);
+                            var rDate = new Date(r.startTime);
                             return !isNaN(rDate.getTime()) && rDate.getDate() === d && (rDate.getMonth() + 1) === month && rDate.getFullYear() === year;
                         });
 

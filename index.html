@@ -8,17 +8,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
         * { font-family: 'CS Prajad', 'Sarabun', sans-serif !important; }
-        /* บังคับไม่ให้ตารางปฏิทินล้นจอ และเกลี่ยช่องวัน 1-31 ให้เท่ากันพอดีเป๊ะ */
-        .fit-calendar table {
-            table-layout: fixed;
-            width: 100%;
-        }
-        .fit-calendar th, .fit-calendar td {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            padding: 2px 1px !important;
-        }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -184,7 +173,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: MONTHLY SUMMARY CALENDAR (บังคับพอดีจอ ไม่ต้องเลื่อนซ้ายขวา) -->
+            <!-- TAB 3: MONTHLY SUMMARY CALENDAR (แสดงชื่อรถและทะเบียนชัดเจน ขนาดอ่านง่ายตามปกติ) -->
             <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน (ปฏิทินซ่อม 1-31)</h2>
@@ -194,8 +183,8 @@
                         <select id="selectYear" onchange="loadMonthlySummary()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-700 outline-none"></select>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-hidden fit-calendar">
-                    <table class="w-full text-center border-collapse text-[11px] h-full">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-auto">
+                    <table class="w-full text-center border-collapse text-xs">
                         <thead id="calendarHeader" class="bg-slate-50 text-slate-700 border-b border-slate-200 sticky top-0 z-10"></thead>
                         <tbody id="calendarBody" class="divide-y divide-slate-100"></tbody>
                     </table>
@@ -925,11 +914,10 @@
             const year = parseInt(document.getElementById('selectYear').value);
             const daysInMonth = new Date(year, month, 0).getDate();
 
-            // ล็อกขนาดช่องหัวตารางให้เฉลี่ยลงตัวพอดีหน้าจอเป๊ะ (ช่องทะเบียนรถ 12%, ที่เหลือเฉลี่ยให้ครบ 31 วัน)
-            let headerHtml = `<tr><th class="p-1 border-r border-slate-200" style="width: 12%;">ทะเบียนรถ</th>`;
+            // คอลัมน์ชื่อรถและทะเบียนขนาดมาตรฐาน อ่านง่าย ชัดเจน ไม่เล็กเกินไป
+            let headerHtml = `<tr><th class="p-2 border-r border-slate-200 w-48 text-left">ทะเบียนรถ / พนักงานขับรถ</th>`;
             for (let d = 1; d <= daysInMonth; d++) {
-                let colWidth = (88 / daysInMonth).toFixed(2) + '%';
-                headerHtml += `<th class="p-0 border-r border-slate-200 text-[10px]" style="width: ${colWidth};">${d}</th>`;
+                headerHtml += `<th class="p-1 border-r border-slate-200 w-10 text-center">${d}</th>`;
             }
             headerHtml += `</tr>`;
             document.getElementById('calendarHeader').innerHTML = headerHtml;
@@ -945,12 +933,12 @@
                 let bodyHtml = '';
                 vehicles.forEach(v => {
                     bodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
-                        <td class="p-1 border-r border-slate-200 text-left overflow-hidden" style="width: 12%;">
-                            <div class="font-bold text-slate-800 text-[11px] truncate">${v.vehicleNumber}</div>
-                            <div class="text-[9px] text-slate-400 truncate">${v.plateNumber}</div>
+                        <td class="p-2 border-r border-slate-200 text-left">
+                            <div class="font-bold text-slate-800 text-xs">${v.vehicleNumber}</div>
+                            <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
+                            <div class="text-[11px] text-slate-600">👤 ${v.driverName}</div>
                         </td>`;
                     for (let d = 1; d <= daysInMonth; d++) {
-                        let colWidth = (88 / daysInMonth).toFixed(2) + '%';
                         const matched = repairs.find(r => {
                             if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
                             const rDate = new Date(r.startTime);
@@ -965,12 +953,12 @@
                             if (displayStatus === 'CM') statusCls = 'text-red-600 font-bold';
                             if (displayStatus === 'PM') statusCls = 'text-[#FF9900] font-bold';
 
-                            bodyHtml += `<td class="p-0 border-r border-slate-200 text-center bg-slate-50 align-middle overflow-hidden" style="width: ${colWidth};">
-                                <div class="text-[9px] ${statusCls} leading-tight">${displayStatus}</div>
-                                <div class="text-[7px] text-slate-500 truncate" title="${causeText}">${causeText}</div>
+                            bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle">
+                                <div class="text-xs ${statusCls}">${displayStatus}</div>
+                                <div class="text-[9px] text-slate-500 truncate max-w-[50px]" title="${causeText}">${causeText}</div>
                             </td>`;
                         } else {
-                            bodyHtml += `<td class="p-0 border-r border-slate-200 text-center text-slate-300 text-[10px]" style="width: ${colWidth};">-</td>`;
+                            bodyHtml += `<td class="p-1 border-r border-slate-200 text-center text-slate-300">-</td>`;
                         }
                     }
                     bodyHtml += `</tr>`;

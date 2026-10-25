@@ -913,6 +913,7 @@
             loadMonthlySummary();
         }
 
+        // อ่านค่าจาก startDay, startMonth, startYear โดยตรง ไม่ต้องผ่าน new Date() ซ้ำ
         async function loadMonthlySummary() {
             const month = parseInt(document.getElementById('selectMonth').value);
             const year = parseInt(document.getElementById('selectYear').value);
@@ -943,15 +944,8 @@
                         </td>`;
                     for (let d = 1; d <= daysInMonth; d++) {
                         const matched = repairs.find(r => {
-                            if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
-                            
-                            var parts = r.startDateISO.split('-');
-                            if (parts.length !== 3) return false;
-                            var rYear = parseInt(parts[0], 10);
-                            var rMonth = parseInt(parts[1], 10);
-                            var rDay = parseInt(parts[2], 10);
-
-                            return rDay === d && rMonth === month && rYear === year;
+                            if (String(r.vehicleNumber).trim() !== String(v.vehicleNumber).trim() || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
+                            return r.startDay === d && r.startMonth === month && r.startYear === year;
                         });
 
                         if (matched) {

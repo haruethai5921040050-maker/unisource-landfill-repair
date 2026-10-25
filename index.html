@@ -913,7 +913,6 @@
             loadMonthlySummary();
         }
 
-        // อ่านค่าจาก startDay, startMonth, startYear โดยตรง ไม่ต้องผ่าน new Date() ซ้ำ
         async function loadMonthlySummary() {
             const month = parseInt(document.getElementById('selectMonth').value);
             const year = parseInt(document.getElementById('selectYear').value);
@@ -933,6 +932,10 @@
                 ]);
                 let vehicles = await vRes.json();
                 let repairs = await rRes.json();
+
+                // 🔥 หัวใจหลักของการแก้ปัญหา: สลับข้อมูลจากล่างขึ้นบน
+                // เพื่อให้ระบบเจองานที่อัปเดต "ล่าสุด" ของวันนั้นๆ ก่อนเสมอ
+                repairs.reverse();
 
                 let bodyHtml = '';
                 vehicles.forEach(v => {

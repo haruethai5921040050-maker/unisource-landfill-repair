@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แจ้งแผนงานซ่อมรายวัน - Unisource Land Fill</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'CS Prajad', 'Sarabun', sans-serif !important; }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 
+                        brandDark: '#000066',
+                        brandBlueDark: '#000066',
+                        brandAccent: '#4682B4',
+                        brandOrange: '#FF9900'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .capturing input, .capturing select { display: none !important; }
+        .capturing .text-replacement { display: inline-block !important; }
+        .text-replacement { display: none; }
+        .capturing .no-print { display: none !important; }
+        .capturing { overflow: visible !important; height: auto !important; max-height: none !important; box-shadow: none !important; border: none !important; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginOverlay" class="fixed inset-0 z-50 bg-[#000066] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 border-t-4 border-[#4682B4]">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-900 tracking-wider">UNISOURCE</h1>
+                <p class="text-[#FF9900] font-bold tracking-widest text-sm uppercase mt-1">LAND FILL</p>
+                <p class="text-slate-500 text-sm mt-3">ระบบแจ้งแผนงานซ่อมรายวัน</p>
+            </div>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">เลือกบทบาทผู้ใช้งาน</label>
+                    <select id="loginRole" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#4682B4] focus:outline-none bg-slate-50">
+                        <option value="">-- เลือกบทบาท --</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Asst Maintenance">Asst Maintenance</option>
+                        <option value="Officer Maintenance">Officer Maintenance</option>
+                        <option value="Transport">Transport</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน</label>
+                    <input type="password" id="loginPassword" required placeholder="กรอกรหัสผ่าน" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#4682B4] focus:outline-none bg-slate-50">
+                </div>
+                <div id="loginError" class="text-red-500 text-sm text-center hidden"></div>
+                <button type="submit" class="w-full bg-[#4682B4] hover:bg-[#3b6d96] text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md">
+                    เข้าสู่ระบบ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP LAYOUT -->
+    <div id="appContainer" class="flex flex-col h-screen w-screen overflow-hidden hidden">
+        
+        <!-- TOP HEADER NAVBAR -->
+        <header class="bg-[#000066] text-white h-16 px-6 flex items-center justify-between shadow-md shrink-0 border-b border-blue-900" style="background-color: #000066 !important;">
+            <div class="flex items-center gap-6">
+                <div>
+                    <h1 class="text-lg font-bold tracking-wider">UNISOURCE</h1>
+                    <p class="text-[#FF9900] text-[10px] font-bold tracking-widest uppercase text-center">LAND FILL</p>
+                </div>
+                <nav class="hidden md:flex items-center gap-2 ml-6">
+                    <a href="#" onclick="switchTab('vehicles')" id="nav-vehicles" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-[#FF9900]">
+                        สถานะรถ
+                    </a>
+                    <a href="#" onclick="switchTab('repairs')" id="nav-repairs" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-[#FF9900]">
+                        บันทึกเหตุการณ์ซ่อม
+                    </a>
+                    <a href="#" onclick="switchTab('monthlySummary')" id="nav-monthlySummary" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-[#FF9900]">
+                        สรุปแผนซ่อมประจำเดือน
+                    </a>
+                </nav>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-blue-900" style="background-color: rgba(0,0,102,0.8);">
+                    <div class="w-7 h-7 rounded-full bg-[#4682B4] text-white flex items-center justify-center font-bold text-xs" id="userInitial">U</div>
+                    <div class="text-xs">
+                        <p class="font-medium text-white" id="userNameDisplay">ผู้ใช้งาน</p>
+                        <p class="text-[#FF9900]" id="userRoleDisplay">Role</p>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="text-xs font-normal text-red-400 hover:text-red-300 transition">
+                    ออกจากระบบ
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-100 p-6">
+            
+            <!-- TAB 1: VEHICLE STATUS -->
+            <div id="view-vehicles" class="space-y-4 view-section flex-1 flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 flex-wrap gap-3">
+                    <div class="flex items-center gap-4">
+                        <h2 class="font-medium text-slate-800 text-base" id="dynamicTitleDate">บันทึกสถานะรถและแผนซ่อมรายวัน</h2>
+                        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs">
+                            <label class="cursor-pointer px-2.5 py-1 rounded transition font-normal" id="lblTargetToday">
+                                <input type="radio" name="planTarget" value="today" checked onchange="changePlanTarget('today')" class="hidden">
+                                <span>แผนวันนี้</span>
+                            </label>
+                            <label class="cursor-pointer px-2.5 py-1 rounded transition font-normal" id="lblTargetTomorrow">
+                                <input type="radio" name="planTarget" value="tomorrow" onchange="changePlanTarget('tomorrow')" class="hidden">
+                                <span>แผนสำหรับพรุ่งนี้</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportToExcel('vehicles')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-normal shadow transition">
+                            Export Excel
+                        </button>
+                        <button onclick="generateReportPreview()" class="bg-[#4682B4] hover:bg-[#3b6d96] text-white px-3.5 py-2 rounded-lg text-xs font-normal shadow transition">
+                            บันทึกรูปภาพรายงานรวม
+                        </button>
+                        <button onclick="saveAllRows()" class="bg-[#000066] hover:bg-[#0b0b52] text-white px-4 py-2 rounded-lg text-xs font-normal shadow transition">
+                            บันทึกทั้งหมด
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CAPTURE AREA FOR REPORT IMAGE -->
+                <div id="reportCaptureArea" class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-auto p-3">
+                    <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
+                        <span class="text-sm font-bold text-[#000066]">รายงานสรุปสถานะรถประจำวัน (Unisource Land Fill)</span>
+                        <span class="text-xs font-medium text-slate-500" id="reportTimestamp"></span>
+                    </div>
+                    <table class="w-full text-left border-collapse mt-2">
+                        <thead class="bg-slate-100 text-slate-600 text-xs uppercase border-b border-slate-200 sticky top-0 z-10">
+                            <tr>
+                                <th class="p-2.5 w-10 text-center">#</th>
+                                <th class="p-2.5 w-36">รถ / ทะเบียน / คนขับ</th>
+                                <th class="p-2.5 w-28">สถานะวันนี้</th>
+                                <th class="p-2.5 w-32">วันเวลาเริ่ม</th>
+                                <th class="p-2.5 w-32">วันเวลาเสร็จ</th>
+                                <th class="p-2.5 w-24">ระยะเวลา</th>
+                                <th class="p-2.5 w-32">อู่ / ศูนย์บริการซ่อม</th>
+                                <th class="p-2.5 w-36">สาเหตุการซ่อม</th>
+                                <th class="p-2.5 w-28">หมายเหตุ</th>
+                                <th class="p-2.5 w-24">ผู้บันทึก</th>
+                                <th class="p-2.5 w-20 text-center no-print">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicleTableBody" class="text-xs divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: REPAIRS REPORT & APPROVAL -->
+            <div id="view-repairs" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 gap-4 flex-wrap">
+                    <h2 class="font-medium text-slate-800 text-base">รายการบันทึกการซ่อมและการอนุมัติ</h2>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <button onclick="exportToExcel('repairs')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-normal shadow transition">
+                            Export Excel
+                        </button>
+                        <div class="flex items-center gap-1.5 text-xs text-slate-500">
+                            <span>วันที่เริ่มซ่อม:</span>
+                            <input type="date" id="dateFilter" onchange="filterRepairs()" class="px-2.5 py-1 rounded-lg border border-slate-300 text-xs bg-white outline-none" />
+                        </div>
+                        <input type="text" id="searchInput" onkeyup="filterRepairs()" placeholder="ค้นหาข้อมูล..." class="px-3 py-1 rounded-lg border border-slate-300 text-xs w-48 bg-white outline-none" />
+                        
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-lg border border-slate-200 text-xs">
+                            <span class="text-slate-400 font-normal">สถานะ:</span>
+                            <label class="inline-flex items-center gap-1 cursor-pointer text-emerald-600 font-normal">
+                                <input type="checkbox" value="พร้อมใช้งาน" checked onchange="filterRepairs()" class="status-chk rounded text-emerald-600 w-3.5 h-3.5">
+                                พร้อมใช้งาน
+                            </label>
+                            <label class="inline-flex items-center gap-1 cursor-pointer text-red-600 font-normal">
+                                <input type="checkbox" value="CM" checked onchange="filterRepairs()" class="status-chk rounded text-red-600 w-3.5 h-3.5">
+                                CM
+                            </label>
+                            <label class="inline-flex items-center gap-1 cursor-pointer text-[#FF9900] font-normal">
+                                <input type="checkbox" value="PM" checked onchange="filterRepairs()" class="status-chk rounded text-[#FF9900] w-3.5 h-3.5">
+                                PM
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200 z-10">
+                            <tr>
+                                <th class="p-3">วันเวลาเริ่มซ่อม</th>
+                                <th class="p-3">รถ / ทะเบียน / คนขับ</th>
+                                <th class="p-3">สถานะซ่อม</th>
+                                <th class="p-3">ระยะเวลา / อู่ / สาเหตุ / หมายเหตุ</th>
+                                <th class="p-3">สถานะหลังซ่อม (เจ้าหน้าที่)</th>
+                                <th class="p-3 w-40">หัวหน้าซ่อมอนุมัติ</th>
+                                <th class="p-3 w-28 text-center">TRANSPORT</th>
+                                <th class="p-3 w-24 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="repairTableBody" class="text-sm divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: MONTHLY SUMMARY CALENDAR -->
+            <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0">
+                    <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน (ปฏิทินซ่อม 1-31)</h2>
+                    <div class="flex items-center gap-3">
+                        <button onclick="exportToExcel('monthly')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-normal shadow transition">
+                            Export Excel
+                        </button>
+                        <select id="selectMonth" onchange="loadMonthlySummary()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-700 outline-none"></select>
+                        <select id="selectYear" onchange="loadMonthlySummary()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-700 outline-none"></select>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-auto">
+                    <table class="w-full text-center border-collapse text-xs">
+                        <thead id="calendarHeader" class="bg-slate-50 text-slate-700 border-b border-slate-200 sticky top-0 z-10"></thead>
+                        <tbody id="calendarBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL: EXPORT REPORT PREVIEW -->
+    <div id="exportReportModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden max-w-2xl w-full p-6 space-y-4 max-h-[90vh] flex flex-col">
+            <h3 class="font-bold text-base text-slate-800">ตัวอย่างรูปภาพรายงานรวมประจำวัน</h3>
+            <div id="reportPreviewContainer" class="border border-slate-300 rounded-lg p-2 overflow-auto bg-slate-50 flex-1">
+                <!-- พรีวิวรูปภาพ -->
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 shrink-0">
+                <button onclick="closeExportModal()" class="px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg text-xs font-medium">ปิด</button>
+                <button onclick="exportReportImageAction('save')" class="px-4 py-2 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded-lg text-xs font-medium shadow">
+                    Save รูป
+                </button>
+                <button onclick="exportReportImageAction('copy')" class="px-4 py-2 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded-lg text-xs font-medium shadow">
+                    Copy รูป
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: SINGLE VEHICLE REPORT CARD -->
+    <div id="singleReportCardModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden max-w-sm w-full">
+            <div id="singleReportContent" class="bg-white p-4 border border-slate-300 rounded-lg text-xs text-slate-800">
+                <div class="text-center font-bold text-sm bg-[#000066] text-white py-2 rounded mb-3 tracking-wide">แจ้งซ่อมรถเสีย</div>
+                <table class="w-full border-collapse border border-slate-300 text-xs">
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold w-1/3 text-center">วันที่</td>
+                        <td class="border border-slate-300 p-2 text-center" id="s_date">-</td>
+                    </tr>
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">สถานะ</td>
+                        <td class="border border-slate-300 p-2 text-center font-bold text-red-600" id="s_status">-</td>
+                    </tr>
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">พนักงานขับรถ</td>
+                        <td class="border border-slate-300 p-2 text-center" id="s_driver">-</td>
+                    </tr>
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">ป้ายทะเบียน</td>
+                        <td class="border border-slate-300 p-2 text-center" id="s_plate">-</td>
+                    </tr>
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">รถเบอร์</td>
+                        <td class="border border-slate-300 p-2 text-center font-bold" id="s_veh">-</td>
+                    </tr>
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">อู่ / ศูนย์ซ่อม</td>
+                        <td class="border border-slate-300 p-2 text-center text-[#4682B4] font-medium" id="s_garage">-</td>
+                    </tr>
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">สาเหตุการซ่อม</td>
+                        <td class="border border-slate-300 p-2 text-center" id="s_cause">-</td>
+                    </tr>
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">หมายเหตุ</td>
+                        <td class="border border-slate-300 p-2 text-center" id="s_remark">-</td>
+                    </tr>
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">ผู้บันทึก</td>
+                        <td class="border border-slate-300 p-2 text-center" id="s_recorder">-</td>
+                    </tr>
+                    <tr>
+                        <td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">หัวหน้าซ่อมอนุมัติ</td>
+                        <td class="border border-slate-300 p-2 text-center font-bold" id="s_approval">-</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="bg-slate-50 p-3 flex justify-end gap-2 border-t border-slate-200">
+                <button onclick="closeSingleReport()" class="px-3 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-700 rounded text-xs">ปิด</button>
+                <button onclick="downloadSingleReportImage('save')" class="px-3 py-1.5 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded text-xs font-medium">Save รูป</button>
+                <button onclick="downloadSingleReportImage('copy')" class="px-3 py-1.5 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded text-xs font-medium">Copy รูป</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        let currentUser = null;
+        let globalVehicles = [];
+        let globalRepairs = [];
+        let currentPlanTarget = 'today';
+        let generatedReportCanvas = null;
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto px-4 py-3 rounded-lg shadow-lg text-xs font-normal text-white flex items-center gap-2 transition-all duration-300 transform translate-y-[-10px] opacity-0 ${
+                type === 'success' ? 'bg-emerald-600' : 'bg-red-600'
+            }`;
+            
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => { toast.classList.remove('translate-y-[-10px]', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        function formatDurationText(totalMinutes) {
+            if (!totalMinutes || totalMinutes <= 0) return '0 นาที';
+            const days = Math.floor(totalMinutes / (24 * 60));
+            const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+            const mins = totalMinutes % 60;
+
+            let result = '';
+            if (days > 0) result += `${days} วัน `;
+            if (hours > 0) result += `${hours} ชม. `;
+            if (mins > 0 || result === '') result += `${mins} นาที`;
+            return result.trim();
+        }
+
+        function getDatetimeISO(daysOffset = 0) {
+            const now = new Date();
+            now.setDate(now.getDate() + daysOffset);
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            return now.toISOString().slice(0, 16);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('unisource_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                document.getElementById('userInitial').innerText = currentUser.fullName.charAt(0);
+                document.getElementById('userNameDisplay').innerText = currentUser.fullName;
+                document.getElementById('userRoleDisplay').innerText = currentUser.role;
+                updatePlanTargetUI();
+                loadVehiclesView();
+            }
+            updateReportTimestamp();
+        });
+
+        function updateReportTimestamp() {
+            const nowStr = new Date().toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' });
+            document.getElementById('reportTimestamp').innerText = `ข้อมูล ณ วันที่: ${nowStr}`;
+        }
+
+        function changePlanTarget(target) {
+            currentPlanTarget = target;
+            updatePlanTargetUI();
+            renderVehicleTable();
+        }
+
+        function updatePlanTargetUI() {
+            const lblToday = document.getElementById('lblTargetToday');
+            const lblTomorrow = document.getElementById('lblTargetTomorrow');
+            
+            if (currentPlanTarget === 'today') {
+                lblToday.className = 'cursor-pointer px-2.5 py-1 rounded transition bg-[#4682B4] text-white font-normal';
+                lblTomorrow.className = 'cursor-pointer px-2.5 py-1 rounded transition text-slate-600 font-normal';
+            } else {
+                lblToday.className = 'cursor-pointer px-2.5 py-1 rounded transition text-slate-600 font-normal';
+                lblTomorrow.className = 'cursor-pointer px-2.5 py-1 rounded transition bg-[#4682B4] text-white font-normal';
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const role = document.getElementById('loginRole').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res.success) {
+                        currentUser = { role: res.role, fullName: res.fullName };
+                        localStorage.setItem('unisource_user', JSON.stringify(currentUser));
+                        document.getElementById('loginOverlay').classList.add('hidden');
+                        document.getElementById('appContainer').classList.remove('hidden');
+                        
+                        document.getElementById('userInitial').innerText = res.fullName.charAt(0);
+                        document.getElementById('userNameDisplay').innerText = res.fullName;
+                        document.getElementById('userRoleDisplay').innerText = res.role;
+
+                        showToast("เข้าสู่ระบบสำเร็จ", "success");
+                        updatePlanTargetUI();
+                        loadVehiclesView();
+                    } else {
+                        errorDiv.innerText = res.message;
+                        errorDiv.classList.remove('hidden');
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    errorDiv.innerText = "เกิดข้อผิดพลาด: " + err.message;
+                    errorDiv.classList.add('hidden');
+                })
+                .loginUser(role, password);
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('unisource_user');
+            currentUser = null;
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.menu-item').forEach(el => {
+                el.classList.remove('text-[#FF9900]', 'font-medium');
+                el.classList.add('text-slate-300');
+            });
+
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            const activeNav = document.getElementById('nav-' + tabId);
+            activeNav.classList.add('text-[#FF9900]', 'font-medium');
+            activeNav.classList.remove('text-slate-300');
+
+            if (tabId === 'vehicles') loadVehiclesView();
+            if (tabId === 'repairs') loadRepairsView();
+            if (tabId === 'monthlySummary') initMonthlySummaryView();
+        }
+
+        function loadVehiclesView() {
+            google.script.run.withSuccessHandler(function(vehicles) {
+                globalVehicles = vehicles;
+                renderVehicleTable();
+            }).getVehicles();
+        }
+
+        function renderVehicleCard(v) {
+            return `<div class="font-medium text-slate-800 text-xs">${v.vehicleNumber}</div>
+                    <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
+                    <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>`;
+        }
+
+        function renderVehicleTable() {
+            let html = '';
+            const offsetDays = currentPlanTarget === 'tomorrow' ? 1 : 0;
+            const defaultDT = getDatetimeISO(offsetDays);
+
+            globalVehicles.forEach((v, index) => {
+                html += `<tr class="hover:bg-slate-50 transition border-b border-slate-100 vehicle-row-item" data-veh="${v.vehicleNumber}">
+                    <td class="p-2 text-center text-xs text-slate-500">${index + 1}</td>
+                    <td class="p-2">${renderVehicleCard(v)}</td>
+                    <td class="p-2">
+                        <select id="status-${v.vehicleNumber}" class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-700 outline-none">
+                            <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
+                            <option value="CM">CM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                        <span class="text-replacement status-text font-normal text-slate-700">พร้อมใช้งาน</span>
+                    </td>
+                    <td class="p-2">
+                        <input type="datetime-local" id="start-${v.vehicleNumber}" value="${defaultDT}" onchange="calculateDuration('${v.vehicleNumber}')" class="w-full px-1.5 py-1 rounded border border-slate-300 text-[11px] bg-white text-slate-600 outline-none" />
+                        <span class="text-replacement start-text text-slate-600">-</span>
+                    </td>
+                    <td class="p-2">
+                        <input type="datetime-local" id="end-${v.vehicleNumber}" value="${defaultDT}" onchange="calculateDuration('${v.vehicleNumber}')" class="w-full px-1.5 py-1 rounded border border-slate-300 text-[11px] bg-white text-slate-600 outline-none" />
+                        <span class="text-replacement end-text text-slate-600">-</span>
+                    </td>
+                    <td class="p-2 text-center text-slate-500 text-[11px]">
+                        <span id="dur-${v.vehicleNumber}">0 นาที</span>
+                        <span class="text-replacement dur-text">-</span>
+                    </td>
+                    <td class="p-2">
+                        <input type="text" id="garage-${v.vehicleNumber}" placeholder="ระบุอู่..." class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-600 outline-none" />
+                        <span class="text-replacement garage-text text-slate-600">-</span>
+                    </td>
+                    <td class="p-2">
+                        <input type="text" id="cause-${v.vehicleNumber}" placeholder="สาเหตุ..." class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-600 outline-none" />
+                        <span class="text-replacement cause-text text-slate-600">-</span>
+                    </td>
+                    <td class="p-2">
+                        <input type="text" id="remark-${v.vehicleNumber}" placeholder="หมายเหตุ..." class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-600 outline-none" />
+                        <span class="text-replacement remark-text text-slate-600">-</span>
+                    </td>
+                    <td class="p-2">
+                        <input type="text" id="recorder-${v.vehicleNumber}" value="" placeholder="ระบุผู้บันทึก..." class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-600 outline-none" />
+                        <span class="text-replacement recorder-text text-slate-600">-</span>
+                    </td>
+                    <td class="p-2 text-center no-print">
+                        <button onclick="saveRow('${v.vehicleNumber}', '${v.plateNumber}', '${v.driverName}')" class="bg-[#4682B4] hover:bg-[#3b6d96] text-white px-2.5 py-1.5 rounded text-xs font-normal transition shadow-sm">บันทึก</button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('vehicleTableBody').innerHTML = html || `<tr><td colspan="11" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรถ</td></tr>`;
+        }
+
+        function calculateDuration(vehNum) {
+            const start = document.getElementById(`start-${vehNum}`).value;
+            const end = document.getElementById(`end-${vehNum}`).value;
+            const durEl = document.getElementById(`dur-${vehNum}`);
+            if (start && end) {
+                const diff = Math.floor((new Date(end) - new Date(start)) / (1000 * 60));
+                durEl.innerText = formatDurationText(diff);
+            } else {
+                durEl.innerText = '0 นาที';
+            }
+        }
+
+        function saveRow(vehNum, plate, driver) {
+            let recorderVal = document.getElementById(`recorder-${vehNum}`).value.trim();
+            if (!recorderVal) {
+                recorderVal = currentUser ? currentUser.fullName : 'ไม่ระบุชื่อ';
+            }
+
+            const data = {
+                vehicleNumber: vehNum,
+                plateNumber: plate,
+                driverName: driver,
+                repairStatus: document.getElementById(`status-${vehNum}`).value,
+                startTime: document.getElementById(`start-${vehNum}`).value,
+                endTime: document.getElementById(`end-${vehNum}`).value,
+                repairCause: document.getElementById(`cause-${vehNum}`).value,
+                garage: document.getElementById(`garage-${vehNum}`).value,
+                remark: document.getElementById(`remark-${vehNum}`).value,
+                recorder: recorderVal
+            };
+
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res.success) {
+                        showToast("บันทึกเรียบร้อย", "success");
+                        loadRepairsView();
+                    } else {
+                        showToast(res.message, "error");
+                    }
+                })
+                .saveRepairRow(data, currentUser.fullName, currentUser.role);
+        }
+
+        function saveAllRows() {
+            let itemsToSave = [];
+            globalVehicles.forEach(v => {
+                let recorderVal = document.getElementById(`recorder-${v.vehicleNumber}`).value.trim();
+                if (!recorderVal) {
+                    recorderVal = currentUser ? currentUser.fullName : 'ไม่ระบุชื่อ';
+                }
+
+                itemsToSave.push({
+                    vehicleNumber: v.vehicleNumber,
+                    plateNumber: v.plateNumber,
+                    driverName: v.driverName,
+                    repairStatus: document.getElementById(`status-${v.vehicleNumber}`).value,
+                    startTime: document.getElementById(`start-${v.vehicleNumber}`).value,
+                    endTime: document.getElementById(`end-${v.vehicleNumber}`).value,
+                    repairCause: document.getElementById(`cause-${v.vehicleNumber}`).value,
+                    garage: document.getElementById(`garage-${v.vehicleNumber}`).value,
+                    remark: document.getElementById(`remark-${v.vehicleNumber}`).value,
+                    recorder: recorderVal
+                });
+            });
+
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res.success) {
+                        showToast("บันทึกเรียบร้อย", "success");
+                        loadRepairsView();
+                    } else {
+                        showToast(res.message, "error");
+                    }
+                })
+                .saveMultipleRepairs(itemsToSave, currentUser.fullName, currentUser.role);
+        }
+
+        function openSingleReport(vehNum, plate, driver, garage, cause, remark, recorder, startDateText, approvalStatus) {
+            document.getElementById('s_date').innerText = startDateText || new Date().toLocaleDateString('th-TH');
+            document.getElementById('s_status').innerText = document.getElementById(`postStatusText-${vehNum}`) ? document.getElementById(`postStatusText-${vehNum}`).innerText : 'CM';
+            document.getElementById('s_driver').innerText = driver;
+            document.getElementById('s_plate').innerText = plate;
+            document.getElementById('s_veh').innerText = vehNum;
+            document.getElementById('s_garage').innerText = garage || '-';
+            document.getElementById('s_cause').innerText = cause || '-';
+            document.getElementById('s_remark').innerText = remark || '-';
+            document.getElementById('s_recorder').innerText = recorder || '-';
+
+            const approvalEl = document.getElementById('s_approval');
+            if (!approvalStatus || approvalStatus === 'โปรดเลือก') {
+                approvalEl.innerText = 'รอหัวหน้าซ่อมอนุมัติ';
+                approvalEl.className = 'border border-slate-300 p-2 text-center font-bold text-red-600';
+            } else if (approvalStatus === 'อนุมัติ') {
+                approvalEl.innerText = 'อนุมัติแล้ว';
+                approvalEl.className = 'border border-slate-300 p-2 text-center font-bold text-emerald-600';
+            } else {
+                approvalEl.innerText = approvalStatus;
+                approvalEl.className = 'border border-slate-300 p-2 text-center font-bold text-red-600';
+            }
+
+            document.getElementById('singleReportCardModal').classList.remove('hidden');
+        }
+
+        function closeSingleReport() {
+            document.getElementById('singleReportCardModal').classList.add('hidden');
+        }
+
+        function downloadSingleReportImage(actionType) {
+            showToast("กำลังสร้างรูปภาพรายงาน...", "success");
+            const content = document.getElementById('singleReportContent');
+
+            html2canvas(content, { scale: 2, useCORS: true }).then(canvas => {
+                if (actionType === 'save') {
+                    const link = document.createElement('a');
+                    link.download = `Unisource_Report_${new Date().toISOString().slice(0,10)}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    showToast("บันทึกรูปภาพสำเร็จ", "success");
+                } else if (actionType === 'copy') {
+                    canvas.toBlob(blob => {
+                        const item = new ClipboardItem({ "image/png": blob });
+                        navigator.clipboard.write([item]).then(() => {
+                            showToast("คัดลอกรูปภาพไปยังคลิปบอร์ดแล้ว (สามารถกดวางได้ทันที)", "success");
+                        }).catch(err => {
+                            showToast("ไม่สามารถคัดลอกรูปภาพได้", "error");
+                        });
+                    });
+                }
+                closeSingleReport();
+            }).catch(err => {
+                showToast("ไม่สามารถสร้างรูปภาพได้", "error");
+            });
+        }
+
+        function generateReportPreview() {
+            showToast("กำลังสร้างรูปภาพตัวอย่างรายงาน...", "success");
+            const captureArea = document.getElementById('reportCaptureArea');
+            
+            updateReportTimestamp();
+
+            const rows = captureArea.querySelectorAll('.vehicle-row-item');
+            rows.forEach(row => {
+                const vNum = row.getAttribute('data-veh');
+                const status = document.getElementById(`status-${vNum}`).value;
+                const startInput = document.getElementById(`start-${vNum}`).value;
+                const endInput = document.getElementById(`end-${vNum}`).value;
+                const dur = document.getElementById(`dur-${vNum}`).innerText;
+                const garage = document.getElementById(`garage-${vNum}`).value.trim();
+                const cause = document.getElementById(`cause-${vNum}`).value.trim();
+                const remark = document.getElementById(`remark-${vNum}`).value.trim();
+                let recorder = document.getElementById(`recorder-${vNum}`).value.trim();
+                if (!recorder) recorder = currentUser ? currentUser.fullName : '-';
+
+                row.querySelector('.status-text').innerText = status;
+                
+                const formattedStart = startInput ? new Date(startInput).toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'}) : new Date().toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'});
+                const formattedEnd = endInput ? new Date(endInput).toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'}) : new Date().toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'});
+
+                row.querySelector('.start-text').innerText = formattedStart;
+                row.querySelector('.end-text').innerText = formattedEnd;
+                row.querySelector('.dur-text').innerText = dur || '0 นาที';
+                row.querySelector('.garage-text').innerText = garage || '-';
+                row.querySelector('.cause-text').innerText = cause || '-';
+                row.querySelector('.remark-text').innerText = remark || '-';
+                row.querySelector('.recorder-text').innerText = recorder;
+            });
+
+            captureArea.classList.add('capturing');
+
+            html2canvas(captureArea, { 
+                scale: 2, 
+                useCORS: true,
+                windowWidth: captureArea.scrollWidth,
+                windowHeight: captureArea.scrollHeight 
+            }).then(canvas => {
+                captureArea.classList.remove('capturing');
+                generatedReportCanvas = canvas;
+                
+                const previewContainer = document.getElementById('reportPreviewContainer');
+                previewContainer.innerHTML = '';
+                canvas.style.width = '100%';
+                canvas.style.height = 'auto';
+                canvas.className = 'rounded shadow';
+                previewContainer.appendChild(canvas);
+
+                document.getElementById('exportReportModal').classList.remove('hidden');
+                showToast("สร้างรูปภาพสำเร็จ", "success");
+            }).catch(err => {
+                captureArea.classList.remove('capturing');
+                showToast("ไม่สามารถสร้างรูปภาพได้", "error");
+            });
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportReportModal').classList.add('hidden');
+        }
+
+        function exportReportImageAction(actionType) {
+            if (!generatedReportCanvas) return;
+
+            if (actionType === 'save') {
+                const link = document.createElement('a');
+                link.download = `Unisource_Vehicle_Status_Report_${new Date().toISOString().slice(0,10)}.png`;
+                link.href = generatedReportCanvas.toDataURL('image/png');
+                link.click();
+                showToast("ดาวน์โหลดรูปภาพรายงานสำเร็จ", "success");
+            } else if (actionType === 'copy') {
+                generatedReportCanvas.toBlob(blob => {
+                    const item = new ClipboardItem({ "image/png": blob });
+                    navigator.clipboard.write([item]).then(() => {
+                        showToast("คัดลอกรูปภาพรายงานไปยังคลิปบอร์ดแล้ว", "success");
+                    }).catch(err => {
+                        showToast("ไม่สามารถคัดลอกรูปภาพได้", "error");
+                    });
+                });
+            }
+            closeExportModal();
+        }
+
+        function exportToExcel(tabType) {
+            let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head><meta charset="UTF-8"></head><body>`;
+
+            if (tabType === 'vehicles') {
+                htmlContent += `<table border="1"><tr style="background-color:#000066; color:#FFFFFF; font-weight:bold;">
+                    <th>ลำดับ</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะ</th><th>อู่ซ่อม</th><th>สาเหตุ</th><th>หมายเหตุ</th><th>ผู้บันทึก</th></tr>`;
+                globalVehicles.forEach((v, index) => {
+                    const status = document.getElementById(`status-${v.vehicleNumber}`).value;
+                    const garage = document.getElementById(`garage-${v.vehicleNumber}`).value || '-';
+                    const cause = document.getElementById(`cause-${v.vehicleNumber}`).value || '-';
+                    const remark = document.getElementById(`remark-${v.vehicleNumber}`).value || '-';
+                    let recorder = document.getElementById(`recorder-${v.vehicleNumber}`).value || '';
+                    if(!recorder) recorder = currentUser ? currentUser.fullName : '-';
+
+                    htmlContent += `<tr><td>${index + 1}</td><td>${v.vehicleNumber}</td><td>${v.plateNumber}</td><td>${v.driverName}</td><td>${status}</td><td>${garage}</td><td>${cause}</td><td>${remark}</td><td>${recorder}</td></tr>`;
+                });
+            } else if (tabType === 'repairs') {
+                htmlContent += `<table border="1"><tr style="background-color:#000066; color:#FFFFFF; font-weight:bold;">
+                    <th>วันเวลาเริ่มซ่อม</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะซ่อม</th><th>อู่ซ่อม</th><th>สาเหตุ</th><th>หมายเหตุ</th><th>สถานะหลังซ่อม</th><th>อนุมัติ</th></tr>`;
+                globalRepairs.forEach(r => {
+                    if (r.approvalStatus === 'ยกเลิก/ลบแล้ว') return;
+                    htmlContent += `<tr><td>${r.startDateText}</td><td>${r.vehicleNumber}</td><td>${r.plateNumber}</td><td>${r.driverName}</td><td>${r.repairStatus}</td><td>${r.garage}</td><td>${r.repairCause}</td><td>${r.remark}</td><td>${r.postRepairStatus}</td><td>${r.approvalStatus}</td></tr>`;
+                });
+            } else if (tabType === 'monthly') {
+                htmlContent += `<table border="1">` + document.querySelector('#view-monthlySummary table').outerHTML + `</table>`;
+            }
+
+            htmlContent += `</table></body></html>`;
+
+            const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Unisource_${tabType}_Export_${new Date().toISOString().slice(0,10)}.xls`;
+            a.click();
+            showToast("Export ไฟล์ Excel สำเร็จ", "success");
+        }
+
+        function deleteRepair(repairID) {
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res.success) {
+                        showToast("ลบเรียบร้อย", "success");
+                        loadRepairsView();
+                    } else {
+                        showToast(res.message, "error");
+                    }
+                })
+                .deleteRepairRecord(repairID, currentUser.fullName, currentUser.role);
+        }
+
+        function loadRepairsView() {
+            google.script.run.withSuccessHandler(function(repairs) {
+                globalRepairs = repairs.reverse();
+                renderRepairsTable(globalRepairs);
+            }).getRepairs();
+        }
+
+        function renderRepairsTable(repairs) {
+            let html = '';
+            repairs.forEach(r => {
+                if (r.approvalStatus === 'ยกเลิก/ลบแล้ว') return;
+
+                const defaultDT = getDatetimeISO(0);
+
+                let statusColor = 'text-emerald-600 font-normal';
+                if (r.repairStatus === 'CM') statusColor = 'text-red-600 font-normal';
+                if (r.repairStatus === 'PM') statusColor = 'text-[#FF9900] font-normal';
+
+                let postColor = 'text-red-600 font-normal';
+                if (r.postRepairStatus === 'เสร็จพร้อมรับงาน') postColor = 'text-emerald-600 font-normal';
+
+                html += `<tr class="hover:bg-slate-50 transition border-b border-slate-100 repair-row" data-search="${r.vehicleNumber} ${r.plateNumber} ${r.driverName} ${r.repairCause} ${r.garage} ${r.remark} ${r.recorder}" data-status="${r.repairStatus}" data-date="${r.startDateISO}">
+                    <td class="p-3 text-[11px] text-slate-500 font-normal">${r.startDateText || '-'}</td>
+                    <td class="p-3">
+                        <div class="font-medium text-slate-800 text-xs">${r.vehicleNumber}</div>
+                        <div class="text-[11px] text-slate-500">${r.plateNumber}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${r.driverName}</div>
+                    </td>
+                    <td class="p-3"><span class="${statusColor} text-xs" id="postStatusText-${r.vehicleNumber}">${r.repairStatus}</span></td>
+                    <td class="p-3 text-slate-500 text-[11px]">
+                        <span class="text-slate-600 font-normal">${formatDurationText(r.duration)}</span><br>
+                        <span class="text-[#4682B4] font-medium">อู่: ${r.garage || '-'}</span><br>
+                        <span class="text-slate-500">สาเหตุ: ${r.repairCause}</span><br>
+                        <span class="text-slate-400">หมายเหตุ: ${r.remark || '-'}</span>
+                    </td>
+                    <td class="p-3 text-[11px]">
+                        <select id="postStatus-${r.repairID}" onchange="togglePostEndTime('${r.repairID}')" class="px-2 py-1 rounded border border-slate-300 text-xs bg-white ${postColor} outline-none">
+                            <option value="กำลังซ่อม" ${r.postRepairStatus === 'กำลังซ่อม' ? 'selected' : ''} class="text-red-600">กำลังซ่อม</option>
+                            <option value="เสร็จพร้อมรับงาน" ${r.postRepairStatus === 'เสร็จพร้อมรับงาน' ? 'selected' : ''} class="text-emerald-600">เสร็จพร้อมรับงาน</option>
+                        </select>
+                        ${r.endDateText ? `<div class="text-[10px] text-emerald-600 mt-1 font-medium">เสร็จ: ${r.endDateText}</div>` : ''}
+                        <div id="postEndTimeContainer-${r.repairID}" class="mt-1 ${r.postRepairStatus === 'เสร็จพร้อมรับงาน' ? 'hidden' : ''}">
+                            <span class="text-[10px] text-slate-400 block">วันเวลาซ่อมเสร็จ:</span>
+                            <input type="datetime-local" id="postEnd-${r.repairID}" value="${defaultDT}" class="px-1.5 py-1 rounded border border-slate-300 text-[10px] bg-white text-slate-600" />
+                            <button id="postBtn-${r.repairID}" onclick="savePostStatus('${r.repairID}')" class="mt-1 text-[11px] text-[#4682B4] hover:text-[#3b6d96] font-medium underline transition">ยืนยัน</button>
+                        </div>
+                    </td>
+                    <td class="p-3">
+                        <select id="app-${r.repairID}" onchange="updateApproval('${r.repairID}')" class="px-2 py-1 rounded border border-slate-300 text-xs bg-white text-slate-700 outline-none">
+                            <option value="โปรดเลือก" ${r.approvalStatus === 'โปรดเลือก' || !r.approvalStatus ? 'selected' : ''}>โปรดเลือก</option>
+                            <option value="อนุมัติ" ${r.approvalStatus === 'อนุมัติ' ? 'selected' : ''}>อนุมัติ</option>
+                            <option value="ไม่อนุมัติ" ${r.approvalStatus === 'ไม่อนุมัติ' ? 'selected' : ''}>ไม่อนุมัติ</option>
+                        </select>
+                    </td>
+                    <td class="p-3 text-center">
+                        <input type="checkbox" ${r.transportAck === 'TRUE' ? 'checked' : ''} onchange="ackRepair('${r.repairID}', this.checked)" class="w-4 h-4 text-emerald-600 rounded border-slate-300" />
+                    </td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button onclick="openSingleReport('${r.vehicleNumber}', '${r.plateNumber}', '${r.driverName}', '${r.garage}', '${r.repairCause}', '${r.remark}', '${r.recorder}', '${r.startDateText}', '${r.approvalStatus}')" class="bg-[#4682B4] hover:bg-[#3b6d96] text-white px-2 py-1 rounded text-[11px] font-normal transition shadow-sm mb-1">บันทึกรูป</button><br>
+                        <button onclick="deleteRepair('${r.repairID}')" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded text-[11px] transition">ลบ</button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('repairTableBody').innerHTML = html || `<tr><td colspan="8" class="p-4 text-center text-slate-400">ยังไม่มีรายการซ่อมในระบบ</td></tr>`;
+        }
+
+        function togglePostEndTime(repairID) {
+            const val = document.getElementById(`postStatus-${repairID}`).value;
+            const container = document.getElementById(`postEndTimeContainer-${repairID}`);
+            const btn = document.getElementById(`postBtn-${repairID}`);
+            if (val === 'เสร็จพร้อมรับงาน') {
+                container.classList.remove('hidden');
+                if(btn) btn.style.display = '';
+            } else {
+                container.classList.add('hidden');
+                savePostStatus(repairID);
+            }
+        }
+
+        function savePostStatus(repairID) {
+            const postStatus = document.getElementById(`postStatus-${repairID}`).value;
+            const endTime = postStatus === 'เสร็จพร้อมรับงาน' ? document.getElementById(`postEnd-${repairID}`).value : null;
+            const btn = document.getElementById(`postBtn-${repairID}`);
+
+            google.script.run.withSuccessHandler(function(res) {
+                if (res.success) {
+                    showToast("บันทึกเรียบร้อย", "success");
+                    if (btn) btn.style.display = 'none';
+                    loadRepairsView();
+                } else {
+                    showToast(res.message, "error");
+                }
+            }).updatePostRepair(repairID, postStatus, endTime, currentUser.fullName, currentUser.role);
+        }
+
+        function filterRepairs() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const dateVal = document.getElementById('dateFilter').value;
+            const selectedStatuses = Array.from(document.querySelectorAll('.status-chk:checked')).map(cb => cb.value);
+
+            const rows = document.querySelectorAll('.repair-row');
+
+            rows.forEach(row => {
+                const searchData = row.getAttribute('data-search').toLowerCase();
+                const rowStatus = row.getAttribute('data-status');
+                const rowDate = row.getAttribute('data-date');
+
+                const matchKeyword = searchData.includes(keyword);
+                const matchStatus = selectedStatuses.includes(rowStatus);
+                const matchDate = !dateVal || rowDate === dateVal;
+
+                if (matchKeyword && matchStatus && matchDate) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function updateApproval(repairID) {
+            const status = document.getElementById(`app-${repairID}`).value;
+            google.script.run.withSuccessHandler(function(res) {
+                if (res.success) {
+                    showToast("บันทึกเรียบร้อย", "success");
+                    loadRepairsView();
+                } else {
+                    showToast(res.message, "error");
+                    loadRepairsView();
+                }
+            }).approveRepair(repairID, status, currentUser.fullName, currentUser.role);
+        }
+
+        function ackRepair(repairID, isChecked) {
+            google.script.run.withSuccessHandler(function(res) {
+                if (res.success) {
+                    showToast("บันทึกเรียบร้อย", "success");
+                } else {
+                    showToast(res.message, "error");
+                    loadRepairsView();
+                }
+            }).acknowledgeRepair(repairID, isChecked, currentUser.fullName, currentUser.role);
+        }
+
+        function initMonthlySummaryView() {
+            const monthSel = document.getElementById('selectMonth');
+            const yearSel = document.getElementById('selectYear');
+            
+            const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+            let mHtml = '';
+            months.forEach((m, i) => { mHtml += `<option value="${i+1}">${m}</option>`; });
+            monthSel.innerHTML = mHtml;
+            monthSel.value = new Date().getMonth() + 1;
+
+            const currentYear = new Date().getFullYear();
+            let yHtml = '';
+            for (let y = currentYear - 1; y <= currentYear + 1; y++) {
+                yHtml += `<option value="${y}">${y + 543} (${y})</option>`;
+            }
+            yearSel.innerHTML = yHtml;
+            yearSel.value = currentYear;
+
+            loadMonthlySummary();
+        }
+
+        function loadMonthlySummary() {
+            const month = parseInt(document.getElementById('selectMonth').value);
+            const year = parseInt(document.getElementById('selectYear').value);
+            
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            let headerHtml = `<tr><th class="p-2 border-r border-slate-200">ทะเบียนรถ</th>`;
+            for (let d = 1; d <= daysInMonth; d++) {
+                headerHtml += `<th class="p-1 border-r border-slate-200 w-10">${d}</th>`;
+            }
+            headerHtml += `</tr>`;
+            document.getElementById('calendarHeader').innerHTML = headerHtml;
+
+            google.script.run.withSuccessHandler(function(vehicles) {
+                google.script.run.withSuccessHandler(function(repairs) {
+                    let bodyHtml = '';
+                    vehicles.forEach(v => {
+                        bodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
+                            <td class="p-2 border-r border-slate-200 whitespace-nowrap text-left">
+                                <div class="font-normal text-slate-800">${v.vehicleNumber}</div>
+                                <div class="text-[11px] text-slate-400">${v.plateNumber} (👤 ${v.driverName})</div>
+                            </td>`;
+                        
+                        for (let d = 1; d <= daysInMonth; d++) {
+                            const matched = repairs.find(r => {
+                                if (r.vehicleNumber !== v.vehicleNumber || !r.startTime || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
+                                const rDate = new Date(r.startTime);
+                                return rDate.getDate() === d && (rDate.getMonth() + 1) === month && rDate.getFullYear() === year;
+                            });
+
+                            if (matched) {
+                                let displayStatus = (matched.repairStatus === 'RDY' || matched.repairStatus === 'พร้อมใช้งาน') ? 'พร้อมใช้งาน' : matched.repairStatus;
+                                
+                                let statusCls = 'text-emerald-600 font-normal';
+                                if (displayStatus === 'CM') statusCls = 'text-red-600 font-normal';
+                                if (displayStatus === 'PM') statusCls = 'text-[#FF9900] font-normal';
+
+                                bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle">
+                                    <div class="text-xs ${statusCls}">${displayStatus}</div>
+                                    <div class="text-[9px] text-slate-400 truncate max-w-[50px]" title="${matched.repairCause}">${matched.repairCause || ''}</div>
+                                </td>`;
+                            } else {
+                                bodyHtml += `<td class="p-1 border-r border-slate-200 text-center text-slate-300">-</td>`;
+                            }
+                        }
+                        bodyHtml += `</tr>`;
+                    });
+                    document.getElementById('calendarBody').innerHTML = bodyHtml || `<tr><td colspan="${daysInMonth + 1}" class="p-4 text-center text-slate-400">ไม่พบข้อความข้อมูล</td></tr>`;
+                }).getRepairs();
+            }).getVehicles();
+        }
+    </script>
+</body>
+</html>

@@ -933,8 +933,6 @@
                 let vehicles = await vRes.json();
                 let repairs = await rRes.json();
 
-                // 🔥 หัวใจหลักของการแก้ปัญหา: สลับข้อมูลจากล่างขึ้นบน
-                // เพื่อให้ระบบเจองานที่อัปเดต "ล่าสุด" ของวันนั้นๆ ก่อนเสมอ
                 repairs.reverse();
 
                 let bodyHtml = '';

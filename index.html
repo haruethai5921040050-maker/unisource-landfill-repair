@@ -30,7 +30,7 @@
         .capturing .vehicle-row-item.is-ready .col-merged { display: table-cell !important; }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
+<body class="bg-[#f1f5f9] text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -72,7 +72,7 @@
 
         <main class="flex-1 flex flex-col overflow-hidden bg-[#f1f5f9] p-4 lg:p-6">
             
-            <!-- TAB 0: DASHBOARD (EXACT PIXEL MATCH TO REFERENCE IMAGE) -->
+            <!-- TAB 0: DASHBOARD -->
             <div id="view-dashboard" class="space-y-4 view-section flex-1 flex flex-col overflow-auto">
                 
                 <!-- HEADER TITLE & DROPDOWNS -->
@@ -92,9 +92,8 @@
                     </div>
                 </div>
 
-                <!-- TOP 4 KPI CARDS (EXACT MATCH) -->
+                <!-- TOP 4 KPI CARDS -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Card 1 -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">งานซ่อมทั้งหมด</div>
@@ -103,12 +102,9 @@
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-xl shadow-md">
-                            🔧
-                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-xl shadow-md">🔧</div>
                     </div>
 
-                    <!-- Card 2 -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">ซ่อมเสร็จรอรับงาน</div>
@@ -117,12 +113,9 @@
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center text-white text-xl shadow-md">
-                            ✅
-                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center text-white text-xl shadow-md">✅</div>
                     </div>
 
-                    <!-- Card 3 -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">กำลังดำเนินการ</div>
@@ -131,12 +124,9 @@
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-white text-xl shadow-md">
-                            ⚙️
-                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-white text-xl shadow-md">⚙️</div>
                     </div>
 
-                    <!-- Card 4 -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">อนุมัติเรียบร้อย</div>
@@ -145,23 +135,23 @@
                                 <span class="text-xs text-slate-500 font-medium">รายการ</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white text-xl shadow-md">
-                            🛡️
-                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white text-xl shadow-md">🛡️</div>
                     </div>
                 </div>
 
-                <!-- MIDDLE ROW: TWO DONUT CHARTS (EXACT MATCH) -->
+                <!-- MIDDLE ROW: CM DONUT CHART & PM PLAN -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- Chart 1 -->
+                    <!-- Chart 1 (Enlarged Donut with True Color Proportion) -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                         <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             📊 สถานะงานซ่อม CM
                         </div>
-                        <div class="p-5 flex items-center justify-around my-auto">
-                            <div class="relative w-36 h-36 rounded-full flex flex-col items-center justify-center bg-slate-50 border-8 border-blue-500 shadow-inner">
-                                <div class="text-3xl font-extrabold text-slate-900" id="chartTotalCM">0</div>
-                                <div class="text-xs text-slate-500">งาน</div>
+                        <div class="p-6 flex items-center justify-around my-auto">
+                            <div id="chartContainerCM" class="relative w-44 h-44 rounded-full flex flex-col items-center justify-center shadow-inner bg-white">
+                                <div class="absolute inset-3 bg-white rounded-full flex flex-col items-center justify-center shadow-sm z-10">
+                                    <div class="text-4xl font-black text-slate-900" id="chartTotalCM">0</div>
+                                    <div class="text-xs text-slate-500 font-medium">งาน</div>
+                                </div>
                             </div>
                             <div class="space-y-3 text-xs">
                                 <div class="flex items-center gap-2.5">
@@ -170,7 +160,7 @@
                                     <span class="font-bold text-slate-900 ml-4" id="legendOngoing">0 (0%)</span>
                                 </div>
                                 <div class="flex items-center gap-2.5">
-                                    <span class="w-3.5 h-3.5 rounded-full bg-blue-500"></span>
+                                    <span class="w-3.5 h-3.5 rounded-full bg-[#4682B4]"></span>
                                     <span class="text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</span>
                                     <span class="font-bold text-slate-900 ml-4" id="legendDone">0 (0%)</span>
                                 </div>
@@ -178,65 +168,40 @@
                         </div>
                     </div>
 
-                    <!-- Chart 2 -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
-                            🛡️ สถานะอนุมัติ
-                        </div>
-                        <div class="p-5 flex items-center justify-around my-auto">
-                            <div class="relative w-36 h-36 rounded-full flex flex-col items-center justify-center bg-slate-50 border-8 border-blue-400 shadow-inner">
-                                <div class="text-3xl font-extrabold text-slate-900" id="chartTotalApp">0</div>
-                                <div class="text-xs text-slate-500">รายการ</div>
-                            </div>
-                            <div class="space-y-3 text-xs">
-                                <div class="flex items-center gap-2.5">
-                                    <span class="w-3.5 h-3.5 rounded-full bg-blue-500"></span>
-                                    <span class="text-slate-600 font-medium">อนุมัติเรียบร้อย</span>
-                                    <span class="font-bold text-slate-900 ml-4" id="legendApproved">0</span>
-                                </div>
-                                <div class="flex items-center gap-2.5">
-                                    <span class="w-3.5 h-3.5 rounded-full bg-slate-300"></span>
-                                    <span class="text-slate-600 font-medium">รอดำเนินการ</span>
-                                    <span class="font-bold text-slate-900 ml-4" id="legendPending">0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- BOTTOM ROW: PM PLAN, FLEET AVAILABILITY & SUMMARY TABLE (EXACT MATCH) -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <!-- PM Plan Card -->
+                    <!-- PM Plan Card (Moved up here) -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
                         <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             📅 แผน PM เดือนนี้
                         </div>
-                        <div class="p-5 flex items-center justify-between my-auto">
-                            <div class="text-5xl font-black text-[#FF9900]" id="dashTotalPM">0</div>
+                        <div class="p-6 flex items-center justify-between my-auto">
+                            <div class="text-6xl font-black text-[#FF9900]" id="dashTotalPM">0</div>
                             <div class="text-right text-xs text-slate-500 font-bold uppercase tracking-wide">คัน/รอบ</div>
                         </div>
                     </div>
+                </div>
 
+                <!-- BOTTOM ROW: FLEET AVAILABILITY & SUMMARY TABLE -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <!-- Fleet Availability Card -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
                         <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             🚚 ความพร้อมของรถในฟลีท
                         </div>
-                        <div class="p-5 flex items-center justify-around my-auto">
-                            <div class="text-3xl font-black text-blue-600" id="dashReadyRate">100%</div>
+                        <div class="p-6 flex items-center justify-around my-auto">
+                            <div class="text-4xl font-black text-blue-600" id="dashReadyRate">100%</div>
                             <div class="text-right">
                                 <div class="text-xs text-slate-400 font-medium">จำนวนรถทั้งหมด</div>
-                                <div class="text-xl font-bold text-slate-900"><span id="dashTotalVehicles">0</span> คัน</div>
+                                <div class="text-2xl font-bold text-slate-900"><span id="dashTotalVehicles">0</span> คัน</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Summary Table Card -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden lg:col-span-1 flex flex-col">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                         <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             📋 สรุปสถานะโดยรวม
                         </div>
-                        <div class="p-4 flex-1 flex flex-col justify-center">
+                        <div class="p-5 flex-1 flex flex-col justify-center">
                             <table class="w-full text-xs text-left">
                                 <thead>
                                     <tr class="text-slate-400 border-b border-slate-100">
@@ -405,7 +370,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycby246X7Am4M8wy4l2gFGeeF39fnw-uE1gCqA_LmpRUumcaXSGnCF9zYR5yqqf9QjRYELg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbz246X7Am4M8wy4l2gFGeeF39fnw-ue1gCqA_LmpRUumcaXSGNcF9zRY5yqqf9QjRYELg/exec";
         let currentUser = null, globalVehicles = [], globalRepairs = [], globalPMs = [], currentPlanTarget = 'today', generatedReportCanvas = null;
 
         function showToast(msg, type = 'success') {
@@ -563,17 +528,22 @@
             document.getElementById('dashTotalPM').innerText = monthPMs.length;
             document.getElementById('dashTotalVehicles').innerText = globalVehicles.length;
 
-            // Donut 1 update
+            // Donut Chart calculation & true proportions
             document.getElementById('chartTotalCM').innerText = totalCM;
             const ongoingPct = totalCM > 0 ? Math.round((ongoingCM / totalCM) * 100) : 0;
             const donePct = totalCM > 0 ? Math.round((doneCM / totalCM) * 100) : 0;
+            
             document.getElementById('legendOngoing').innerText = `${ongoingCM} (${ongoingPct}%)`;
             document.getElementById('legendDone').innerText = `${doneCM} (${donePct}%)`;
 
-            // Donut 2 update
-            document.getElementById('chartTotalApp').innerText = totalCM;
-            document.getElementById('legendApproved').innerText = approvedCM;
-            document.getElementById('legendPending').innerText = Math.max(0, totalCM - approvedCM);
+            // Draw Conic Gradient Donut
+            const ongoingAngle = (ongoingCM / (totalCM || 1)) * 360;
+            const chartDiv = document.getElementById('chartContainerCM');
+            if (totalCM > 0) {
+                chartDiv.style.background = `conic-gradient(#FF9900 0deg ${ongoingAngle}deg, #4682B4 ${ongoingAngle}deg 360deg)`;
+            } else {
+                chartDiv.style.background = `#e2e8f0`;
+            }
 
             // Summary table update
             document.getElementById('dashSummaryTable').innerHTML = `
@@ -830,7 +800,7 @@
             });
         }
 
-        // ================= MONTHLY SUMMARY (WITH PM OVERLAY LOGIC) =================
+        // ================= MONTHLY SUMMARY =================
         async function loadMonthlySummary() {
             const m = parseInt(document.getElementById('selectMonth').value);
             const y = parseInt(document.getElementById('selectYear').value);
@@ -927,7 +897,7 @@
             document.getElementById('pmCalendarBody').innerHTML=tb;
         }
 
-        // ================= EXPORT EXCEL (CLEAN & SEPARATE COLUMNS) =================
+        // ================= EXPORT EXCEL =================
         function exportToExcel(type) {
             let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
             <head><meta charset="UTF-8"><style>table{border-collapse:collapse;} th,td{border:1px solid #000000;padding:5px;font-family:Sarabun,sans-serif;font-size:11pt;}</style></head><body>`;

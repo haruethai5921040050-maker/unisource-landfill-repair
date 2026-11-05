@@ -24,7 +24,6 @@
         .capturing .no-print { display: none !important; }
         .capturing { overflow: visible !important; height: auto !important; max-height: none !important; box-shadow: none !important; border: none !important; }
 
-        /* พาดยาวเฉพาะตอนแคปรูป แต่ขนาดตัวอักษรเท่าสถานะปกติ (text-xs) */
         .capturing .vehicle-row-item.is-ready .col-garage,
         .capturing .vehicle-row-item.is-ready .col-cause,
         .capturing .vehicle-row-item.is-ready .col-remark { display: none !important; }
@@ -188,6 +187,7 @@
             <div class="flex justify-end gap-2 pt-3 mt-2 border-t">
                 <button onclick="document.getElementById('exportReportModal').classList.add('hidden')" class="px-4 py-2 bg-slate-300 rounded-lg text-xs font-medium">ปิด</button>
                 <button onclick="exportReportImageAction('save')" class="px-4 py-2 bg-[#4682B4] text-white rounded-lg text-xs font-medium">Save รูป</button>
+                <button onclick="exportReportImageAction('copy')" class="px-4 py-2 bg-[#4682B4] text-white rounded-lg text-xs font-medium">Copy รูป</button>
             </div>
         </div>
     </div>
@@ -213,6 +213,7 @@
             <div class="bg-slate-50 p-3 flex justify-end gap-2 border-t">
                 <button onclick="document.getElementById('singleReportCardModal').classList.add('hidden')" class="px-3 py-1.5 bg-slate-300 rounded text-xs">ปิด</button>
                 <button onclick="downloadSingleReportImage('save')" class="px-3 py-1.5 bg-[#4682B4] text-white rounded text-xs">Save รูป</button>
+                <button onclick="downloadSingleReportImage('copy')" class="px-3 py-1.5 bg-[#4682B4] text-white rounded text-xs">Copy รูป</button>
             </div>
         </div>
     </div>
@@ -399,7 +400,14 @@
 
         function exportReportImageAction(a) {
             if(!generatedReportCanvas) return;
-            const l=document.createElement('a'); l.download=`Report_${new Date().getTime()}.png`; l.href=generatedReportCanvas.toDataURL('image/png'); l.click();
+            if(a === 'save') {
+                const l=document.createElement('a'); l.download=`Report_${new Date().getTime()}.png`; l.href=generatedReportCanvas.toDataURL('image/png'); l.click();
+            } else if(a === 'copy') {
+                generatedReportCanvas.toBlob(blob => {
+                    const item = new ClipboardItem({ "image/png": blob });
+                    navigator.clipboard.write([item]).then(() => showToast("คัดลอกรูปภาพรายงานแล้ว")).catch(() => showToast("ไม่สามารถคัดลอกรูปได้", "error"));
+                });
+            }
         }
 
         // ================= REPAIRS =================
@@ -521,11 +529,18 @@
         function downloadSingleReportImage(type) {
             const el = document.getElementById('singleReportContent');
             html2canvas(el, {scale:2}).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Repair_Report_${new Date().getTime()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                document.getElementById('singleReportCardModal').classList.add('hidden');
+                if(type === 'save') {
+                    const link = document.createElement('a');
+                    link.download = `Repair_Report_${new Date().getTime()}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    document.getElementById('singleReportCardModal').classList.add('hidden');
+                } else if(type === 'copy') {
+                    canvas.toBlob(blob => {
+                        const item = new ClipboardItem({ "image/png": blob });
+                        navigator.clipboard.write([item]).then(() => showToast("คัดลอกรูปภาพรายงานรายคันแล้ว")).catch(() => showToast("ไม่สามารถคัดลอกรูปได้", "error"));
+                    });
+                }
             });
         }
 
@@ -621,16 +636,51 @@
             document.getElementById('pmCalendarBody').innerHTML=tb;
         }
 
+        // ================= EXPORT EXCEL (CLEAN & SEPARATE COLUMNS) =================
         function exportToExcel(type) {
-            let tb = '';
-            if(type==='vehicles') tb = document.querySelector('#view-vehicles table').outerHTML;
-            if(type==='repairs') tb = document.querySelector('#view-repairs table').outerHTML;
-            if(type==='monthly') tb = document.querySelector('#view-monthlySummary table').outerHTML;
-            if(type==='pm') tb = document.querySelector('#view-pmPlan table').outerHTML;
-            if(type==='pmcal') tb = document.querySelector('#view-pmCalendar table').outerHTML;
-            const html = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>${tb}</body></html>`;
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([html], {type:'application/vnd.ms-excel'}));
-            a.download = `Export_${type}_${new Date().toISOString().slice(0,10)}.xls`; a.click(); showToast("ดาวน์โหลดสำเร็จ");
+            let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head><meta charset="UTF-8"><style>table{border-collapse:collapse;} th,td{border:1px solid #000000;padding:5px;font-family:Sarabun,sans-serif;font-size:11pt;}</style></head><body>`;
+
+            if(type === 'vehicles') {
+                htmlContent += `<table><tr style="background-color:#000066;color:#FFFFFF;font-weight:bold;"><th>ลำดับ</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะ</th><th>วันเวลาเริ่ม</th><th>วันเวลาเสร็จ</th><th>ระยะเวลา</th><th>อู่ / ศูนย์บริการ</th><th>สาเหตุการซ่อม</th><th>หมายเหตุ</th></tr>`;
+                globalVehicles.forEach((v, index) => {
+                    const st = document.getElementById(`status-${v.vehicleNumber}`).value;
+                    const stt = document.getElementById(`start-${v.vehicleNumber}`).value;
+                    const edt = document.getElementById(`end-${v.vehicleNumber}`).value;
+                    const dur = document.getElementById(`dur-${v.vehicleNumber}`).innerText;
+                    const gar = document.getElementById(`garage-${v.vehicleNumber}`).value || '-';
+                    const cau = document.getElementById(`cause-${v.vehicleNumber}`).value || '-';
+                    const rem = document.getElementById(`remark-${v.vehicleNumber}`).value || '-';
+                    htmlContent += `<tr><td>${index+1}</td><td>${v.vehicleNumber}</td><td>${v.plateNumber}</td><td>${v.driverName}</td><td>${st}</td><td>${stt}</td><td>${edt}</td><td>${dur}</td><td>${gar}</td><td>${cau}</td><td>${rem}</td></tr>`;
+                });
+            } else if(type === 'repairs') {
+                htmlContent += `<table><tr style="background-color:#000066;color:#FFFFFF;font-weight:bold;"><th>วันเวลาเริ่มซ่อม</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะซ่อม</th><th>ระยะเวลา</th><th>อู่ซ่อม</th><th>สาเหตุการซ่อม</th><th>หมายเหตุ</th><th>สถานะหลังซ่อม</th><th>อนุมัติ</th></tr>`;
+                globalRepairs.forEach(r => {
+                    if(r.approvalStatus === 'ยกเลิก/ลบแล้ว') return;
+                    htmlContent += `<tr><td>${r.startDateText}</td><td>${r.vehicleNumber}</td><td>${r.plateNumber}</td><td>${r.driverName}</td><td>${r.repairStatus}</td><td>${formatDuration(r.duration)}</td><td>${r.garage}</td><td>${r.repairCause}</td><td>${r.remark}</td><td>${r.postRepairStatus}</td><td>${r.approvalStatus}</td></tr>`;
+                });
+            } else if(type === 'monthly') {
+                htmlContent += `<table>` + document.querySelector('#view-monthlySummary table').outerHTML + `</table>`;
+            } else if(type === 'pm') {
+                htmlContent += `<table><tr style="background-color:#000066;color:#FFFFFF;font-weight:bold;"><th>ลำดับ</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>วันเวลาเริ่ม PM</th><th>คาดว่าเสร็จ</th><th>อู่ซ่อม</th><th>รายการ PM</th><th>หมายเหตุ</th></tr>`;
+                globalVehicles.forEach((v, index) => {
+                    const pms = document.getElementById(`pmstart-${v.vehicleNumber}`).value;
+                    const pme = document.getElementById(`pmend-${v.vehicleNumber}`).value;
+                    const pmg = document.getElementById(`pmgar-${v.vehicleNumber}`).value || '-';
+                    const pmc = document.getElementById(`pmdet-${v.vehicleNumber}`).value || '-';
+                    const pmr = document.getElementById(`pmrem-${v.vehicleNumber}`).value || '-';
+                    htmlContent += `<tr><td>${index+1}</td><td>${v.vehicleNumber}</td><td>${v.plateNumber}</td><td>${v.driverName}</td><td>${pms}</td><td>${pme}</td><td>${pmg}</td><td>${pmc}</td><td>${pmr}</td></tr>`;
+                });
+            } else if(type === 'pmcal') {
+                htmlContent += `<table>` + document.querySelector('#view-pmCalendar table').outerHTML + `</table>`;
+            }
+
+            htmlContent += `</body></html>`;
+            const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url;
+            a.download = `Unisource_${type}_Export_${new Date().toISOString().slice(0,10)}.xls`;
+            a.click(); showToast("Export ไฟล์ Excel สำเร็จ");
         }
     </script>
 </body>

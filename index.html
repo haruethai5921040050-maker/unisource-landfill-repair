@@ -34,7 +34,7 @@
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- LOGIN OVERLAY -->
+    <!-- LOGIN OVERLAY (ORIGINAL WORKING VERSION) -->
     <div id="loginOverlay" class="fixed inset-0 z-50 bg-[#000066] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 border-t-4 border-[#4682B4]">
             <div class="text-center mb-8">
@@ -43,16 +43,10 @@
                 <p class="text-slate-500 text-sm mt-3">ระบบแจ้งแผนงานซ่อมรายวัน & PM</p>
             </div>
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้งาน</label>
-                    <input type="text" id="loginRole" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#4682B4]">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน</label>
-                    <input type="password" id="loginPassword" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#4682B4]">
-                </div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้งาน</label><input type="text" id="loginRole" required class="w-full px-4 py-3 rounded-lg border"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน</label><input type="password" id="loginPassword" required class="w-full px-4 py-3 rounded-lg border"></div>
                 <div id="loginError" class="text-red-500 text-sm text-center hidden"></div>
-                <button type="submit" class="w-full bg-[#4682B4] text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-600 transition">เข้าสู่ระบบ</button>
+                <button type="submit" class="w-full bg-[#4682B4] text-white font-semibold py-3 rounded-lg shadow-md">เข้าสู่ระบบ</button>
             </form>
         </div>
     </div>
@@ -61,10 +55,7 @@
     <div id="appContainer" class="flex flex-col h-screen w-screen overflow-hidden hidden">
         <header class="bg-[#000066] text-white h-16 px-6 flex items-center justify-between shadow-md shrink-0 border-b border-blue-900 overflow-x-auto">
             <div class="flex items-center gap-6 whitespace-nowrap">
-                <div>
-                    <h1 class="text-lg font-bold tracking-wider">UNISOURCE</h1>
-                    <p class="text-[#FF9900] text-[10px] font-bold tracking-widest text-center">LAND FILL</p>
-                </div>
+                <div><h1 class="text-lg font-bold tracking-wider">UNISOURCE</h1><p class="text-[#FF9900] text-[10px] font-bold tracking-widest text-center">LAND FILL</p></div>
                 <nav class="flex items-center gap-1 ml-4">
                     <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="menu-item px-3 py-2 text-sm text-[#FF9900] font-medium transition">Dashboard</a>
                     <a href="#" onclick="switchTab('vehicles')" id="nav-vehicles" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">สถานะรถ</a>
@@ -81,19 +72,21 @@
 
         <main class="flex-1 flex flex-col overflow-hidden bg-slate-100 p-4 lg:p-6">
             
-            <!-- TAB 0: DASHBOARD (EXACT REFERENCE MATCH) -->
+            <!-- TAB 0: DASHBOARD (EXACT REFERENCE MATCH - CLEAN & MINIMAL) -->
             <div id="view-dashboard" class="space-y-4 view-section flex-1 flex flex-col overflow-auto">
-                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 flex-wrap gap-4">
+                
+                <!-- HEADER TITLE & DROPDOWNS -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center shrink-0 flex-wrap gap-4">
                     <div>
-                        <h2 class="font-bold text-slate-900 text-lg">Executive Dashboard</h2>
+                        <h2 class="font-bold text-slate-900 text-xl tracking-tight">Executive Dashboard</h2>
                         <p class="text-xs text-slate-500 mt-0.5">สรุปสถานะการซ่อมบำรุงและแผนงาน PM ประจำเดือน</p>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <div class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700">
-                            📅 <select id="dashMonth" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer"></select>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700">
+                            📅 <select id="dashMonth" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
-                        <div class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700">
-                            📅 <select id="dashYear" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer"></select>
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700">
+                            📅 <select id="dashYear" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
                     </div>
                 </div>
@@ -103,9 +96,9 @@
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">งานซ่อมทั้งหมด</div>
-                            <div class="flex items-baseline gap-1 mt-1.5">
+                            <div class="flex items-baseline gap-1.5 mt-1.5">
                                 <span class="text-2xl font-bold text-slate-900" id="dashTotalCM">0</span>
-                                <span class="text-xs text-slate-500">งาน</span>
+                                <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white text-base shadow-sm">🔧</div>
@@ -114,9 +107,9 @@
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">ซ่อมเสร็จรอรับงาน</div>
-                            <div class="flex items-baseline gap-1 mt-1.5">
+                            <div class="flex items-baseline gap-1.5 mt-1.5">
                                 <span class="text-2xl font-bold text-emerald-600" id="dashDoneCM">0</span>
-                                <span class="text-xs text-slate-500">งาน</span>
+                                <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white text-base shadow-sm">✅</div>
@@ -125,9 +118,9 @@
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">กำลังดำเนินการ</div>
-                            <div class="flex items-baseline gap-1 mt-1.5">
+                            <div class="flex items-baseline gap-1.5 mt-1.5">
                                 <span class="text-2xl font-bold text-[#FF9900]" id="dashOngoingCM">0</span>
-                                <span class="text-xs text-slate-500">งาน</span>
+                                <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-[#FF9900] flex items-center justify-center text-white text-base shadow-sm">⚙️</div>
@@ -136,23 +129,23 @@
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">อนุมัติเรียบร้อย</div>
-                            <div class="flex items-baseline gap-1 mt-1.5">
+                            <div class="flex items-baseline gap-1.5 mt-1.5">
                                 <span class="text-2xl font-bold text-purple-600" id="dashApprovedCM">0</span>
-                                <span class="text-xs text-slate-500">รายการ</span>
+                                <span class="text-xs text-slate-500 font-medium">รายการ</span>
                             </div>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white text-base shadow-sm">🛡️</div>
                     </div>
                 </div>
 
-                <!-- MIDDLE ROW: TWO ANALYTIC BOXES -->
+                <!-- MIDDLE ROW: TWO DONUT CHARTS -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <!-- Chart 1 -->
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
-                            <span class="text-sm font-bold text-slate-700">📊 สถานะงานซ่อม CM</span>
+                        <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100 font-bold text-slate-800 text-sm">
+                            📊 สถานะงานซ่อม CM
                         </div>
-                        <div class="flex items-center justify-around py-2">
+                        <div class="flex items-center justify-around py-3">
                             <div class="relative w-28 h-28 rounded-full flex flex-col items-center justify-center bg-slate-50 border-4 border-blue-500 shadow-inner">
                                 <div class="text-xl font-bold text-slate-900" id="chartTotalCM">0</div>
                                 <div class="text-[10px] text-slate-500">งาน</div>
@@ -174,10 +167,10 @@
 
                     <!-- Chart 2 -->
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
-                            <span class="text-sm font-bold text-slate-700">🛡️ สถานะอนุมัติ</span>
+                        <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100 font-bold text-slate-800 text-sm">
+                            🛡️ สถานะอนุมัติ
                         </div>
-                        <div class="flex items-center justify-around py-2">
+                        <div class="flex items-center justify-around py-3">
                             <div class="relative w-28 h-28 rounded-full flex flex-col items-center justify-center bg-slate-50 border-4 border-blue-400 shadow-inner">
                                 <div class="text-xl font-bold text-slate-900" id="chartTotalApp">0</div>
                                 <div class="text-[10px] text-slate-500">รายการ</div>
@@ -202,8 +195,8 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <!-- PM Plan Card -->
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                        <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-                            <span class="text-xs font-bold text-slate-700">📅 แผน PM เดือนนี้</span>
+                        <div class="flex items-center gap-2 pb-2 border-b border-slate-100 font-bold text-slate-800 text-xs">
+                            📅 แผน PM เดือนนี้
                         </div>
                         <div class="flex items-center justify-between my-auto py-3">
                             <div class="text-3xl font-extrabold text-[#FF9900]" id="dashTotalPM">0</div>
@@ -213,8 +206,8 @@
 
                     <!-- Fleet Availability Card -->
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                        <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-                            <span class="text-xs font-bold text-slate-700">🚚 ความพร้อมของรถในฟลีท</span>
+                        <div class="flex items-center gap-2 pb-2 border-b border-slate-100 font-bold text-slate-800 text-xs">
+                            🚚 ความพร้อมของรถในฟลีท
                         </div>
                         <div class="flex items-center justify-around py-2">
                             <div class="text-2xl font-extrabold text-blue-600" id="dashReadyRate">100%</div>
@@ -227,8 +220,8 @@
 
                     <!-- Summary Table Card -->
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
-                        <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-                            <span class="text-xs font-bold text-slate-700">📋 สรุปสถานะโดยรวม</span>
+                        <div class="flex items-center gap-2 pb-2 border-b border-slate-100 font-bold text-slate-800 text-xs">
+                            📋 สรุปสถานะโดยรวม
                         </div>
                         <table class="w-full text-xs text-left mt-2">
                             <thead>

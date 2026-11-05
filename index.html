@@ -74,8 +74,6 @@
             
             <!-- TAB 0: DASHBOARD -->
             <div id="view-dashboard" class="space-y-4 view-section flex-1 flex flex-col overflow-auto">
-                
-                <!-- HEADER TITLE & DROPDOWNS -->
                 <div class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center shrink-0 flex-wrap gap-4 relative overflow-hidden">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#FF9900]"></div>
                     <div>
@@ -92,7 +90,6 @@
                     </div>
                 </div>
 
-                <!-- TOP 4 KPI CARDS -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
@@ -139,9 +136,7 @@
                     </div>
                 </div>
 
-                <!-- MIDDLE ROW: CM DONUT CHART & PM PLAN -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- Chart 1 (Enlarged Donut with True Color Proportion) -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                         <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             📊 สถานะงานซ่อม CM
@@ -168,7 +163,6 @@
                         </div>
                     </div>
 
-                    <!-- PM Plan Card (Moved up here) -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
                         <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             📅 แผน PM เดือนนี้
@@ -180,9 +174,7 @@
                     </div>
                 </div>
 
-                <!-- BOTTOM ROW: FLEET AVAILABILITY & SUMMARY TABLE -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- Fleet Availability Card -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
                         <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             🚚 ความพร้อมของรถในฟลีท
@@ -196,7 +188,6 @@
                         </div>
                     </div>
 
-                    <!-- Summary Table Card -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                         <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             📋 สรุปสถานะโดยรวม
@@ -383,6 +374,23 @@
             setTimeout(() => { t.classList.add('opacity-0'); setTimeout(()=>t.remove(),300); }, 2500);
         }
 
+        async function fetchAPI(action) {
+            try {
+                const res = await fetch(`${API_URL}?action=${action}`);
+                const text = await res.text();
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error("JSON Parse Error on action:", action, text);
+                    return [];
+                }
+            } catch (err) {
+                console.error("Fetch Error on action:", action, err);
+                showToast(`โหลดข้อมูล ${action} ไม่สำเร็จ`, "error");
+                return [];
+            }
+        }
+
         function formatDuration(mins) {
             if (!mins || mins <= 0) return '0 นาที';
             const d = Math.floor(mins / 1440), h = Math.floor((mins % 1440) / 60), m = mins % 60;
@@ -500,16 +508,13 @@
             const y = parseInt(document.getElementById('dashYear').value);
             
             if(!globalVehicles.length) {
-                let resV = await fetch(`${API_URL}?action=getVehicles`);
-                globalVehicles = await resV.json();
+                globalVehicles = await fetchAPI('getVehicles');
             }
             if(!globalRepairs.length) {
-                let resR = await fetch(`${API_URL}?action=getRepairs`);
-                globalRepairs = await resR.json();
+                globalRepairs = await fetchAPI('getRepairs');
             }
             if(!globalPMs.length) {
-                let resP = await fetch(`${API_URL}?action=getPMs`);
-                globalPMs = await resP.json();
+                globalPMs = await fetchAPI('getPMs');
             }
 
             const monthRepairs = globalRepairs.filter(r => r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startMonth === m && r.startYear === y);
@@ -528,7 +533,6 @@
             document.getElementById('dashTotalPM').innerText = monthPMs.length;
             document.getElementById('dashTotalVehicles').innerText = globalVehicles.length;
 
-            // Donut Chart calculation & true proportions
             document.getElementById('chartTotalCM').innerText = totalCM;
             const ongoingPct = totalCM > 0 ? Math.round((ongoingCM / totalCM) * 100) : 0;
             const donePct = totalCM > 0 ? Math.round((doneCM / totalCM) * 100) : 0;
@@ -536,7 +540,6 @@
             document.getElementById('legendOngoing').innerText = `${ongoingCM} (${ongoingPct}%)`;
             document.getElementById('legendDone').innerText = `${doneCM} (${donePct}%)`;
 
-            // Draw Conic Gradient Donut
             const ongoingAngle = (ongoingCM / (totalCM || 1)) * 360;
             const chartDiv = document.getElementById('chartContainerCM');
             if (totalCM > 0) {
@@ -545,7 +548,6 @@
                 chartDiv.style.background = `#e2e8f0`;
             }
 
-            // Summary table update
             document.getElementById('dashSummaryTable').innerHTML = `
                 <tr><td class="py-2.5 text-slate-600 font-medium">กำลังดำเนินการ</td><td class="py-2.5 text-center font-bold text-slate-900">${ongoingCM}</td><td class="py-2.5 text-right font-semibold text-slate-700">${ongoingPct}%</td></tr>
                 <tr><td class="py-2.5 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-2.5 text-center font-bold text-slate-900">${doneCM}</td><td class="py-2.5 text-right font-semibold text-slate-700">${donePct}%</td></tr>
@@ -565,11 +567,8 @@
         }
 
         async function loadVehiclesView() {
-            try {
-                let res = await fetch(`${API_URL}?action=getVehicles`);
-                globalVehicles = await res.json();
-                renderVehicleTable();
-            } catch(e) { showToast("Error loading vehicles", "error"); }
+            globalVehicles = await fetchAPI('getVehicles');
+            renderVehicleTable();
         }
 
         function updateSelectColor(sel) {
@@ -581,6 +580,10 @@
 
         function renderVehicleTable() {
             let h = '', dt = getISO(currentPlanTarget === 'tomorrow' ? 1 : 0);
+            if (!globalVehicles || !globalVehicles.length) {
+                document.getElementById('vehicleTableBody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400">ไม่พบข้อมูลรถ (กรุณาตรวจสอบการเชื่อมต่อ Apps Script)</td></tr>`;
+                return;
+            }
             globalVehicles.forEach((v, i) => {
                 h += `<tr class="hover:bg-slate-50 border-b vehicle-row-item" data-veh="${v.vehicleNumber}">
                     <td class="p-2 text-center text-xs text-slate-500">${i+1}</td>
@@ -668,12 +671,17 @@
 
         // ================= REPAIRS =================
         async function loadRepairsView() {
-            let res = await fetch(`${API_URL}?action=getRepairs`); globalRepairs = (await res.json()).reverse();
+            let res = await fetchAPI('getRepairs'); 
+            globalRepairs = (res || []).reverse();
             renderRepairsTable(globalRepairs);
         }
 
         function renderRepairsTable(repairs) {
             let h='';
+            if(!repairs || !repairs.length) {
+                document.getElementById('repairTableBody').innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">ยังไม่มีรายการซ่อม</td></tr>`;
+                return;
+            }
             repairs.forEach(r => {
                 if(r.approvalStatus==='ยกเลิก/ลบแล้ว') return;
                 const defaultDT = getISO(0);
@@ -813,11 +821,16 @@
             headerHtml += `</tr>`;
             document.getElementById('calendarHeader').innerHTML = headerHtml;
 
-            if(!globalVehicles.length) await loadVehiclesView();
-            let resR = await fetch(`${API_URL}?action=getRepairs`); globalRepairs = (await resR.json()).reverse();
-            let resP = await fetch(`${API_URL}?action=getPMs`); globalPMs = (await resP.json()).reverse();
+            if(!globalVehicles.length) globalVehicles = await fetchAPI('getVehicles');
+            let resR = await fetchAPI('getRepairs'); globalRepairs = (resR || []).reverse();
+            let resP = await fetchAPI('getPMs'); globalPMs = (resP || []).reverse();
 
             let bodyHtml = '';
+            if(!globalVehicles || !globalVehicles.length) {
+                document.getElementById('calendarBody').innerHTML = `<tr><td colspan="${daysInMonth+1}" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรถในระบบ</td></tr>`;
+                return;
+            }
+
             globalVehicles.forEach(v => {
                 bodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
                     <td class="p-2 border-r border-slate-200 text-left">
@@ -846,9 +859,13 @@
 
         // ================= PM PLANS =================
         async function loadPMView() {
-            if(!globalVehicles.length) await loadVehiclesView();
-            let res = await fetch(`${API_URL}?action=getPMs`); globalPMs = (await res.json()).reverse();
+            if(!globalVehicles.length) globalVehicles = await fetchAPI('getVehicles');
+            let res = await fetchAPI('getPMs'); globalPMs = (res || []).reverse();
             let h='', dt = getISO(0);
+            if(!globalVehicles || !globalVehicles.length) {
+                document.getElementById('pmTableBody').innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรถสำหรับแจ้งแผน PM</td></tr>`;
+                return;
+            }
             globalVehicles.forEach((v, i) => {
                 h += `<tr class="hover:bg-slate-50 border-b pm-row-item">
                     <td class="p-2 text-center text-xs text-slate-500">${i+1}</td>
@@ -878,9 +895,13 @@
             const m = parseInt(document.getElementById('selectMonthPM').value), y = parseInt(document.getElementById('selectYearPM').value), d = new Date(y,m,0).getDate();
             let th=`<tr><th class="p-2 border-r w-48 text-left">ทะเบียนรถ / พนักงานขับรถ</th>`; for(let i=1;i<=d;i++) th+=`<th class="p-1 border-r text-center w-8">${i}</th>`; th+=`</tr>`;
             document.getElementById('pmCalendarHeader').innerHTML=th;
-            if(!globalVehicles.length) await loadVehiclesView();
-            let res = await fetch(`${API_URL}?action=getPMs`); globalPMs = (await res.json()).reverse();
+            if(!globalVehicles.length) globalVehicles = await fetchAPI('getVehicles');
+            let res = await fetchAPI('getPMs'); globalPMs = (res || []).reverse();
             let tb='';
+            if(!globalVehicles || !globalVehicles.length) {
+                document.getElementById('pmCalendarBody').innerHTML = `<tr><td colspan="${d+1}" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรถในระบบ</td></tr>`;
+                return;
+            }
             globalVehicles.forEach(v => {
                 tb+=`<tr class="border-b">
                     <td class="p-2 border-r text-left">

@@ -30,7 +30,7 @@
         .capturing .vehicle-row-item.is-ready .col-merged { display: table-cell !important; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
+<body class="bg-[#f8fafc] text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -70,172 +70,187 @@
             </div>
         </header>
 
-        <main class="flex-1 flex flex-col overflow-hidden bg-slate-100 p-4 lg:p-6">
+        <main class="flex-1 flex flex-col overflow-hidden bg-[#f1f5f9] p-4 lg:p-6">
             
-            <!-- TAB 0: DASHBOARD (EXACT REFERENCE MATCH) -->
+            <!-- TAB 0: DASHBOARD (EXACT PIXEL MATCH TO REFERENCE IMAGE) -->
             <div id="view-dashboard" class="space-y-4 view-section flex-1 flex flex-col overflow-auto">
                 
                 <!-- HEADER TITLE & DROPDOWNS -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center shrink-0 flex-wrap gap-4">
+                <div class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center shrink-0 flex-wrap gap-4 relative overflow-hidden">
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#FF9900]"></div>
                     <div>
                         <h2 class="font-bold text-slate-900 text-xl tracking-tight">Executive Dashboard</h2>
                         <p class="text-xs text-slate-500 mt-0.5">สรุปสถานะการซ่อมบำรุงและแผนงาน PM ประจำเดือน</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700">
+                        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
                             📅 <select id="dashMonth" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
-                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700">
+                        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
                             📅 <select id="dashYear" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
                     </div>
                 </div>
 
-                <!-- TOP 4 KPI CARDS -->
+                <!-- TOP 4 KPI CARDS (EXACT MATCH) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <!-- Card 1 -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">งานซ่อมทั้งหมด</div>
-                            <div class="flex items-baseline gap-1.5 mt-1.5">
-                                <span class="text-2xl font-bold text-slate-900" id="dashTotalCM">0</span>
+                            <div class="flex items-baseline gap-1.5 mt-2">
+                                <span class="text-3xl font-bold text-slate-900" id="dashTotalCM">0</span>
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white text-base shadow-sm">🔧</div>
+                        <div class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-xl shadow-md">
+                            🔧
+                        </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <!-- Card 2 -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">ซ่อมเสร็จรอรับงาน</div>
-                            <div class="flex items-baseline gap-1.5 mt-1.5">
-                                <span class="text-2xl font-bold text-emerald-600" id="dashDoneCM">0</span>
+                            <div class="flex items-baseline gap-1.5 mt-2">
+                                <span class="text-3xl font-bold text-emerald-600" id="dashDoneCM">0</span>
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white text-base shadow-sm">✅</div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center text-white text-xl shadow-md">
+                            ✅
+                        </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <!-- Card 3 -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">กำลังดำเนินการ</div>
-                            <div class="flex items-baseline gap-1.5 mt-1.5">
-                                <span class="text-2xl font-bold text-[#FF9900]" id="dashOngoingCM">0</span>
+                            <div class="flex items-baseline gap-1.5 mt-2">
+                                <span class="text-3xl font-bold text-[#FF9900]" id="dashOngoingCM">0</span>
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-xl bg-[#FF9900] flex items-center justify-center text-white text-base shadow-sm">⚙️</div>
+                        <div class="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-white text-xl shadow-md">
+                            ⚙️
+                        </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <!-- Card 4 -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">อนุมัติเรียบร้อย</div>
-                            <div class="flex items-baseline gap-1.5 mt-1.5">
-                                <span class="text-2xl font-bold text-purple-600" id="dashApprovedCM">0</span>
+                            <div class="flex items-baseline gap-1.5 mt-2">
+                                <span class="text-3xl font-bold text-purple-600" id="dashApprovedCM">0</span>
                                 <span class="text-xs text-slate-500 font-medium">รายการ</span>
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white text-base shadow-sm">🛡️</div>
+                        <div class="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white text-xl shadow-md">
+                            🛡️
+                        </div>
                     </div>
                 </div>
 
-                <!-- MIDDLE ROW: TWO DONUT CHARTS -->
+                <!-- MIDDLE ROW: TWO DONUT CHARTS (EXACT MATCH) -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <!-- Chart 1 -->
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100 font-bold text-slate-800 text-sm">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             📊 สถานะงานซ่อม CM
                         </div>
-                        <div class="flex items-center justify-around py-3">
-                            <div class="relative w-28 h-28 rounded-full flex flex-col items-center justify-center bg-slate-50 border-4 border-blue-500 shadow-inner">
-                                <div class="text-xl font-bold text-slate-900" id="chartTotalCM">0</div>
-                                <div class="text-[10px] text-slate-500">งาน</div>
+                        <div class="p-5 flex items-center justify-around my-auto">
+                            <div class="relative w-36 h-36 rounded-full flex flex-col items-center justify-center bg-slate-50 border-8 border-blue-500 shadow-inner">
+                                <div class="text-3xl font-extrabold text-slate-900" id="chartTotalCM">0</div>
+                                <div class="text-xs text-slate-500">งาน</div>
                             </div>
-                            <div class="space-y-2 text-xs">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#FF9900]"></span>
-                                    <span class="text-slate-600">กำลังดำเนินการ</span>
-                                    <span class="font-bold text-slate-900 ml-auto" id="legendOngoing">0 (0%)</span>
+                            <div class="space-y-3 text-xs">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-3.5 h-3.5 rounded-full bg-[#FF9900]"></span>
+                                    <span class="text-slate-600 font-medium">กำลังดำเนินการ</span>
+                                    <span class="font-bold text-slate-900 ml-4" id="legendOngoing">0 (0%)</span>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                                    <span class="text-slate-600">ซ่อมเสร็จ/รอรับงาน</span>
-                                    <span class="font-bold text-slate-900 ml-auto" id="legendDone">0 (0%)</span>
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-3.5 h-3.5 rounded-full bg-blue-500"></span>
+                                    <span class="text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</span>
+                                    <span class="font-bold text-slate-900 ml-4" id="legendDone">0 (0%)</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Chart 2 -->
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100 font-bold text-slate-800 text-sm">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             🛡️ สถานะอนุมัติ
                         </div>
-                        <div class="flex items-center justify-around py-3">
-                            <div class="relative w-28 h-28 rounded-full flex flex-col items-center justify-center bg-slate-50 border-4 border-blue-400 shadow-inner">
-                                <div class="text-xl font-bold text-slate-900" id="chartTotalApp">0</div>
-                                <div class="text-[10px] text-slate-500">รายการ</div>
+                        <div class="p-5 flex items-center justify-around my-auto">
+                            <div class="relative w-36 h-36 rounded-full flex flex-col items-center justify-center bg-slate-50 border-8 border-blue-400 shadow-inner">
+                                <div class="text-3xl font-extrabold text-slate-900" id="chartTotalApp">0</div>
+                                <div class="text-xs text-slate-500">รายการ</div>
                             </div>
-                            <div class="space-y-2 text-xs">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                                    <span class="text-slate-600">อนุมัติเรียบร้อย</span>
-                                    <span class="font-bold text-slate-900 ml-auto" id="legendApproved">0</span>
+                            <div class="space-y-3 text-xs">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-3.5 h-3.5 rounded-full bg-blue-500"></span>
+                                    <span class="text-slate-600 font-medium">อนุมัติเรียบร้อย</span>
+                                    <span class="font-bold text-slate-900 ml-4" id="legendApproved">0</span>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                                    <span class="text-slate-600">รอดำเนินการ</span>
-                                    <span class="font-bold text-slate-900 ml-auto" id="legendPending">0</span>
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-3.5 h-3.5 rounded-full bg-slate-300"></span>
+                                    <span class="text-slate-600 font-medium">รอดำเนินการ</span>
+                                    <span class="font-bold text-slate-900 ml-4" id="legendPending">0</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- BOTTOM ROW: PM PLAN, FLEET AVAILABILITY & SUMMARY TABLE -->
+                <!-- BOTTOM ROW: PM PLAN, FLEET AVAILABILITY & SUMMARY TABLE (EXACT MATCH) -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <!-- PM Plan Card -->
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                        <div class="flex items-center gap-2 pb-2 border-b border-slate-100 font-bold text-slate-800 text-xs">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
+                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             📅 แผน PM เดือนนี้
                         </div>
-                        <div class="flex items-center justify-between my-auto py-3">
-                            <div class="text-3xl font-extrabold text-[#FF9900]" id="dashTotalPM">0</div>
-                            <div class="text-right text-xs text-slate-500 font-medium">คัน/รอบ</div>
+                        <div class="p-5 flex items-center justify-between my-auto">
+                            <div class="text-5xl font-black text-[#FF9900]" id="dashTotalPM">0</div>
+                            <div class="text-right text-xs text-slate-500 font-bold uppercase tracking-wide">คัน/รอบ</div>
                         </div>
                     </div>
 
                     <!-- Fleet Availability Card -->
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                        <div class="flex items-center gap-2 pb-2 border-b border-slate-100 font-bold text-slate-800 text-xs">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
+                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             🚚 ความพร้อมของรถในฟลีท
                         </div>
-                        <div class="flex items-center justify-around py-2">
-                            <div class="text-2xl font-extrabold text-blue-600" id="dashReadyRate">100%</div>
+                        <div class="p-5 flex items-center justify-around my-auto">
+                            <div class="text-3xl font-black text-blue-600" id="dashReadyRate">100%</div>
                             <div class="text-right">
-                                <div class="text-[11px] text-slate-500">จำนวนรถทั้งหมด</div>
-                                <div class="text-base font-bold text-slate-900"><span id="dashTotalVehicles">0</span> คัน</div>
+                                <div class="text-xs text-slate-400 font-medium">จำนวนรถทั้งหมด</div>
+                                <div class="text-xl font-bold text-slate-900"><span id="dashTotalVehicles">0</span> คัน</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Summary Table Card -->
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
-                        <div class="flex items-center gap-2 pb-2 border-b border-slate-100 font-bold text-slate-800 text-xs">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden lg:col-span-1 flex flex-col">
+                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
                             📋 สรุปสถานะโดยรวม
                         </div>
-                        <table class="w-full text-xs text-left mt-2">
-                            <thead>
-                                <tr class="text-slate-400 border-b">
-                                    <th class="pb-1 font-medium">สถานะ</th>
-                                    <th class="pb-1 font-medium text-center">จำนวน</th>
-                                    <th class="pb-1 font-medium text-right">สัดส่วน</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100" id="dashSummaryTable">
-                                <tr><td class="py-1.5 text-slate-600">กำลังดำเนินการ</td><td class="py-1.5 text-center font-bold">0</td><td class="py-1.5 text-right">0%</td></tr>
-                                <tr><td class="py-1.5 text-slate-600">ซ่อมเสร็จ/รอรับงาน</td><td class="py-1.5 text-center font-bold">0</td><td class="py-1.5 text-right">0%</td></tr>
-                            </tbody>
-                        </table>
+                        <div class="p-4 flex-1 flex flex-col justify-center">
+                            <table class="w-full text-xs text-left">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-100">
+                                        <th class="pb-2 font-semibold">สถานะ</th>
+                                        <th class="pb-2 font-semibold text-center">จำนวน</th>
+                                        <th class="pb-2 font-semibold text-right">สัดส่วน</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="dashSummaryTable">
+                                    <tr><td class="py-2.5 text-slate-600 font-medium">กำลังดำเนินการ</td><td class="py-2.5 text-center font-bold text-slate-900">0</td><td class="py-2.5 text-right font-semibold text-slate-700">0%</td></tr>
+                                    <tr><td class="py-2.5 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-2.5 text-center font-bold text-slate-900">0</td><td class="py-2.5 text-right font-semibold text-slate-700">0%</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -444,7 +459,6 @@
             btn.disabled = true;
 
             try {
-                // ใช้รูปแบบเรียกผ่าน Text เพื่อเลี่ยงปัญหา CORS ใน Google Apps Script
                 const res = await fetch(API_URL, { 
                     method: "POST", 
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -563,8 +577,8 @@
 
             // Summary table update
             document.getElementById('dashSummaryTable').innerHTML = `
-                <tr><td class="py-1.5 text-slate-600">กำลังดำเนินการ</td><td class="py-1.5 text-center font-bold">${ongoingCM}</td><td class="py-1.5 text-right">${ongoingPct}%</td></tr>
-                <tr><td class="py-1.5 text-slate-600">ซ่อมเสร็จ/รอรับงาน</td><td class="py-1.5 text-center font-bold">${doneCM}</td><td class="py-1.5 text-right">${donePct}%</td></tr>
+                <tr><td class="py-2.5 text-slate-600 font-medium">กำลังดำเนินการ</td><td class="py-2.5 text-center font-bold text-slate-900">${ongoingCM}</td><td class="py-2.5 text-right font-semibold text-slate-700">${ongoingPct}%</td></tr>
+                <tr><td class="py-2.5 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-2.5 text-center font-bold text-slate-900">${doneCM}</td><td class="py-2.5 text-right font-semibold text-slate-700">${donePct}%</td></tr>
             `;
             
             const totalVeh = globalVehicles.length || 1;

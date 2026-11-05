@@ -387,7 +387,7 @@
                     document.getElementById('loginOverlay').classList.add('hidden');
                     document.getElementById('appContainer').classList.remove('hidden');
                     initDateSelectors();
-                    // Pre-fetch global data to ensure all views have data loaded
+                    // Pre-load global data immediately so tables are fully populated
                     globalVehicles = await fetchAPI('getVehicles');
                     globalRepairs = await fetchAPI('getRepairs');
                     globalPMs = await fetchAPI('getPMs');

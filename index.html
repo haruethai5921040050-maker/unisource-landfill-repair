@@ -18,7 +18,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
         * { font-family: 'CS Prajad', 'Sarabun', sans-serif !important; }
         
-        /* สไตล์พิเศษสำหรับซ่อนตอนแคปรูป และรวมเซลล์ พร้อมใช้งาน */
         .capturing input, .capturing select { display: none !important; }
         .capturing .text-replacement { display: inline-block !important; }
         .text-replacement { display: none; }
@@ -70,7 +69,6 @@
 
         <main class="flex-1 flex flex-col overflow-hidden bg-slate-100 p-4 lg:p-6">
             
-            <!-- TAB 1: VEHICLES -->
             <div id="view-vehicles" class="space-y-4 view-section flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 flex-wrap gap-3">
                     <div class="flex items-center gap-4">
@@ -98,7 +96,6 @@
                 </div>
             </div>
 
-            <!-- TAB 2: REPAIRS -->
             <div id="view-repairs" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border flex-wrap gap-4">
                     <h2 class="font-medium text-slate-800 text-base">รายการบันทึกการซ่อมและการอนุมัติ</h2>
@@ -121,7 +118,6 @@
                 </div>
             </div>
 
-            <!-- TAB 3: MONTHLY SUMMARY -->
             <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน</h2>
@@ -136,7 +132,6 @@
                 </div>
             </div>
 
-            <!-- TAB 4: PM PLAN -->
             <div id="view-pmPlan" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">แจ้งแผน PM ล่วงหน้า</h2>
@@ -152,7 +147,6 @@
                 </div>
             </div>
 
-            <!-- TAB 5: PM CALENDAR -->
             <div id="view-pmCalendar" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">ปฏิทินแผน PM ประจำเดือน</h2>
@@ -169,7 +163,6 @@
         </main>
     </div>
 
-    <!-- MODAL: REPORT EXPORT -->
     <div id="exportReportModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 flex flex-col max-h-[90vh]">
             <h3 class="font-bold text-base mb-2">ตัวอย่างรูปภาพรายงาน</h3>
@@ -361,7 +354,6 @@
             const l=document.createElement('a'); l.download=`Report_${new Date().getTime()}.png`; l.href=generatedReportCanvas.toDataURL('image/png'); l.click();
         }
 
-        // ================= REPAIRS =================
         async function loadRepairsView() {
             let res = await fetch(`${API_URL}?action=getRepairs`); globalRepairs = (await res.json()).reverse();
             renderRepairsTable(globalRepairs);
@@ -395,7 +387,6 @@
         }
         async function delRep(id) { await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"deleteRepair",repairID:id})}); loadRepairsView(); }
 
-        // ================= MONTHLY SUMMARY =================
         async function loadMonthlySummary() {
             const m = parseInt(document.getElementById('selectMonth').value), y = parseInt(document.getElementById('selectYear').value), d = new Date(y,m,0).getDate();
             let th=`<tr><th class="p-2 border-r">ทะเบียนรถ</th>`; for(let i=1;i<=d;i++) th+=`<th class="p-1 border-r text-center w-8">${i}</th>`; th+=`</tr>`;
@@ -415,7 +406,6 @@
             document.getElementById('calendarBody').innerHTML=tb;
         }
 
-        // ================= PM PLANS (NEW) =================
         async function loadPMView() {
             if(!globalVehicles.length) await loadVehiclesView();
             let res = await fetch(`${API_URL}?action=getPMs`); globalPMs = (await res.json()).reverse();
@@ -462,7 +452,7 @@
         function exportToExcel(type) {
             let tb = '';
             if(type==='vehicles') tb = document.querySelector('#view-vehicles table').outerHTML;
-            if(type==='repairs') tb = document.querySelector('#view-repairs table').outerHTML; // *มันจะดาวน์โหลดแถวที่โชว์อยู่ (ผ่านการฟิลเตอร์ช่วงวันที่มาแล้ว)
+            if(type==='repairs') tb = document.querySelector('#view-repairs table').outerHTML;
             if(type==='monthly') tb = document.querySelector('#view-monthlySummary table').outerHTML;
             if(type==='pm') tb = document.querySelector('#view-pmPlan table').outerHTML;
             if(type==='pmcal') tb = document.querySelector('#view-pmCalendar table').outerHTML;

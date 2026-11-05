@@ -90,7 +90,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-slate-50/70 p-5 rounded-2xl border border-slate-100 flex items-center justify-between">
+                    <div class="bg-slate-50/70 p-5 rounded-2xl flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">งานซ่อมทั้งหมด</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -100,7 +100,7 @@
                         </div>
                         <div class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-xl shadow-md">🔧</div>
                     </div>
-                    <div class="bg-slate-50/70 p-5 rounded-2xl border border-slate-100 flex items-center justify-between">
+                    <div class="bg-slate-50/70 p-5 rounded-2xl flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">ซ่อมเสร็จรอรับงาน</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -110,7 +110,7 @@
                         </div>
                         <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center text-white text-xl shadow-md">✅</div>
                     </div>
-                    <div class="bg-slate-50/70 p-5 rounded-2xl border border-slate-100 flex items-center justify-between">
+                    <div class="bg-slate-50/70 p-5 rounded-2xl flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">กำลังซ่อม</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -120,7 +120,7 @@
                         </div>
                         <div class="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-white text-xl shadow-md">⚙️</div>
                     </div>
-                    <div class="bg-slate-50/70 p-5 rounded-2xl border border-slate-100 flex items-center justify-between">
+                    <div class="bg-slate-50/70 p-5 rounded-2xl flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">อนุมัติเรียบร้อย</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -368,18 +368,12 @@
             return r.trim();
         }
 
-        function getLocalISO(offsetDays = 0) {
-            const n = new Date(); 
-            n.setDate(n.getDate() + offsetDays);
-            const y = n.getFullYear();
-            const m = String(n.getMonth() + 1).padStart(2, '0');
-            const d = String(n.getDate()).padStart(2, '0');
-            const h = String(n.getHours()).padStart(2, '0');
-            const min = String(n.getMinutes()).padStart(2, '0');
-            return `${y}-${m}-${d}T${h}:${min}`;
+        function getISO(offsetDays = 0) {
+            const n = new Date(); n.setDate(n.getDate() + offsetDays);
+            return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}T${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        window.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('unisource_user');
             if (saved && saved !== "undefined" && saved !== "null") {
                 try {
@@ -387,10 +381,6 @@
                     document.getElementById('loginOverlay').classList.add('hidden');
                     document.getElementById('appContainer').classList.remove('hidden');
                     initDateSelectors();
-                    // Pre-load global data immediately so tables are fully populated
-                    globalVehicles = await fetchAPI('getVehicles');
-                    globalRepairs = await fetchAPI('getRepairs');
-                    globalPMs = await fetchAPI('getPMs');
                     switchTab('dashboard');
                 } catch(e) { localStorage.removeItem('unisource_user'); }
             }
@@ -418,11 +408,7 @@
                     localStorage.setItem('unisource_user', JSON.stringify(currentUser));
                     document.getElementById('loginOverlay').classList.add('hidden');
                     document.getElementById('appContainer').classList.remove('hidden');
-                    initDateSelectors();
-                    globalVehicles = await fetchAPI('getVehicles');
-                    globalRepairs = await fetchAPI('getRepairs');
-                    globalPMs = await fetchAPI('getPMs');
-                    showToast("เข้าสู่ระบบสำเร็จ"); switchTab('dashboard');
+                    initDateSelectors(); switchTab('dashboard');
                 } else { err.innerText = result.message || "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง"; err.classList.remove('hidden'); }
             } catch (error) { err.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อระบบ"; err.classList.remove('hidden'); } 
             finally { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; }
@@ -465,24 +451,46 @@
             const m = parseInt(document.getElementById('dashMonth').value);
             const y = parseInt(document.getElementById('dashYear').value);
             
-            if(!globalVehicles.length) globalVehicles = await fetchAPI('getVehicles');
-            if(!globalRepairs.length) globalRepairs = await fetchAPI('getRepairs');
-            if(!globalPMs.length) globalPMs = await fetchAPI('getPMs');
+            globalVehicles = await fetchAPI('getVehicles');
+            globalRepairs = await fetchAPI('getRepairs');
+            globalPMs = await fetchAPI('getPMs');
 
-            const monthRepairs = globalRepairs.filter(r => r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startMonth === m && r.startYear === y);
+            // 1. ดึงจำนวนรถจริงทั้งหมดในระบบ
+            const totalVehiclesCount = globalVehicles.length;
+
+            // 2. หารถคันที่มีสถานะ CM และ "กำลังซ่อมอยู่" (ยังไม่มีการใส่วันเวลาซ่อมเสร็จ) ในเดือน/ปีที่เลือก
+            const ongoingCMRollingVehicles = new Set();
+            
+            globalRepairs.forEach(r => {
+                if (
+                    r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && 
+                    r.repairStatus === 'CM' && 
+                    r.startMonth === m && 
+                    r.startYear === y
+                ) {
+                    const hasEnded = (r.endDateText && r.endDateText.trim() !== '') || (r.endDateISO && r.endDateISO.trim() !== '');
+                    if (!hasEnded && r.postRepairStatus !== 'เสร็จพร้อมรับงาน') {
+                        ongoingCMRollingVehicles.add(String(r.vehicleNumber).trim());
+                    }
+                }
+            });
+
+            // 3. สรุปจำนวนรถจริงตามสถานะ
+            const ongoingCM = ongoingCMRollingVehicles.size; 
+            const doneCM = totalVehiclesCount > 0 ? Math.max(0, totalVehiclesCount - ongoingCM) : 0; 
+            const totalCM = totalVehiclesCount; 
+
             const monthPMs = globalPMs.filter(p => p.startMonth === m && p.startYear === y);
+            const approvedCM = globalRepairs.filter(r => r.approvalStatus === 'อนุมัติ' && r.repairStatus === 'CM' && r.startMonth === m && r.startYear === y).length;
 
-            const totalCM = monthRepairs.length;
-            const doneCM = monthRepairs.filter(r => r.postRepairStatus === 'เสร็จพร้อมรับงาน').length;
-            const ongoingCM = monthRepairs.filter(r => r.postRepairStatus === 'กำลังซ่อม').length;
-            const approvedCM = monthRepairs.filter(r => r.approvalStatus === 'อนุมัติ').length;
-
+            // 4. อัปเดตการ์ดสรุปตัวเลขด้านบน
             document.getElementById('dashTotalCM').innerText = totalCM;
             document.getElementById('dashDoneCM').innerText = doneCM;
             document.getElementById('dashOngoingCM').innerText = ongoingCM;
             document.getElementById('dashApprovedCM').innerText = approvedCM;
             document.getElementById('dashTotalPM').innerText = monthPMs.length;
 
+            // ตารางรายการ PM เดือนนี้
             let pmListHtml = '';
             if (monthPMs.length > 0) {
                 monthPMs.forEach(p => {
@@ -494,6 +502,7 @@
             }
             document.getElementById('dashPMListTable').innerHTML = pmListHtml;
 
+            // 5 อันดับรถที่มี CM มากที่สุด
             const cmCounts = {};
             globalRepairs.forEach(r => {
                 if (r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.repairStatus === 'CM') {
@@ -512,6 +521,7 @@
             }
             document.getElementById('dashTopCMTable').innerHTML = topCmHtml;
 
+            // 5. วาดกราฟวงกลมและสรุปสัดส่วนตามจำนวนรถจริง
             document.getElementById('chartTotalCM').innerText = totalCM;
             const ongoingPct = totalCM > 0 ? Math.round((ongoingCM / totalCM) * 100) : 0;
             const donePct = totalCM > 0 ? Math.round((doneCM / totalCM) * 100) : 0;
@@ -541,7 +551,7 @@
         }
 
         async function loadVehiclesView() {
-            if (!globalVehicles.length) globalVehicles = await fetchAPI('getVehicles');
+            globalVehicles = await fetchAPI('getVehicles');
             renderVehicleTable();
         }
 
@@ -553,7 +563,7 @@
         }
 
         function renderVehicleTable() {
-            let h = '', dt = getLocalISO(currentPlanTarget === 'tomorrow' ? 1 : 0);
+            let h = '', dt = getISO(currentPlanTarget === 'tomorrow' ? 1 : 0);
             if (!globalVehicles || !globalVehicles.length) {
                 document.getElementById('vehicleTableBody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400">ไม่พบข้อมูลรถ</td></tr>`;
                 return;
@@ -646,7 +656,7 @@
         // ================= REPAIRS =================
         async function loadRepairsView() {
             let res = await fetchAPI('getRepairs'); 
-            globalRepairs = (res || []).slice().reverse();
+            globalRepairs = (res || []).reverse();
             renderRepairsTable(globalRepairs);
         }
 
@@ -658,7 +668,7 @@
             }
             repairs.forEach(r => {
                 if(r.approvalStatus==='ยกเลิก/ลบแล้ว') return;
-                const defaultDT = getLocalISO(0);
+                const defaultDT = getISO(0);
                 let statusColor = 'text-emerald-600';
                 if(r.repairStatus==='CM') statusColor = 'text-red-600';
                 if(r.repairStatus==='PM') statusColor = 'text-[#FF9900]';
@@ -795,9 +805,9 @@
             headerHtml += `</tr>`;
             document.getElementById('calendarHeader').innerHTML = headerHtml;
 
-            if(!globalVehicles.length) globalVehicles = await fetchAPI('getVehicles');
-            let resR = await fetchAPI('getRepairs'); globalRepairs = (resR || []).slice().reverse();
-            let resP = await fetchAPI('getPMs'); globalPMs = (resP || []).slice().reverse();
+            globalVehicles = await fetchAPI('getVehicles');
+            let resR = await fetchAPI('getRepairs'); globalRepairs = (resR || []).reverse();
+            let resP = await fetchAPI('getPMs'); globalPMs = (resP || []).reverse();
 
             let bodyHtml = '';
             if(!globalVehicles || !globalVehicles.length) {
@@ -833,9 +843,9 @@
 
         // ================= PM PLANS =================
         async function loadPMView() {
-            if(!globalVehicles.length) globalVehicles = await fetchAPI('getVehicles');
-            let res = await fetchAPI('getPMs'); globalPMs = (res || []).slice().reverse();
-            let h='', dt = getLocalISO(0);
+            globalVehicles = await fetchAPI('getVehicles');
+            let res = await fetchAPI('getPMs'); globalPMs = (res || []).reverse();
+            let h='', dt = getISO(0);
             if(!globalVehicles || !globalVehicles.length) {
                 document.getElementById('pmTableBody').innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรถสำหรับแจ้งแผน PM</td></tr>`;
                 return;
@@ -854,7 +864,7 @@
                     <td class="p-2"><input type="text" id="pmgar-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"></td>
                     <td class="p-2"><input type="text" id="pmdet-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"></td>
                     <td class="p-2"><input type="text" id="pmrem-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"></td>
-                    <td class="p-2 text-center"><button onclick="savePM('${v.vehicleNumber}','${v.plateNumber}','${v.driverName}')" class="bg-[#FF9900] text-white px-2 py-1 rounded text-xs">Save PM</button></td>
+                    <td class="p-2 text-center"><button onclick="savePM('${v.vehicleNumber}','${v.plateNumber}','${v.driverName}')" class="bg-[#FF9900] text-[#000066] px-2 py-1 rounded text-xs font-bold">Save PM</button></td>
                 </tr>`;
             });
             document.getElementById('pmTableBody').innerHTML=h;
@@ -869,8 +879,8 @@
             const m = parseInt(document.getElementById('selectMonthPM').value), y = parseInt(document.getElementById('selectYearPM').value), d = new Date(y,m,0).getDate();
             let th=`<tr><th class="p-2 border-r w-48 text-left">ทะเบียนรถ / พนักงานขับรถ</th>`; for(let i=1;i<=d;i++) th+=`<th class="p-1 border-r text-center w-8">${i}</th>`; th+=`</tr>`;
             document.getElementById('pmCalendarHeader').innerHTML=th;
-            if(!globalVehicles.length) globalVehicles = await fetchAPI('getVehicles');
-            let res = await fetchAPI('getPMs'); globalPMs = (res || []).slice().reverse();
+            globalVehicles = await fetchAPI('getVehicles');
+            let res = await fetchAPI('getPMs'); globalPMs = (res || []).reverse();
             let tb='';
             if(!globalVehicles || !globalVehicles.length) {
                 document.getElementById('pmCalendarBody').innerHTML = `<tr><td colspan="${d+1}" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรถในระบบ</td></tr>`;

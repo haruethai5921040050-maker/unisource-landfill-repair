@@ -30,7 +30,7 @@
         .capturing .vehicle-row-item.is-ready .col-merged { display: table-cell !important; }
     </style>
 </head>
-<body class="bg-[#f1f5f9] text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
+<body class="bg-[#f8fafc] text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -70,28 +70,31 @@
             </div>
         </header>
 
-        <main class="flex-1 flex flex-col overflow-hidden bg-[#f1f5f9] p-4 lg:p-6">
+        <main class="flex-1 flex flex-col overflow-auto bg-[#f8fafc] p-4 lg:p-6 gap-5">
             
             <!-- TAB 0: DASHBOARD -->
-            <div id="view-dashboard" class="space-y-4 view-section flex-1 flex flex-col overflow-auto">
-                <div class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center shrink-0 flex-wrap gap-4 relative overflow-hidden">
+            <div id="view-dashboard" class="space-y-5 view-section flex flex-col">
+                
+                <!-- HEADER TITLE & DROPDOWNS -->
+                <div class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-slate-200/80 flex justify-between items-center shrink-0 flex-wrap gap-4 relative overflow-hidden">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#FF9900]"></div>
                     <div>
-                        <h2 class="font-bold text-slate-900 text-xl tracking-tight">Executive Dashboard</h2>
+                        <h2 class="font-bold text-slate-900 text-lg tracking-tight">Executive Dashboard</h2>
                         <p class="text-xs text-slate-500 mt-0.5">สรุปสถานะการซ่อมบำรุงและแผนงาน PM ประจำเดือน</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
-                            📅 <select id="dashMonth" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
+                            <select id="dashMonth" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
                         <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
-                            📅 <select id="dashYear" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
+                            <select id="dashYear" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
                     </div>
                 </div>
 
+                <!-- TOP 4 KPI CARDS -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">งานซ่อมทั้งหมด</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -99,10 +102,10 @@
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-xl shadow-md">🔧</div>
+                        <div class="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-white text-lg shadow-sm">🔧</div>
                     </div>
 
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">ซ่อมเสร็จรอรับงาน</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -110,10 +113,10 @@
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center text-white text-xl shadow-md">✅</div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white text-lg shadow-sm">✅</div>
                     </div>
 
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">กำลังดำเนินการ</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -121,10 +124,10 @@
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-white text-xl shadow-md">⚙️</div>
+                        <div class="w-12 h-12 rounded-xl bg-[#FF9900] flex items-center justify-center text-white text-lg shadow-sm">⚙️</div>
                     </div>
 
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">อนุมัติเรียบร้อย</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -132,65 +135,71 @@
                                 <span class="text-xs text-slate-500 font-medium">รายการ</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white text-xl shadow-md">🛡️</div>
+                        <div class="w-12 h-12 rounded-xl bg-purple-600 flex items-center justify-center text-white text-lg shadow-sm">🛡️</div>
                     </div>
                 </div>
 
+                <!-- MIDDLE ROW: CM DONUT CHART & PM PLAN (COMPACT & BALANCED) -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
-                            📊 สถานะงานซ่อม CM
+                    <!-- Chart Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col">
+                        <div class="bg-[#1e293b] text-white px-5 py-3 text-xs font-bold tracking-wide">
+                            สถานะงานซ่อม CM
                         </div>
                         <div class="p-6 flex items-center justify-around my-auto">
-                            <div id="chartContainerCM" class="relative w-44 h-44 rounded-full flex flex-col items-center justify-center shadow-inner bg-white">
+                            <div id="chartContainerCM" class="relative w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-inner bg-white">
                                 <div class="absolute inset-3 bg-white rounded-full flex flex-col items-center justify-center shadow-sm z-10">
-                                    <div class="text-4xl font-black text-slate-900" id="chartTotalCM">0</div>
-                                    <div class="text-xs text-slate-500 font-medium">งาน</div>
+                                    <div class="text-3xl font-black text-slate-900" id="chartTotalCM">0</div>
+                                    <div class="text-[11px] text-slate-500 font-medium">งาน</div>
                                 </div>
                             </div>
                             <div class="space-y-3 text-xs">
                                 <div class="flex items-center gap-2.5">
-                                    <span class="w-3.5 h-3.5 rounded-full bg-[#FF9900]"></span>
+                                    <span class="w-3 h-3 rounded-full bg-[#FF9900]"></span>
                                     <span class="text-slate-600 font-medium">กำลังดำเนินการ</span>
-                                    <span class="font-bold text-slate-900 ml-4" id="legendOngoing">0 (0%)</span>
+                                    <span class="font-bold text-slate-900 ml-3" id="legendOngoing">0 (0%)</span>
                                 </div>
                                 <div class="flex items-center gap-2.5">
-                                    <span class="w-3.5 h-3.5 rounded-full bg-[#4682B4]"></span>
+                                    <span class="w-3 h-3 rounded-full bg-[#4682B4]"></span>
                                     <span class="text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</span>
-                                    <span class="font-bold text-slate-900 ml-4" id="legendDone">0 (0%)</span>
+                                    <span class="font-bold text-slate-900 ml-3" id="legendDone">0 (0%)</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
-                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
-                            📅 แผน PM เดือนนี้
+                    <!-- PM Plan Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+                        <div class="bg-[#1e293b] text-white px-5 py-3 text-xs font-bold tracking-wide">
+                            แผน PM เดือนนี้
                         </div>
                         <div class="p-6 flex items-center justify-between my-auto">
-                            <div class="text-6xl font-black text-[#FF9900]" id="dashTotalPM">0</div>
-                            <div class="text-right text-xs text-slate-500 font-bold uppercase tracking-wide">คัน/รอบ</div>
+                            <div class="text-5xl font-black text-[#FF9900]" id="dashTotalPM">0</div>
+                            <div class="text-right text-xs text-slate-400 font-bold uppercase tracking-wider">คัน / รอบ</div>
                         </div>
                     </div>
                 </div>
 
+                <!-- BOTTOM ROW: FLEET AVAILABILITY & SUMMARY TABLE -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
-                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
-                            🚚 ความพร้อมของรถในฟลีท
+                    <!-- Fleet Availability Card (Calculated from active total minus current CM/PM) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+                        <div class="bg-[#1e293b] text-white px-5 py-3 text-xs font-bold tracking-wide">
+                            ความพร้อมของรถในฟลีท (ณ ปัจจุบัน)
                         </div>
                         <div class="p-6 flex items-center justify-around my-auto">
                             <div class="text-4xl font-black text-blue-600" id="dashReadyRate">100%</div>
                             <div class="text-right">
-                                <div class="text-xs text-slate-400 font-medium">จำนวนรถทั้งหมด</div>
-                                <div class="text-2xl font-bold text-slate-900"><span id="dashTotalVehicles">0</span> คัน</div>
+                                <div class="text-xs text-slate-400 font-medium">จำนวนรถพร้อมใช้งาน / ทั้งหมด</div>
+                                <div class="text-xl font-bold text-slate-900 mt-0.5"><span id="dashReadyVehicles">0</span> / <span id="dashTotalVehicles">0</span> คัน</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                        <div class="bg-[#1e293b] text-white px-5 py-3 flex items-center gap-2.5 text-sm font-bold">
-                            📋 สรุปสถานะโดยรวม
+                    <!-- Summary Table Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col">
+                        <div class="bg-[#1e293b] text-white px-5 py-3 text-xs font-bold tracking-wide">
+                            สรุปสถานะโดยรวม
                         </div>
                         <div class="p-5 flex-1 flex flex-col justify-center">
                             <table class="w-full text-xs text-left">
@@ -378,17 +387,8 @@
             try {
                 const res = await fetch(`${API_URL}?action=${action}`);
                 const text = await res.text();
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error("JSON Parse Error on action:", action, text);
-                    return [];
-                }
-            } catch (err) {
-                console.error("Fetch Error on action:", action, err);
-                showToast(`โหลดข้อมูล ${action} ไม่สำเร็จ`, "error");
-                return [];
-            }
+                try { return JSON.parse(text); } catch (e) { return []; }
+            } catch (err) { return []; }
         }
 
         function formatDuration(mins) {
@@ -413,9 +413,7 @@
                     document.getElementById('appContainer').classList.remove('hidden');
                     initDateSelectors();
                     switchTab('dashboard');
-                } catch(e) {
-                    localStorage.removeItem('unisource_user');
-                }
+                } catch(e) { localStorage.removeItem('unisource_user'); }
             }
             document.getElementById('reportTimestamp').innerText = `ข้อมูล ณ วันที่: ${new Date().toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})}`;
         });
@@ -427,9 +425,7 @@
             const err = document.getElementById('loginError');
             const btn = document.getElementById('loginBtn');
             
-            err.classList.add('hidden');
-            btn.innerText = "กำลังตรวจสอบ...";
-            btn.disabled = true;
+            err.classList.add('hidden'); btn.innerText = "กำลังตรวจสอบ..."; btn.disabled = true;
 
             try {
                 const res = await fetch(API_URL, { 
@@ -437,40 +433,19 @@
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({ action: "login", role: r, password: p }) 
                 });
-                
-                const textResult = await res.text();
-                let result;
-                try {
-                    result = JSON.parse(textResult);
-                } catch (parseErr) {
-                    result = { success: false, message: "รูปแบบข้อมูลตอบกลับไม่ถูกต้อง" };
-                }
-
+                const result = JSON.parse(await res.text());
                 if (result.success) {
                     currentUser = { role: result.role, fullName: result.fullName };
                     localStorage.setItem('unisource_user', JSON.stringify(currentUser));
                     document.getElementById('loginOverlay').classList.add('hidden');
                     document.getElementById('appContainer').classList.remove('hidden');
-                    showToast("เข้าสู่ระบบสำเร็จ"); 
-                    initDateSelectors(); 
-                    switchTab('dashboard');
-                } else { 
-                    err.innerText = result.message || "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง"; 
-                    err.classList.remove('hidden'); 
-                }
-            } catch (error) { 
-                err.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อระบบ กรุณาลองใหม่อีกครั้ง"; 
-                err.classList.remove('hidden'); 
-            } finally {
-                btn.innerText = "เข้าสู่ระบบ";
-                btn.disabled = false;
-            }
+                    showToast("เข้าสู่ระบบสำเร็จ"); initDateSelectors(); switchTab('dashboard');
+                } else { err.innerText = result.message || "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง"; err.classList.remove('hidden'); }
+            } catch (error) { err.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อระบบ"; err.classList.remove('hidden'); } 
+            finally { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; }
         }
 
-        function handleLogout() { 
-            localStorage.removeItem('unisource_user'); 
-            location.reload(); 
-        }
+        function handleLogout() { localStorage.removeItem('unisource_user'); location.reload(); }
 
         function initDateSelectors() {
             const ms = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
@@ -507,15 +482,9 @@
             const m = parseInt(document.getElementById('dashMonth').value);
             const y = parseInt(document.getElementById('dashYear').value);
             
-            if(!globalVehicles.length) {
-                globalVehicles = await fetchAPI('getVehicles');
-            }
-            if(!globalRepairs.length) {
-                globalRepairs = await fetchAPI('getRepairs');
-            }
-            if(!globalPMs.length) {
-                globalPMs = await fetchAPI('getPMs');
-            }
+            if(!globalVehicles.length) globalVehicles = await fetchAPI('getVehicles');
+            if(!globalRepairs.length) globalRepairs = await fetchAPI('getRepairs');
+            if(!globalPMs.length) globalPMs = await fetchAPI('getPMs');
 
             const monthRepairs = globalRepairs.filter(r => r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startMonth === m && r.startYear === y);
             const monthPMs = globalPMs.filter(p => p.startMonth === m && p.startYear === y);
@@ -529,10 +498,32 @@
             document.getElementById('dashDoneCM').innerText = doneCM;
             document.getElementById('dashOngoingCM').innerText = ongoingCM;
             document.getElementById('dashApprovedCM').innerText = approvedCM;
-
             document.getElementById('dashTotalPM').innerText = monthPMs.length;
-            document.getElementById('dashTotalVehicles').innerText = globalVehicles.length;
 
+            const totalVeh = globalVehicles.length || 1;
+            document.getElementById('dashTotalVehicles').innerText = totalVeh;
+
+            // Calculate current active broken/PM vehicles for today
+            const todayStr = new Date().toISOString().slice(0,10);
+            const todayBrokenVehicles = new Set();
+            globalRepairs.forEach(r => {
+                if(r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startDateISO && r.startDateISO.startsWith(todayStr) && r.postRepairStatus !== 'เสร็จพร้อมรับงาน') {
+                    todayBrokenVehicles.add(String(r.vehicleNumber).trim());
+                }
+            });
+            globalPMs.forEach(p => {
+                if(p.startDateISO && p.startDateISO.startsWith(todayStr)) {
+                    todayBrokenVehicles.add(String(p.vehicleNumber).trim());
+                }
+            });
+
+            const readyVehCount = Math.max(0, totalVeh - todayBrokenVehicles.size);
+            const readyRate = Math.round((readyVehCount / totalVeh) * 100);
+
+            document.getElementById('dashReadyVehicles').innerText = readyVehCount;
+            document.getElementById('dashReadyRate').innerText = readyRate + '%';
+
+            // Donut Chart updates
             document.getElementById('chartTotalCM').innerText = totalCM;
             const ongoingPct = totalCM > 0 ? Math.round((ongoingCM / totalCM) * 100) : 0;
             const donePct = totalCM > 0 ? Math.round((doneCM / totalCM) * 100) : 0;
@@ -552,11 +543,6 @@
                 <tr><td class="py-2.5 text-slate-600 font-medium">กำลังดำเนินการ</td><td class="py-2.5 text-center font-bold text-slate-900">${ongoingCM}</td><td class="py-2.5 text-right font-semibold text-slate-700">${ongoingPct}%</td></tr>
                 <tr><td class="py-2.5 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-2.5 text-center font-bold text-slate-900">${doneCM}</td><td class="py-2.5 text-right font-semibold text-slate-700">${donePct}%</td></tr>
             `;
-            
-            const totalVeh = globalVehicles.length || 1;
-            const brokenVeh = new Set(monthRepairs.map(r => r.vehicleNumber)).size;
-            const readyRate = Math.max(0, Math.round(((totalVeh - brokenVeh) / totalVeh) * 100));
-            document.getElementById('dashReadyRate').innerText = readyRate + '%';
         }
 
         function changePlanTarget(t) {
@@ -581,7 +567,7 @@
         function renderVehicleTable() {
             let h = '', dt = getISO(currentPlanTarget === 'tomorrow' ? 1 : 0);
             if (!globalVehicles || !globalVehicles.length) {
-                document.getElementById('vehicleTableBody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400">ไม่พบข้อมูลรถ (กรุณาตรวจสอบการเชื่อมต่อ Apps Script)</td></tr>`;
+                document.getElementById('vehicleTableBody').innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400">ไม่พบข้อมูลรถ</td></tr>`;
                 return;
             }
             globalVehicles.forEach((v, i) => {
@@ -590,7 +576,7 @@
                     <td class="p-2">
                         <div class="font-medium text-xs text-slate-800">${v.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">${v.driverName}</div>
                     </td>
                     <td class="p-2">
                         <select id="status-${v.vehicleNumber}" class="w-full px-1.5 py-1 rounded border text-xs bg-white outline-none font-bold text-emerald-600" onchange="updateSelectColor(this)">
@@ -697,7 +683,7 @@
                     <td class="p-2">
                         <div class="font-medium text-xs text-slate-800">${r.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${r.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${r.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">${r.driverName}</div>
                     </td>
                     <td class="p-3"><span class="${statusColor} font-bold text-xs" id="postStatusText-${r.vehicleNumber}">${r.repairStatus}</span></td>
                     <td class="p-3 text-slate-500 text-[10px]">
@@ -836,7 +822,7 @@
                     <td class="p-2 border-r border-slate-200 text-left">
                         <div class="font-bold text-slate-800 text-xs">${v.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">${v.driverName}</div>
                     </td>`;
                 for (let d = 1; d <= daysInMonth; d++) {
                     const matchedRepair = globalRepairs.find(r => String(r.vehicleNumber).trim() === String(v.vehicleNumber).trim() && r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startDay === d && r.startMonth === m && r.startYear === y);
@@ -872,7 +858,7 @@
                     <td class="p-2">
                         <div class="font-medium text-xs text-slate-800">${v.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">${v.driverName}</div>
                     </td>
                     <td class="p-2"><input type="datetime-local" id="pmstart-${v.vehicleNumber}" value="${dt}" class="w-full p-1 border rounded text-[10px]"></td>
                     <td class="p-2"><input type="datetime-local" id="pmend-${v.vehicleNumber}" value="${dt}" class="w-full p-1 border rounded text-[10px]"></td>
@@ -907,7 +893,7 @@
                     <td class="p-2 border-r text-left">
                         <div class="font-bold text-slate-800 text-xs">${v.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">${v.driverName}</div>
                     </td>`;
                 for(let i=1;i<=d;i++){
                     const match = globalPMs.find(p=>String(p.vehicleNumber).trim()===String(v.vehicleNumber).trim() && p.startDay===i && p.startMonth===m && p.startYear===y);

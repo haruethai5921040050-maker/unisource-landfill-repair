@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แจ้งแผนงานซ่อม & PM - Unisource Land Fill</title>
+    <title>แดชบอร์ด & ระบบแจ้งแผนงานซ่อม - Unisource Land Fill</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -55,7 +55,8 @@
             <div class="flex items-center gap-6 whitespace-nowrap">
                 <div><h1 class="text-lg font-bold tracking-wider">UNISOURCE</h1><p class="text-[#FF9900] text-[10px] font-bold tracking-widest text-center">LAND FILL</p></div>
                 <nav class="flex items-center gap-1 ml-4">
-                    <a href="#" onclick="switchTab('vehicles')" id="nav-vehicles" class="menu-item px-3 py-2 text-sm text-[#FF9900] font-medium transition">สถานะรถ</a>
+                    <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="menu-item px-3 py-2 text-sm text-[#FF9900] font-medium transition">แดชบอร์ดภาพรวม</a>
+                    <a href="#" onclick="switchTab('vehicles')" id="nav-vehicles" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">สถานะรถ</a>
                     <a href="#" onclick="switchTab('repairs')" id="nav-repairs" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">บันทึกเหตุการณ์ซ่อม</a>
                     <a href="#" onclick="switchTab('monthlySummary')" id="nav-monthlySummary" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">ปฏิทินซ่อมรายเดือน</a>
                     <a href="#" onclick="switchTab('pmPlan')" id="nav-pmPlan" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">แจ้งแผน PM</a>
@@ -69,8 +70,62 @@
 
         <main class="flex-1 flex flex-col overflow-hidden bg-slate-100 p-4 lg:p-6">
             
+            <!-- TAB 0: DASHBOARD (DEFAULT FIRST PAGE) -->
+            <div id="view-dashboard" class="space-y-4 view-section flex-1 flex flex-col overflow-auto">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 flex-wrap gap-3">
+                    <h2 class="font-bold text-slate-800 text-base">ภาพรวมระบบ (Dashboard)</h2>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-slate-500 font-medium">เลือกเดือนประจำข้อมูล:</span>
+                        <select id="dashMonth" onchange="loadDashboard()" class="px-3 py-1.5 rounded-lg border text-xs bg-white text-slate-700"></select>
+                        <select id="dashYear" onchange="loadDashboard()" class="px-3 py-1.5 rounded-lg border text-xs bg-white text-slate-700"></select>
+                    </div>
+                </div>
+
+                <!-- Section 1: Repair Dashboard -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
+                    <h3 class="text-sm font-bold text-[#000066] border-b pb-2">📊 ส่วนที่ 1: แดชบอร์ดสถานะการซ่อมประจำเดือน</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+                            <div class="text-xs text-slate-500 font-medium">ประเด็นซ่อมทั้งหมด (CM)</div>
+                            <div class="text-2xl font-bold text-[#000066] mt-1" id="dashTotalCM">0</div>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                            <div class="text-xs text-slate-500 font-medium">ซ่อมเสร็จพร้อมรับงาน</div>
+                            <div class="text-2xl font-bold text-emerald-600 mt-1" id="dashDoneCM">0</div>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                            <div class="text-xs text-slate-500 font-medium">กำลังดำเนินการซ่อม</div>
+                            <div class="text-2xl font-bold text-amber-600 mt-1" id="dashOngoingCM">0</div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
+                            <div class="text-xs text-slate-500 font-medium">อนุมัติซ่อมแล้ว</div>
+                            <div class="text-2xl font-bold text-purple-600 mt-1" id="dashApprovedCM">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: PM Plan Dashboard -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
+                    <h3 class="text-sm font-bold text-[#FF9900] border-b pb-2">📅 ส่วนที่ 2: แดชบอร์ดแผนการ PM ประจำเดือน</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
+                            <div class="text-xs text-slate-500 font-medium">แผน PM ทั้งหมดในเดือนนี้</div>
+                            <div class="text-2xl font-bold text-[#FF9900] mt-1" id="dashTotalPM">0</div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                            <div class="text-xs text-slate-500 font-medium">รถทั้งหมดในระบบ</div>
+                            <div class="text-2xl font-bold text-slate-700 mt-1" id="dashTotalVehicles">0</div>
+                        </div>
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+                            <div class="text-xs text-slate-500 font-medium">อัตราความพร้อมใช้งาน</div>
+                            <div class="text-2xl font-bold text-blue-600 mt-1" id="dashReadyRate">100%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TAB 1: VEHICLES -->
-            <div id="view-vehicles" class="space-y-4 view-section flex-1 flex flex-col overflow-hidden">
+            <div id="view-vehicles" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 flex-wrap gap-3">
                     <div class="flex items-center gap-4">
                         <h2 class="font-medium text-slate-800 text-base">บันทึกสถานะรถและแผนซ่อมรายวัน</h2>
@@ -125,7 +180,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: MONTHLY SUMMARY -->
+            <!-- TAB 3: MONTHLY SUMMARY (INTEGRATED WITH PM OVERLAY) -->
             <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน (ปฏิทินซ่อม 1-31)</h2>
@@ -251,9 +306,8 @@
                 currentUser = JSON.parse(saved);
                 document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
-                changePlanTarget('today');
-                loadVehiclesView();
                 initDateSelectors();
+                switchTab('dashboard'); // เปิดหน้า Dashboard เป็นหน้าแรกสุด
             }
             document.getElementById('reportTimestamp').innerText = `ข้อมูล ณ วันที่: ${new Date().toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})}`;
         });
@@ -269,7 +323,9 @@
                     localStorage.setItem('unisource_user', JSON.stringify(currentUser));
                     document.getElementById('loginOverlay').classList.add('hidden');
                     document.getElementById('appContainer').classList.remove('hidden');
-                    showToast("เข้าสู่ระบบสำเร็จ"); initDateSelectors(); loadVehiclesView();
+                    showToast("เข้าสู่ระบบสำเร็จ"); 
+                    initDateSelectors(); 
+                    switchTab('dashboard');
                 } else { err.innerText = result.message; err.classList.remove('hidden'); }
             } catch (error) { err.innerText = "Error connecting to API"; err.classList.add('hidden'); }
         }
@@ -282,6 +338,9 @@
             const yr = new Date().getFullYear();
             for(let y=yr-1; y<=yr+1; y++) yh+=`<option value="${y}">${y+543} (${y})</option>`;
             
+            document.getElementById('dashMonth').innerHTML = mh; document.getElementById('dashYear').innerHTML = yh;
+            document.getElementById('dashMonth').value = new Date().getMonth()+1; document.getElementById('dashYear').value = yr;
+
             document.getElementById('selectMonth').innerHTML = mh; document.getElementById('selectYear').innerHTML = yh;
             document.getElementById('selectMonth').value = new Date().getMonth()+1; document.getElementById('selectYear').value = yr;
             
@@ -294,11 +353,47 @@
             document.querySelectorAll('.menu-item').forEach(e=>e.classList.replace('text-[#FF9900]','text-slate-300'));
             document.getElementById(`view-${id}`).classList.remove('hidden');
             document.getElementById(`nav-${id}`).classList.replace('text-slate-300','text-[#FF9900]');
+            if(id==='dashboard') loadDashboard();
             if(id==='vehicles') loadVehiclesView();
             if(id==='repairs') loadRepairsView();
             if(id==='monthlySummary') loadMonthlySummary();
             if(id==='pmPlan') loadPMView();
             if(id==='pmCalendar') loadPMCalendar();
+        }
+
+        // ================= DASHBOARD =================
+        async function loadDashboard() {
+            const m = parseInt(document.getElementById('dashMonth').value);
+            const y = parseInt(document.getElementById('dashYear').value);
+            
+            if(!globalVehicles.length) {
+                let resV = await fetch(`${API_URL}?action=getVehicles`);
+                globalVehicles = await resV.json();
+            }
+            if(!globalRepairs.length) {
+                let resR = await fetch(`${API_URL}?action=getRepairs`);
+                globalRepairs = await resR.json();
+            }
+            if(!globalPMs.length) {
+                let resP = await fetch(`${API_URL}?action=getPMs`);
+                globalPMs = await resP.json();
+            }
+
+            const monthRepairs = globalRepairs.filter(r => r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startMonth === m && r.startYear === y);
+            const monthPMs = globalPMs.filter(p => p.startMonth === m && p.startYear === y);
+
+            document.getElementById('dashTotalCM').innerText = monthRepairs.length;
+            document.getElementById('dashDoneCM').innerText = monthRepairs.filter(r => r.postRepairStatus === 'เสร็จพร้อมรับงาน').length;
+            document.getElementById('dashOngoingCM').innerText = monthRepairs.filter(r => r.postRepairStatus === 'กำลังซ่อม').length;
+            document.getElementById('dashApprovedCM').innerText = monthRepairs.filter(r => r.approvalStatus === 'อนุมัติ').length;
+
+            document.getElementById('dashTotalPM').innerText = monthPMs.length;
+            document.getElementById('dashTotalVehicles').innerText = globalVehicles.length;
+            
+            const totalVeh = globalVehicles.length || 1;
+            const brokenVeh = new Set(monthRepairs.map(r => r.vehicleNumber)).size;
+            const readyRate = Math.max(0, Math.round(((totalVeh - brokenVeh) / totalVeh) * 100));
+            document.getElementById('dashReadyRate').innerText = readyRate + '%';
         }
 
         function changePlanTarget(t) {
@@ -544,7 +639,7 @@
             });
         }
 
-        // ================= MONTHLY SUMMARY =================
+        // ================= MONTHLY SUMMARY (WITH PM OVERLAY LOGIC) =================
         async function loadMonthlySummary() {
             const m = parseInt(document.getElementById('selectMonth').value);
             const y = parseInt(document.getElementById('selectYear').value);
@@ -558,7 +653,8 @@
             document.getElementById('calendarHeader').innerHTML = headerHtml;
 
             if(!globalVehicles.length) await loadVehiclesView();
-            let res = await fetch(`${API_URL}?action=getRepairs`); globalRepairs = (await res.json()).reverse();
+            let resR = await fetch(`${API_URL}?action=getRepairs`); globalRepairs = (await resR.json()).reverse();
+            let resP = await fetch(`${API_URL}?action=getPMs`); globalPMs = (await resP.json()).reverse();
 
             let bodyHtml = '';
             globalVehicles.forEach(v => {
@@ -569,11 +665,15 @@
                         <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
                     </td>`;
                 for (let d = 1; d <= daysInMonth; d++) {
-                    const matched = globalRepairs.find(r => String(r.vehicleNumber).trim() === String(v.vehicleNumber).trim() && r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startDay === d && r.startMonth === m && r.startYear === y);
-                    if (matched) {
-                        let st = matched.repairStatus || 'พร้อมใช้งาน';
+                    const matchedRepair = globalRepairs.find(r => String(r.vehicleNumber).trim() === String(v.vehicleNumber).trim() && r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startDay === d && r.startMonth === m && r.startYear === y);
+                    const matchedPM = globalPMs.find(p => String(p.vehicleNumber).trim() === String(v.vehicleNumber).trim() && p.startDay === d && p.startMonth === m && p.startYear === y);
+
+                    if (matchedRepair) {
+                        let st = matchedRepair.repairStatus || 'พร้อมใช้งาน';
                         let cls = st === 'CM' ? 'text-red-600 font-bold' : st === 'PM' ? 'text-[#FF9900] font-bold' : 'text-emerald-600 font-bold';
                         bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle"><div class="text-[9px] ${cls}">${st}</div></td>`;
+                    } else if (matchedPM) {
+                        bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-orange-50 align-middle"><div class="text-[9px] font-bold text-[#FF9900]">PM</div></td>`;
                     } else {
                         bodyHtml += `<td class="p-1 border-r border-slate-200 text-center text-slate-300">-</td>`;
                     }

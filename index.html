@@ -3,34 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แจ้งแผนงานซ่อมรายวัน - Unisource Land Fill</title>
+    <title>แจ้งแผนงานซ่อม & PM - Unisource Land Fill</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-        * { font-family: 'CS Prajad', 'Sarabun', sans-serif !important; }
-    </style>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
-                extend: {
-                    colors: { 
-                        brandDark: '#000066',
-                        brandBlueDark: '#000066',
-                        brandAccent: '#4682B4',
-                        brandOrange: '#FF9900'
-                    }
-                }
+                extend: { colors: { brandDark: '#000066', brandAccent: '#4682B4', brandOrange: '#FF9900' } }
             }
         }
     </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'CS Prajad', 'Sarabun', sans-serif !important; }
+        
+        /* สไตล์พิเศษสำหรับซ่อนตอนแคปรูป และรวมเซลล์ พร้อมใช้งาน */
         .capturing input, .capturing select { display: none !important; }
         .capturing .text-replacement { display: inline-block !important; }
         .text-replacement { display: none; }
         .capturing .no-print { display: none !important; }
         .capturing { overflow: visible !important; height: auto !important; max-height: none !important; box-shadow: none !important; border: none !important; }
+
+        .capturing .vehicle-row-item.is-ready .col-garage,
+        .capturing .vehicle-row-item.is-ready .col-cause,
+        .capturing .vehicle-row-item.is-ready .col-remark { display: none !important; }
+        .capturing .vehicle-row-item.is-ready .col-merged { display: table-cell !important; }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
@@ -42,935 +40,435 @@
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-slate-900 tracking-wider">UNISOURCE</h1>
                 <p class="text-[#FF9900] font-bold tracking-widest text-sm uppercase mt-1">LAND FILL</p>
-                <p class="text-slate-500 text-sm mt-3">ระบบแจ้งแผนงานซ่อมรายวัน</p>
+                <p class="text-slate-500 text-sm mt-3">ระบบแจ้งแผนงานซ่อมรายวัน & PM</p>
             </div>
-            
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้งาน (Username)</label>
-                    <input type="text" id="loginRole" required placeholder="กรอก Username เช่น Admin" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#4682B4] focus:outline-none bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน</label>
-                    <input type="password" id="loginPassword" required placeholder="กรอกรหัสผ่าน" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#4682B4] focus:outline-none bg-slate-50">
-                </div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้งาน</label><input type="text" id="loginRole" required class="w-full px-4 py-3 rounded-lg border"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน</label><input type="password" id="loginPassword" required class="w-full px-4 py-3 rounded-lg border"></div>
                 <div id="loginError" class="text-red-500 text-sm text-center hidden"></div>
-                <button type="submit" class="w-full bg-[#4682B4] hover:bg-[#3b6d96] text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md">
-                    เข้าสู่ระบบ
-                </button>
+                <button type="submit" class="w-full bg-[#4682B4] text-white font-semibold py-3 rounded-lg shadow-md">เข้าสู่ระบบ</button>
             </form>
         </div>
     </div>
 
     <div id="appContainer" class="flex flex-col h-screen w-screen overflow-hidden hidden">
-        <header class="bg-[#000066] text-white h-16 px-6 flex items-center justify-between shadow-md shrink-0 border-b border-blue-900" style="background-color: #000066 !important;">
-            <div class="flex items-center gap-6">
-                <div>
-                    <h1 class="text-lg font-bold tracking-wider">UNISOURCE</h1>
-                    <p class="text-[#FF9900] text-[10px] font-bold tracking-widest uppercase text-center">LAND FILL</p>
-                </div>
-                <nav class="hidden md:flex items-center gap-2 ml-6">
-                    <a href="#" onclick="switchTab('vehicles')" id="nav-vehicles" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-[#FF9900]">สถานะรถ</a>
-                    <a href="#" onclick="switchTab('repairs')" id="nav-repairs" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-[#FF9900]">บันทึกเหตุการณ์ซ่อม</a>
-                    <a href="#" onclick="switchTab('monthlySummary')" id="nav-monthlySummary" class="menu-item px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-[#FF9900]">สรุปแผนซ่อมประจำเดือน</a>
+        <header class="bg-[#000066] text-white h-16 px-6 flex items-center justify-between shadow-md shrink-0 border-b border-blue-900 overflow-x-auto">
+            <div class="flex items-center gap-6 whitespace-nowrap">
+                <div><h1 class="text-lg font-bold tracking-wider">UNISOURCE</h1><p class="text-[#FF9900] text-[10px] font-bold tracking-widest text-center">LAND FILL</p></div>
+                <nav class="flex items-center gap-1 ml-4">
+                    <a href="#" onclick="switchTab('vehicles')" id="nav-vehicles" class="menu-item px-3 py-2 text-sm text-[#FF9900] font-medium transition">สถานะรถ</a>
+                    <a href="#" onclick="switchTab('repairs')" id="nav-repairs" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">บันทึกเหตุการณ์ซ่อม</a>
+                    <a href="#" onclick="switchTab('monthlySummary')" id="nav-monthlySummary" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">ปฏิทินซ่อมรายเดือน</a>
+                    <a href="#" onclick="switchTab('pmPlan')" id="nav-pmPlan" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">แจ้งแผน PM</a>
+                    <a href="#" onclick="switchTab('pmCalendar')" id="nav-pmCalendar" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">ปฏิทิน PM</a>
                 </nav>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-blue-900" style="background-color: rgba(0,0,102,0.8);">
-                    <div class="w-7 h-7 rounded-full bg-[#4682B4] text-white flex items-center justify-center font-bold text-xs" id="userInitial">U</div>
-                    <div class="text-xs">
-                        <p class="font-medium text-white" id="userNameDisplay">ผู้ใช้งาน</p>
-                        <p class="text-[#FF9900]" id="userRoleDisplay">Role</p>
-                    </div>
-                </div>
+            <div class="flex items-center gap-4 shrink-0">
                 <button onclick="handleLogout()" class="text-xs font-normal text-red-400 hover:text-red-300 transition">ออกจากระบบ</button>
             </div>
         </header>
 
-        <main class="flex-1 flex flex-col overflow-hidden bg-slate-100 p-6">
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-100 p-4 lg:p-6">
+            
+            <!-- TAB 1: VEHICLES -->
             <div id="view-vehicles" class="space-y-4 view-section flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 flex-wrap gap-3">
                     <div class="flex items-center gap-4">
-                        <h2 class="font-medium text-slate-800 text-base" id="dynamicTitleDate">บันทึกสถานะรถและแผนซ่อมรายวัน</h2>
+                        <h2 class="font-medium text-slate-800 text-base">บันทึกสถานะรถและแผนซ่อมรายวัน</h2>
                         <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs">
-                            <label class="cursor-pointer px-2.5 py-1 rounded transition font-normal" id="lblTargetToday">
-                                <input type="radio" name="planTarget" value="today" checked onchange="changePlanTarget('today')" class="hidden">
-                                <span>แผนวันนี้</span>
-                            </label>
-                            <label class="cursor-pointer px-2.5 py-1 rounded transition font-normal" id="lblTargetTomorrow">
-                                <input type="radio" name="planTarget" value="tomorrow" onchange="changePlanTarget('tomorrow')" class="hidden">
-                                <span>แผนสำหรับพรุ่งนี้</span>
-                            </label>
+                            <label class="cursor-pointer px-2.5 py-1 rounded transition bg-[#4682B4] text-white" id="lblTargetToday"><input type="radio" name="planTarget" value="today" checked onchange="changePlanTarget('today')" class="hidden"><span>แผนวันนี้</span></label>
+                            <label class="cursor-pointer px-2.5 py-1 rounded transition text-slate-600" id="lblTargetTomorrow"><input type="radio" name="planTarget" value="tomorrow" onchange="changePlanTarget('tomorrow')" class="hidden"><span>แผนพรุ่งนี้</span></label>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="exportToExcel('vehicles')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-normal shadow transition">Export Excel</button>
-                        <button onclick="generateReportPreview()" class="bg-[#4682B4] hover:bg-[#3b6d96] text-white px-3.5 py-2 rounded-lg text-xs font-normal shadow transition">บันทึกรูปภาพรายงานรวม</button>
-                        <button onclick="saveAllRows()" class="bg-[#000066] hover:bg-[#0b0b52] text-white px-4 py-2 rounded-lg text-xs font-normal shadow transition">บันทึกทั้งหมด</button>
+                        <button onclick="exportToExcel('vehicles')" class="bg-emerald-600 text-white px-3.5 py-2 rounded-lg text-xs shadow">Export Excel</button>
+                        <button onclick="generateReportPreview()" class="bg-[#4682B4] text-white px-3.5 py-2 rounded-lg text-xs shadow">บันทึกรูปรายงาน</button>
+                        <button onclick="saveAllRows()" class="bg-[#000066] text-white px-4 py-2 rounded-lg text-xs shadow">บันทึกทั้งหมด</button>
                     </div>
                 </div>
 
                 <div id="reportCaptureArea" class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-auto p-3">
-                    <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
-                        <span class="text-sm font-bold text-[#000066]">รายงานสรุปสถานะรถประจำวัน (Unisource Land Fill)</span>
-                        <span class="text-xs font-medium text-slate-500" id="reportTimestamp"></span>
-                    </div>
+                    <div class="p-3 border-b flex justify-between bg-slate-50 rounded-t-lg"><span class="text-sm font-bold text-[#000066]">รายงานสรุปสถานะรถประจำวัน</span><span class="text-xs font-medium text-slate-500" id="reportTimestamp"></span></div>
                     <table class="w-full text-left border-collapse mt-2">
-                        <thead class="bg-slate-100 text-slate-600 text-xs uppercase border-b border-slate-200 sticky top-0 z-10">
-                            <tr>
-                                <th class="p-2.5 w-10 text-center">#</th>
-                                <th class="p-2.5 w-36">รถ / ทะเบียน / คนขับ</th>
-                                <th class="p-2.5 w-28">สถานะวันนี้</th>
-                                <th class="p-2.5 w-32">วันเวลาเริ่ม</th>
-                                <th class="p-2.5 w-32">วันเวลาเสร็จ</th>
-                                <th class="p-2.5 w-24">ระยะเวลา</th>
-                                <th class="p-2.5 w-32">อู่ / ศูนย์บริการซ่อม</th>
-                                <th class="p-2.5 w-36">สาเหตุการซ่อม</th>
-                                <th class="p-2.5 w-28">หมายเหตุ</th>
-                                <th class="p-2.5 w-24">ผู้บันทึก</th>
-                                <th class="p-2.5 w-20 text-center no-print">จัดการ</th>
-                            </tr>
+                        <thead class="bg-slate-100 text-slate-600 text-[11px] uppercase border-b sticky top-0 z-10">
+                            <tr><th class="p-2 w-10 text-center">#</th><th class="p-2 w-32">รถ / ทะเบียน / คนขับ</th><th class="p-2 w-28">สถานะวันนี้</th><th class="p-2 w-32">วันเวลาเริ่ม</th><th class="p-2 w-32">วันเวลาเสร็จ</th><th class="p-2 w-20">ระยะเวลา</th><th class="p-2 w-32">อู่ / ศูนย์บริการ</th><th class="p-2 w-32">สาเหตุการซ่อม</th><th class="p-2 w-32">หมายเหตุ</th><th class="p-2 w-16 text-center no-print">จัดการ</th></tr>
                         </thead>
                         <tbody id="vehicleTableBody" class="text-xs divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
 
+            <!-- TAB 2: REPAIRS -->
             <div id="view-repairs" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
-                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 gap-4 flex-wrap">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border flex-wrap gap-4">
                     <h2 class="font-medium text-slate-800 text-base">รายการบันทึกการซ่อมและการอนุมัติ</h2>
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <button onclick="exportToExcel('repairs')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-normal shadow transition">Export Excel</button>
-                        <div class="flex items-center gap-1.5 text-xs text-slate-500">
-                            <span>วันที่เริ่มซ่อม:</span>
-                            <input type="date" id="dateFilter" onchange="filterRepairs()" class="px-2.5 py-1 rounded-lg border border-slate-300 text-xs bg-white outline-none" />
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="exportToExcel('repairs')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs">Export Excel</button>
+                        <div class="flex items-center gap-1 text-xs bg-slate-50 border p-1 rounded-lg">
+                            <span class="text-slate-500 ml-1">ตั้งแต่:</span><input type="date" id="dateStart" onchange="filterRepairs()" class="px-2 py-1 rounded border text-xs outline-none">
+                            <span class="text-slate-500">ถึง:</span><input type="date" id="dateEnd" onchange="filterRepairs()" class="px-2 py-1 rounded border text-xs outline-none">
                         </div>
-                        <input type="text" id="searchInput" onkeyup="filterRepairs()" placeholder="ค้นหาข้อมูล..." class="px-3 py-1 rounded-lg border border-slate-300 text-xs w-48 bg-white outline-none" />
-                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-lg border border-slate-200 text-xs">
-                            <span class="text-slate-400 font-normal">สถานะ:</span>
-                            <label class="inline-flex items-center gap-1 cursor-pointer text-emerald-600 font-normal"><input type="checkbox" value="พร้อมใช้งาน" checked onchange="filterRepairs()" class="status-chk rounded text-emerald-600 w-3.5 h-3.5"> พร้อมใช้งาน</label>
-                            <label class="inline-flex items-center gap-1 cursor-pointer text-red-600 font-normal"><input type="checkbox" value="CM" checked onchange="filterRepairs()" class="status-chk rounded text-red-600 w-3.5 h-3.5"> CM</label>
-                            <label class="inline-flex items-center gap-1 cursor-pointer text-[#FF9900] font-normal"><input type="checkbox" value="PM" checked onchange="filterRepairs()" class="status-chk rounded text-[#FF9900] w-3.5 h-3.5"> PM</label>
+                        <input type="text" id="searchInput" onkeyup="filterRepairs()" placeholder="ค้นหาข้อมูล..." class="px-3 py-1 rounded-lg border text-xs w-32 outline-none">
+                        <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border text-xs">
+                            <label class="text-emerald-600"><input type="checkbox" value="พร้อมใช้งาน" checked onchange="filterRepairs()" class="status-chk rounded w-3 h-3"> พร้อมใช้งาน</label>
+                            <label class="text-red-600"><input type="checkbox" value="CM" checked onchange="filterRepairs()" class="status-chk rounded w-3 h-3"> CM</label>
+                            <label class="text-[#FF9900]"><input type="checkbox" value="PM" checked onchange="filterRepairs()" class="status-chk rounded w-3 h-3"> PM</label>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200 z-10">
-                            <tr>
-                                <th class="p-3">วันเวลาเริ่มซ่อม</th>
-                                <th class="p-3">รถ / ทะเบียน / คนขับ</th>
-                                <th class="p-3">สถานะซ่อม</th>
-                                <th class="p-3">ระยะเวลา / อู่ / สาเหตุ / หมายเหตุ</th>
-                                <th class="p-3">สถานะหลังซ่อม (เจ้าหน้าที่)</th>
-                                <th class="p-3 w-40">หัวหน้าซ่อมอนุมัติ</th>
-                                <th class="p-3 w-28 text-center">TRANSPORT</th>
-                                <th class="p-3 w-24 text-center">จัดการ</th>
-                            </tr>
+                <div class="bg-white rounded-xl shadow-sm border flex-1 overflow-auto">
+                    <table class="w-full text-left border-collapse"><thead class="sticky top-0 bg-slate-50 text-slate-600 text-xs uppercase border-b z-10"><tr><th class="p-3">เวลาเริ่ม</th><th class="p-3">รถ/ทะเบียน/คนขับ</th><th class="p-3">สถานะ</th><th class="p-3">ข้อมูลซ่อม</th><th class="p-3">อัปเดตงาน</th><th class="p-3 w-32">อนุมัติ</th><th class="p-3 w-20 text-center">จัดการ</th></tr></thead><tbody id="repairTableBody" class="text-xs divide-y divide-slate-100"></tbody></table>
+                </div>
+            </div>
+
+            <!-- TAB 3: MONTHLY SUMMARY -->
+            <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border shrink-0">
+                    <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน</h2>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportToExcel('monthly')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs">Export Excel</button>
+                        <select id="selectMonth" onchange="loadMonthlySummary()" class="px-3 py-1.5 rounded-lg border text-xs"></select>
+                        <select id="selectYear" onchange="loadMonthlySummary()" class="px-3 py-1.5 rounded-lg border text-xs"></select>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border flex-1 overflow-auto">
+                    <table class="w-full text-center border-collapse text-xs"><thead id="calendarHeader" class="bg-slate-50 border-b sticky top-0 z-10"></thead><tbody id="calendarBody" class="divide-y divide-slate-100"></tbody></table>
+                </div>
+            </div>
+
+            <!-- TAB 4: PM PLAN -->
+            <div id="view-pmPlan" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border shrink-0">
+                    <h2 class="font-medium text-slate-800 text-base">แจ้งแผน PM ล่วงหน้า</h2>
+                    <button onclick="exportToExcel('pm')" class="bg-emerald-600 text-white px-3.5 py-2 rounded-lg text-xs shadow">Export Excel</button>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border flex-1 overflow-auto p-3">
+                    <table class="w-full text-left border-collapse mt-2">
+                        <thead class="bg-slate-100 text-slate-600 text-[11px] uppercase border-b sticky top-0 z-10">
+                            <tr><th class="p-2 w-10 text-center">#</th><th class="p-2 w-32">รถ / ทะเบียน / คนขับ</th><th class="p-2 w-32">วันเวลาเริ่ม PM</th><th class="p-2 w-32">คาดว่าเสร็จ</th><th class="p-2 w-20">ระยะเวลา</th><th class="p-2 w-32">อู่ / ศูนย์บริการ</th><th class="p-2 w-32">รายการ PM</th><th class="p-2 w-32">หมายเหตุ</th><th class="p-2 w-16 text-center">จัดการ</th></tr>
                         </thead>
-                        <tbody id="repairTableBody" class="text-sm divide-y divide-slate-100"></tbody>
+                        <tbody id="pmTableBody" class="text-xs divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- TAB 3: MONTHLY SUMMARY CALENDAR -->
-            <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
-                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0">
-                    <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน (ปฏิทินซ่อม 1-31)</h2>
-                    <div class="flex items-center gap-3">
-                        <button onclick="exportToExcel('monthly')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-normal shadow transition">Export Excel</button>
-                        <select id="selectMonth" onchange="loadMonthlySummary()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-700 outline-none"></select>
-                        <select id="selectYear" onchange="loadMonthlySummary()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-700 outline-none"></select>
+            <!-- TAB 5: PM CALENDAR -->
+            <div id="view-pmCalendar" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border shrink-0">
+                    <h2 class="font-medium text-slate-800 text-base">ปฏิทินแผน PM ประจำเดือน</h2>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportToExcel('pmcal')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs">Export Excel</button>
+                        <select id="selectMonthPM" onchange="loadPMCalendar()" class="px-3 py-1.5 rounded-lg border text-xs"></select>
+                        <select id="selectYearPM" onchange="loadPMCalendar()" class="px-3 py-1.5 rounded-lg border text-xs"></select>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 overflow-auto">
-                    <table class="w-full text-center border-collapse text-xs">
-                        <thead id="calendarHeader" class="bg-slate-50 text-slate-700 border-b border-slate-200 sticky top-0 z-10"></thead>
-                        <tbody id="calendarBody" class="divide-y divide-slate-100"></tbody>
-                    </table>
+                <div class="bg-white rounded-xl border flex-1 overflow-auto">
+                    <table class="w-full text-center border-collapse text-xs"><thead id="pmCalendarHeader" class="bg-slate-50 border-b sticky top-0 z-10"></thead><tbody id="pmCalendarBody" class="divide-y divide-slate-100"></tbody></table>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- MODAL: EXPORT REPORT PREVIEW -->
+    <!-- MODAL: REPORT EXPORT -->
     <div id="exportReportModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-xl shadow-2xl overflow-hidden max-w-2xl w-full p-6 space-y-4 max-h-[90vh] flex flex-col">
-            <h3 class="font-bold text-base text-slate-800">ตัวอย่างรูปภาพรายงานรวมประจำวัน</h3>
-            <div id="reportPreviewContainer" class="border border-slate-300 rounded-lg p-2 overflow-auto bg-slate-50 flex-1"></div>
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 shrink-0">
-                <button onclick="closeExportModal()" class="px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg text-xs font-medium">ปิด</button>
-                <button onclick="exportReportImageAction('save')" class="px-4 py-2 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded-lg text-xs font-medium shadow">Save รูป</button>
-                <button onclick="exportReportImageAction('copy')" class="px-4 py-2 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded-lg text-xs font-medium shadow">Copy รูป</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: SINGLE VEHICLE REPORT CARD -->
-    <div id="singleReportCardModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-xl shadow-2xl overflow-hidden max-w-sm w-full">
-            <div id="singleReportContent" class="bg-white p-4 border border-slate-300 rounded-lg text-xs text-slate-800">
-                <div class="text-center font-bold text-sm bg-[#000066] text-white py-2 rounded mb-3 tracking-wide">แจ้งซ่อมรถเสีย</div>
-                <table class="w-full border-collapse border border-slate-300 text-xs">
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold w-1/3 text-center">วันที่</td><td class="border border-slate-300 p-2 text-center" id="s_date">-</td></tr>
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">สถานะ</td><td class="border border-slate-300 p-2 text-center font-bold text-red-600" id="s_status">-</td></tr>
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">พนักงานขับรถ</td><td class="border border-slate-300 p-2 text-center" id="s_driver">-</td></tr>
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">ป้ายทะเบียน</td><td class="border border-slate-300 p-2 text-center" id="s_plate">-</td></tr>
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">รถเบอร์</td><td class="border border-slate-300 p-2 text-center font-bold" id="s_veh">-</td></tr>
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">อู่ / ศูนย์ซ่อม</td><td class="border border-slate-300 p-2 text-center text-[#4682B4] font-medium" id="s_garage">-</td></tr>
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">สาเหตุการซ่อม</td><td class="border border-slate-300 p-2 text-center" id="s_cause">-</td></tr>
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">หมายเหตุ</td><td class="border border-slate-300 p-2 text-center" id="s_remark">-</td></tr>
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">ผู้บันทึก</td><td class="border border-slate-300 p-2 text-center" id="s_recorder">-</td></tr>
-                    <tr><td class="bg-slate-100 border border-slate-300 p-2 font-semibold text-center">หัวหน้าซ่อมอนุมัติ</td><td class="border border-slate-300 p-2 text-center font-bold" id="s_approval">-</td></tr>
-                </table>
-            </div>
-            <div class="bg-slate-50 p-3 flex justify-end gap-2 border-t border-slate-200">
-                <button onclick="closeSingleReport()" class="px-3 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-700 rounded text-xs">ปิด</button>
-                <button onclick="downloadSingleReportImage('save')" class="px-3 py-1.5 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded text-xs font-medium">Save รูป</button>
-                <button onclick="downloadSingleReportImage('copy')" class="px-3 py-1.5 bg-[#4682B4] hover:bg-[#3b6d96] text-white rounded text-xs font-medium">Copy รูป</button>
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 flex flex-col max-h-[90vh]">
+            <h3 class="font-bold text-base mb-2">ตัวอย่างรูปภาพรายงาน</h3>
+            <div id="reportPreviewContainer" class="border p-2 overflow-auto bg-slate-50 flex-1"></div>
+            <div class="flex justify-end gap-2 pt-3 mt-2 border-t">
+                <button onclick="document.getElementById('exportReportModal').classList.add('hidden')" class="px-4 py-2 bg-slate-300 rounded-lg text-xs font-medium">ปิด</button>
+                <button onclick="exportReportImageAction('save')" class="px-4 py-2 bg-[#4682B4] text-white rounded-lg text-xs font-medium">Save รูป</button>
             </div>
         </div>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxeGD7tjEPBiLCnHJ7QluwBW8CqpB38k1uIvQf-gpYJIVRCSXZF4I8FKUY4NY3lQeOLZQ/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycby246X7Am4M8wy4l2gFGeeF39fnw-uE1gCqA_LmpRUumcaXSGnCF9zYR5yqqf9QjRYELg/exec";
+        let currentUser = null, globalVehicles = [], globalRepairs = [], globalPMs = [], currentPlanTarget = 'today', generatedReportCanvas = null;
 
-        let currentUser = null;
-        let globalVehicles = [];
-        let globalRepairs = [];
-        let currentPlanTarget = 'today';
-        let generatedReportCanvas = null;
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `pointer-events-auto px-4 py-3 rounded-lg shadow-lg text-xs font-normal text-white flex items-center gap-2 transition-all duration-300 transform translate-y-[-10px] opacity-0 ${
-                type === 'success' ? 'bg-emerald-600' : 'bg-red-600'
-            }`;
-            toast.innerHTML = `<span>${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.classList.remove('translate-y-[-10px]', 'opacity-0'); }, 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-[-10px]');
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
+        function showToast(msg, type = 'success') {
+            const cont = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `px-4 py-3 rounded-lg text-xs text-white flex gap-2 transition-all opacity-0 ${type==='success'?'bg-emerald-600':'bg-red-600'}`;
+            t.innerHTML = `<span>${msg}</span>`;
+            cont.appendChild(t);
+            setTimeout(() => t.classList.remove('opacity-0'), 10);
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(()=>t.remove(),300); }, 2500);
         }
 
-        function formatDurationText(totalMinutes) {
-            if (!totalMinutes || totalMinutes <= 0) return '0 นาที';
-            const days = Math.floor(totalMinutes / (24 * 60));
-            const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
-            const mins = totalMinutes % 60;
-            let result = '';
-            if (days > 0) result += `${days} วัน `;
-            if (hours > 0) result += `${hours} ชม. `;
-            if (mins > 0 || result === '') result += `${mins} นาที`;
-            return result.trim();
+        function formatDuration(mins) {
+            if (!mins || mins <= 0) return '0 นาที';
+            const d = Math.floor(mins / 1440), h = Math.floor((mins % 1440) / 60), m = mins % 60;
+            let r = '';
+            if(d>0) r+=`${d} วัน `; if(h>0) r+=`${h} ชม. `; if(m>0||r==='') r+=`${m} นาที`;
+            return r.trim();
         }
 
-        function getDatetimeISO(daysOffset = 0) {
-            const now = new Date();
-            now.setDate(now.getDate() + daysOffset);
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        function getISO(offsetDays = 0) {
+            const n = new Date(); n.setDate(n.getDate() + offsetDays);
+            return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}T${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const savedUser = localStorage.getItem('unisource_user');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
+            const saved = localStorage.getItem('unisource_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
                 document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
-                document.getElementById('userInitial').innerText = currentUser.fullName.charAt(0);
-                document.getElementById('userNameDisplay').innerText = currentUser.fullName;
-                document.getElementById('userRoleDisplay').innerText = currentUser.role;
-                updatePlanTargetUI();
+                changePlanTarget('today');
                 loadVehiclesView();
+                initDateSelectors();
             }
-            updateReportTimestamp();
+            document.getElementById('reportTimestamp').innerText = `ข้อมูล ณ วันที่: ${new Date().toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})}`;
         });
-
-        function updateReportTimestamp() {
-            const nowStr = new Date().toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' });
-            document.getElementById('reportTimestamp').innerText = `ข้อมูล ณ วันที่: ${nowStr}`;
-        }
-
-        function changePlanTarget(target) {
-            currentPlanTarget = target;
-            updatePlanTargetUI();
-            renderVehicleTable();
-        }
-
-        function updatePlanTargetUI() {
-            const lblToday = document.getElementById('lblTargetToday');
-            const lblTomorrow = document.getElementById('lblTargetTomorrow');
-            if (currentPlanTarget === 'today') {
-                lblToday.className = 'cursor-pointer px-2.5 py-1 rounded transition bg-[#4682B4] text-white font-normal';
-                lblTomorrow.className = 'cursor-pointer px-2.5 py-1 rounded transition text-slate-600 font-normal';
-            } else {
-                lblToday.className = 'cursor-pointer px-2.5 py-1 rounded transition text-slate-600 font-normal';
-                lblTomorrow.className = 'cursor-pointer px-2.5 py-1 rounded transition bg-[#4682B4] text-white font-normal';
-            }
-        }
 
         async function handleLogin(e) {
             e.preventDefault();
-            const role = document.getElementById('loginRole').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
-
+            const r = document.getElementById('loginRole').value, p = document.getElementById('loginPassword').value, err = document.getElementById('loginError');
             try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "login", role: role, password: password })
-                });
+                let res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", role: r, password: p }) });
                 let result = await res.json();
-
                 if (result.success) {
                     currentUser = { role: result.role, fullName: result.fullName };
                     localStorage.setItem('unisource_user', JSON.stringify(currentUser));
                     document.getElementById('loginOverlay').classList.add('hidden');
                     document.getElementById('appContainer').classList.remove('hidden');
-                    
-                    document.getElementById('userInitial').innerText = result.fullName.charAt(0);
-                    document.getElementById('userNameDisplay').innerText = result.fullName;
-                    document.getElementById('userRoleDisplay').innerText = result.role;
+                    showToast("เข้าสู่ระบบสำเร็จ"); initDateSelectors(); loadVehiclesView();
+                } else { err.innerText = result.message; err.classList.remove('hidden'); }
+            } catch (error) { err.innerText = "Error connecting to API"; err.classList.remove('hidden'); }
+        }
+        function handleLogout() { localStorage.removeItem('unisource_user'); location.reload(); }
 
-                    showToast("เข้าสู่ระบบสำเร็จ", "success");
-                    updatePlanTargetUI();
-                    loadVehiclesView();
-                } else {
-                    errorDiv.innerText = result.message;
-                    errorDiv.classList.remove('hidden');
-                }
-            } catch (err) {
-                errorDiv.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ API";
-                errorDiv.classList.add('hidden');
-            }
+        function initDateSelectors() {
+            const ms = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+            let mh='', yh='';
+            ms.forEach((m,i)=>mh+=`<option value="${i+1}">${m}</option>`);
+            const yr = new Date().getFullYear();
+            for(let y=yr-1; y<=yr+1; y++) yh+=`<option value="${y}">${y+543} (${y})</option>`;
+            
+            document.getElementById('selectMonth').innerHTML = mh; document.getElementById('selectYear').innerHTML = yh;
+            document.getElementById('selectMonth').value = new Date().getMonth()+1; document.getElementById('selectYear').value = yr;
+            
+            document.getElementById('selectMonthPM').innerHTML = mh; document.getElementById('selectYearPM').innerHTML = yh;
+            document.getElementById('selectMonthPM').value = new Date().getMonth()+1; document.getElementById('selectYearPM').value = yr;
         }
 
-        function handleLogout() {
-            localStorage.removeItem('unisource_user');
-            currentUser = null;
-            document.getElementById('appContainer').classList.add('hidden');
-            document.getElementById('loginOverlay').classList.remove('hidden');
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loginError').classList.add('hidden');
+        function switchTab(id) {
+            document.querySelectorAll('.view-section').forEach(e=>e.classList.add('hidden'));
+            document.querySelectorAll('.menu-item').forEach(e=>e.classList.replace('text-[#FF9900]','text-slate-300'));
+            document.getElementById(`view-${id}`).classList.remove('hidden');
+            document.getElementById(`nav-${id}`).classList.replace('text-slate-300','text-[#FF9900]');
+            if(id==='vehicles') loadVehiclesView();
+            if(id==='repairs') loadRepairsView();
+            if(id==='monthlySummary') loadMonthlySummary();
+            if(id==='pmPlan') loadPMView();
+            if(id==='pmCalendar') loadPMCalendar();
         }
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.menu-item').forEach(el => {
-                el.classList.remove('text-[#FF9900]', 'font-medium');
-                el.classList.add('text-slate-300');
-            });
-
-            document.getElementById('view-' + tabId).classList.remove('hidden');
-            const activeNav = document.getElementById('nav-' + tabId);
-            activeNav.classList.add('text-[#FF9900]', 'font-medium');
-            activeNav.classList.remove('text-slate-300');
-
-            if (tabId === 'vehicles') loadVehiclesView();
-            if (tabId === 'repairs') loadRepairsView();
-            if (tabId === 'monthlySummary') initMonthlySummaryView();
+        function changePlanTarget(t) {
+            currentPlanTarget = t;
+            document.getElementById('lblTargetToday').className = t==='today' ? 'cursor-pointer px-2.5 py-1 rounded transition bg-[#4682B4] text-white' : 'cursor-pointer px-2.5 py-1 rounded transition text-slate-600';
+            document.getElementById('lblTargetTomorrow').className = t==='tomorrow' ? 'cursor-pointer px-2.5 py-1 rounded transition bg-[#4682B4] text-white' : 'cursor-pointer px-2.5 py-1 rounded transition text-slate-600';
+            if (globalVehicles.length > 0) renderVehicleTable();
         }
 
         async function loadVehiclesView() {
             try {
                 let res = await fetch(`${API_URL}?action=getVehicles`);
-                let vehicles = await res.json();
-                globalVehicles = vehicles;
+                globalVehicles = await res.json();
                 renderVehicleTable();
-            } catch (err) {
-                showToast("ไม่สามารถดึงข้อมูลรถได้", "error");
-            }
+            } catch(e) { showToast("Error loading vehicles", "error"); }
         }
 
-        function renderVehicleCard(v) {
-            return `<div class="font-medium text-slate-800 text-xs">${v.vehicleNumber}</div>
-                    <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                    <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>`;
+        function updateSelectColor(sel) {
+            sel.className = "w-full px-1.5 py-1 rounded border text-xs bg-white outline-none font-bold ";
+            if(sel.value==='พร้อมใช้งาน') sel.className += "text-emerald-600";
+            else if(sel.value==='CM') sel.className += "text-red-600";
+            else if(sel.value==='PM') sel.className += "text-[#FF9900]";
         }
 
         function renderVehicleTable() {
-            let html = '';
-            const offsetDays = currentPlanTarget === 'tomorrow' ? 1 : 0;
-            const defaultDT = getDatetimeISO(offsetDays);
-
-            globalVehicles.forEach((v, index) => {
-                html += `<tr class="hover:bg-slate-50 transition border-b border-slate-100 vehicle-row-item" data-veh="${v.vehicleNumber}">
-                    <td class="p-2 text-center text-xs text-slate-500">${index + 1}</td>
-                    <td class="p-2">${renderVehicleCard(v)}</td>
+            let h = '', dt = getISO(currentPlanTarget === 'tomorrow' ? 1 : 0);
+            globalVehicles.forEach((v, i) => {
+                h += `<tr class="hover:bg-slate-50 border-b vehicle-row-item" data-veh="${v.vehicleNumber}">
+                    <td class="p-2 text-center text-xs text-slate-500">${i+1}</td>
+                    <td class="p-2"><div class="font-medium text-xs">${v.vehicleNumber}</div><div class="text-[10px] text-slate-500">${v.plateNumber} | 👤 ${v.driverName}</div></td>
                     <td class="p-2">
-                        <select id="status-${v.vehicleNumber}" class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-700 outline-none">
-                            <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
-                            <option value="CM">CM</option>
-                            <option value="PM">PM</option>
+                        <select id="status-${v.vehicleNumber}" class="w-full px-1.5 py-1 rounded border text-xs bg-white outline-none font-bold text-emerald-600" onchange="updateSelectColor(this)">
+                            <option value="พร้อมใช้งาน" class="text-emerald-600 font-bold">พร้อมใช้งาน</option>
+                            <option value="CM" class="text-red-600 font-bold">CM</option>
+                            <option value="PM" class="text-[#FF9900] font-bold">PM</option>
                         </select>
-                        <span class="text-replacement status-text font-normal text-slate-700">พร้อมใช้งาน</span>
+                        <span class="text-replacement status-text font-bold text-emerald-600">พร้อมใช้งาน</span>
                     </td>
-                    <td class="p-2">
-                        <input type="datetime-local" id="start-${v.vehicleNumber}" value="${defaultDT}" onchange="calculateDuration('${v.vehicleNumber}')" class="w-full px-1.5 py-1 rounded border border-slate-300 text-[11px] bg-white text-slate-600 outline-none" />
-                        <span class="text-replacement start-text text-slate-600">-</span>
-                    </td>
-                    <td class="p-2">
-                        <input type="datetime-local" id="end-${v.vehicleNumber}" value="${defaultDT}" onchange="calculateDuration('${v.vehicleNumber}')" class="w-full px-1.5 py-1 rounded border border-slate-300 text-[11px] bg-white text-slate-600 outline-none" />
-                        <span class="text-replacement end-text text-slate-600">-</span>
-                    </td>
-                    <td class="p-2 text-center text-slate-500 text-[11px]">
-                        <span id="dur-${v.vehicleNumber}">0 นาที</span>
-                        <span class="text-replacement dur-text">-</span>
-                    </td>
-                    <td class="p-2">
-                        <input type="text" id="garage-${v.vehicleNumber}" placeholder="ระบุอู่..." class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-600 outline-none" />
-                        <span class="text-replacement garage-text text-slate-600">-</span>
-                    </td>
-                    <td class="p-2">
-                        <input type="text" id="cause-${v.vehicleNumber}" placeholder="สาเหตุ..." class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-600 outline-none" />
-                        <span class="text-replacement cause-text text-slate-600">-</span>
-                    </td>
-                    <td class="p-2">
-                        <input type="text" id="remark-${v.vehicleNumber}" placeholder="หมายเหตุ..." class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-600 outline-none" />
-                        <span class="text-replacement remark-text text-slate-600">-</span>
-                    </td>
-                    <td class="p-2">
-                        <input type="text" id="recorder-${v.vehicleNumber}" value="" placeholder="ระบุผู้บันทึก..." class="w-full px-1.5 py-1 rounded border border-slate-300 text-xs bg-white text-slate-600 outline-none" />
-                        <span class="text-replacement recorder-text text-slate-600">-</span>
-                    </td>
-                    <td class="p-2 text-center no-print">
-                        <button onclick="saveRow('${v.vehicleNumber}', '${v.plateNumber}', '${v.driverName}')" class="bg-[#4682B4] hover:bg-[#3b6d96] text-white px-2.5 py-1.5 rounded text-xs font-normal transition shadow-sm">บันทึก</button>
-                    </td>
+                    <td class="p-2"><input type="datetime-local" id="start-${v.vehicleNumber}" value="${dt}" onchange="calcDur('${v.vehicleNumber}')" class="w-full p-1 border rounded text-[10px]"><span class="text-replacement start-text text-[10px]">-</span></td>
+                    <td class="p-2"><input type="datetime-local" id="end-${v.vehicleNumber}" value="${dt}" onchange="calcDur('${v.vehicleNumber}')" class="w-full p-1 border rounded text-[10px]"><span class="text-replacement end-text text-[10px]">-</span></td>
+                    <td class="p-2 text-center text-[10px]"><span id="dur-${v.vehicleNumber}">0 นาที</span><span class="text-replacement dur-text">-</span></td>
+                    <td class="p-2 col-garage"><input type="text" id="garage-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"><span class="text-replacement garage-text text-xs">-</span></td>
+                    <td class="p-2 col-cause"><input type="text" id="cause-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"><span class="text-replacement cause-text text-xs">-</span></td>
+                    <td class="p-2 col-remark"><input type="text" id="remark-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"><span class="text-replacement remark-text text-xs">-</span></td>
+                    <td class="p-2 col-merged hidden text-center text-emerald-500 font-bold text-xl tracking-[0.2em] bg-white/50" colspan="3">พร้อมใช้งาน</td>
+                    <td class="p-2 text-center no-print"><button onclick="saveRow('${v.vehicleNumber}','${v.plateNumber}','${v.driverName}')" class="bg-[#4682B4] text-white px-2 py-1 rounded text-xs">บันทึก</button></td>
                 </tr>`;
             });
-            document.getElementById('vehicleTableBody').innerHTML = html || `<tr><td colspan="11" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรถ</td></tr>`;
+            document.getElementById('vehicleTableBody').innerHTML = h;
         }
 
-        function calculateDuration(vehNum) {
-            const start = document.getElementById(`start-${vehNum}`).value;
-            const end = document.getElementById(`end-${vehNum}`).value;
-            const durEl = document.getElementById(`dur-${vehNum}`);
-            if (start && end) {
-                const diff = Math.floor((new Date(end) - new Date(start)) / (1000 * 60));
-                durEl.innerText = formatDurationText(diff);
-            } else {
-                durEl.innerText = '0 นาที';
-            }
+        function calcDur(id) {
+            const s=document.getElementById(`start-${id}`).value, e=document.getElementById(`end-${id}`).value, d=document.getElementById(`dur-${id}`);
+            d.innerText = (s&&e) ? formatDuration(Math.floor((new Date(e)-new Date(s))/60000)) : '0 นาที';
         }
 
-        async function saveRow(vehNum, plate, driver) {
-            let recorderVal = document.getElementById(`recorder-${vehNum}`).value.trim();
-            if (!recorderVal) recorderVal = currentUser ? currentUser.fullName : 'ไม่ระบุชื่อ';
-
-            const selectedStatus = document.getElementById(`status-${vehNum}`).value;
-
-            const payload = {
-                vehicleNumber: vehNum,
-                plateNumber: plate,
-                driverName: driver,
-                repairStatus: selectedStatus,
-                startTime: document.getElementById(`start-${vehNum}`).value,
-                endTime: document.getElementById(`end-${vehNum}`).value,
-                repairCause: document.getElementById(`cause-${vehNum}`).value,
-                garage: document.getElementById(`garage-${vehNum}`).value,
-                remark: document.getElementById(`remark-${vehNum}`).value,
-                recorder: recorderVal
-            };
-
-            try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "saveRepair", payload: payload, userName: currentUser.fullName, userRole: currentUser.role })
-                });
-                let result = await res.json();
-                if (result.success) {
-                    showToast("บันทึกเรียบร้อย", "success");
-                    loadRepairsView();
-                    loadMonthlySummary();
-                } else {
-                    showToast(result.message, "error");
-                }
-            } catch (err) {
-                showToast("เกิดข้อผิดพลาดในการบันทึก", "error");
-            }
+        async function saveRow(veh, pl, dr) {
+            const payload = { vehicleNumber:veh, plateNumber:pl, driverName:dr, repairStatus:document.getElementById(`status-${veh}`).value, startTime:document.getElementById(`start-${veh}`).value, endTime:document.getElementById(`end-${veh}`).value, garage:document.getElementById(`garage-${veh}`).value, repairCause:document.getElementById(`cause-${veh}`).value, remark:document.getElementById(`remark-${veh}`).value, recorder:currentUser.fullName };
+            try { await fetch(API_URL, { method:"POST", body:JSON.stringify({action:"saveRepair", payload:payload, userName:currentUser.fullName})}); showToast("บันทึกเรียบร้อย"); } 
+            catch(e){ showToast("Error","error"); }
         }
 
         async function saveAllRows() {
-            let itemsToSave = [];
-            globalVehicles.forEach(v => {
-                let recorderVal = document.getElementById(`recorder-${v.vehicleNumber}`).value.trim();
-                if (!recorderVal) recorderVal = currentUser ? currentUser.fullName : 'ไม่ระบุชื่อ';
-
-                itemsToSave.push({
-                    vehicleNumber: v.vehicleNumber,
-                    plateNumber: v.plateNumber,
-                    driverName: v.driverName,
-                    repairStatus: document.getElementById(`status-${v.vehicleNumber}`).value,
-                    startTime: document.getElementById(`start-${v.vehicleNumber}`).value,
-                    endTime: document.getElementById(`end-${v.vehicleNumber}`).value,
-                    repairCause: document.getElementById(`cause-${v.vehicleNumber}`).value,
-                    garage: document.getElementById(`garage-${v.vehicleNumber}`).value,
-                    remark: document.getElementById(`remark-${v.vehicleNumber}`).value,
-                    recorder: recorderVal
-                });
-            });
-
-            try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "saveMultipleRepairs", payload: itemsToSave, userName: currentUser.fullName, userRole: currentUser.role })
-                });
-                let result = await res.json();
-                if (result.success) {
-                    showToast("บันทึกเรียบร้อย", "success");
-                    loadRepairsView();
-                    loadMonthlySummary();
-                } else {
-                    showToast(result.message, "error");
-                }
-            } catch (err) {
-                showToast("เกิดข้อผิดพลาดในการบันทึก", "error");
-            }
-        }
-
-        function openSingleReport(vehNum, plate, driver, garage, cause, remark, recorder, startDateText, approvalStatus) {
-            document.getElementById('s_date').innerText = startDateText || new Date().toLocaleDateString('th-TH');
-            document.getElementById('s_status').innerText = document.getElementById(`postStatusText-${vehNum}`) ? document.getElementById(`postStatusText-${vehNum}`).innerText : 'CM';
-            document.getElementById('s_driver').innerText = driver;
-            document.getElementById('s_plate').innerText = plate;
-            document.getElementById('s_veh').innerText = vehNum;
-            document.getElementById('s_garage').innerText = garage || '-';
-            document.getElementById('s_cause').innerText = cause || '-';
-            document.getElementById('s_remark').innerText = remark || '-';
-            document.getElementById('s_recorder').innerText = recorder || '-';
-
-            const approvalEl = document.getElementById('s_approval');
-            if (!approvalStatus || approvalStatus === 'โปรดเลือก') {
-                approvalEl.innerText = 'รอหัวหน้าซ่อมอนุมัติ';
-                approvalEl.className = 'border border-slate-300 p-2 text-center font-bold text-red-600';
-            } else if (approvalStatus === 'อนุมัติ') {
-                approvalEl.innerText = 'อนุมัติแล้ว';
-                approvalEl.className = 'border border-slate-300 p-2 text-center font-bold text-emerald-600';
-            } else {
-                approvalEl.innerText = approvalStatus;
-                approvalEl.className = 'border border-slate-300 p-2 text-center font-bold text-red-600';
-            }
-
-            document.getElementById('singleReportCardModal').classList.remove('hidden');
-        }
-
-        function closeSingleReport() {
-            document.getElementById('singleReportCardModal').classList.add('hidden');
-        }
-
-        function downloadSingleReportImage(actionType) {
-            showToast("กำลังสร้างรูปภาพรายงาน...", "success");
-            const content = document.getElementById('singleReportContent');
-
-            html2canvas(content, { scale: 2, useCORS: true }).then(canvas => {
-                if (actionType === 'save') {
-                    const link = document.createElement('a');
-                    link.download = `Unisource_Report_${new Date().toISOString().slice(0,10)}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    showToast("บันทึกรูปภาพสำเร็จ", "success");
-                } else if (actionType === 'copy') {
-                    canvas.toBlob(blob => {
-                        const item = new ClipboardItem({ "image/png": blob });
-                        navigator.clipboard.write([item]).then(() => {
-                            showToast("คัดลอกรูปภาพไปยังคลิปบอร์ดแล้ว", "success");
-                        }).catch(err => {
-                            showToast("ไม่สามารถคัดลอกรูปภาพได้", "error");
-                        });
-                    });
-                }
-                closeSingleReport();
-            }).catch(err => {
-                showToast("ไม่สามารถสร้างรูปภาพได้", "error");
-            });
+            let items = globalVehicles.map(v => ({ vehicleNumber:v.vehicleNumber, plateNumber:v.plateNumber, driverName:v.driverName, repairStatus:document.getElementById(`status-${v.vehicleNumber}`).value, startTime:document.getElementById(`start-${v.vehicleNumber}`).value, endTime:document.getElementById(`end-${v.vehicleNumber}`).value, garage:document.getElementById(`garage-${v.vehicleNumber}`).value, repairCause:document.getElementById(`cause-${v.vehicleNumber}`).value, remark:document.getElementById(`remark-${v.vehicleNumber}`).value, recorder:currentUser.fullName }));
+            try { await fetch(API_URL, { method:"POST", body:JSON.stringify({action:"saveMultipleRepairs", payload:items, userName:currentUser.fullName})}); showToast("บันทึกสำเร็จ"); } 
+            catch(e){ showToast("Error","error"); }
         }
 
         function generateReportPreview() {
-            showToast("กำลังสร้างรูปภาพตัวอย่างรายงาน...", "success");
-            const captureArea = document.getElementById('reportCaptureArea');
-            updateReportTimestamp();
+            const area = document.getElementById('reportCaptureArea');
+            document.getElementById('reportTimestamp').innerText = `ข้อมูล ณ วันที่: ${new Date().toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})}`;
+            area.querySelectorAll('.vehicle-row-item').forEach(r => {
+                const vn = r.getAttribute('data-veh');
+                const st = document.getElementById(`status-${vn}`).value;
+                r.querySelector('.status-text').innerText = st;
+                r.querySelector('.status-text').className = `text-replacement status-text font-bold ${st==='พร้อมใช้งาน'?'text-emerald-600':st==='CM'?'text-red-600':'text-[#FF9900]'}`;
+                if(st === 'พร้อมใช้งาน') r.classList.add('is-ready'); else r.classList.remove('is-ready');
 
-            const rows = captureArea.querySelectorAll('.vehicle-row-item');
-            rows.forEach(row => {
-                const vNum = row.getAttribute('data-veh');
-                const status = document.getElementById(`status-${vNum}`).value;
-                const startInput = document.getElementById(`start-${vNum}`).value;
-                const endInput = document.getElementById(`end-${vNum}`).value;
-                const dur = document.getElementById(`dur-${vNum}`).innerText;
-                const garage = document.getElementById(`garage-${vNum}`).value.trim();
-                const cause = document.getElementById(`cause-${vNum}`).value.trim();
-                const remark = document.getElementById(`remark-${vNum}`).value.trim();
-                let recorder = document.getElementById(`recorder-${vNum}`).value.trim();
-                if (!recorder) recorder = currentUser ? currentUser.fullName : '-';
-
-                row.querySelector('.status-text').innerText = status;
-                const formattedStart = startInput ? new Date(startInput).toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'}) : new Date().toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'});
-                const formattedEnd = endInput ? new Date(endInput).toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'}) : new Date().toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'});
-
-                row.querySelector('.start-text').innerText = formattedStart;
-                row.querySelector('.end-text').innerText = formattedEnd;
-                row.querySelector('.dur-text').innerText = dur || '0 นาที';
-                row.querySelector('.garage-text').innerText = garage || '-';
-                row.querySelector('.cause-text').innerText = cause || '-';
-                row.querySelector('.remark-text').innerText = remark || '-';
-                row.querySelector('.recorder-text').innerText = recorder;
+                r.querySelector('.start-text').innerText = new Date(document.getElementById(`start-${vn}`).value).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
+                r.querySelector('.end-text').innerText = new Date(document.getElementById(`end-${vn}`).value).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
+                r.querySelector('.dur-text').innerText = document.getElementById(`dur-${vn}`).innerText;
+                r.querySelector('.garage-text').innerText = document.getElementById(`garage-${vn}`).value || '-';
+                r.querySelector('.cause-text').innerText = document.getElementById(`cause-${vn}`).value || '-';
+                r.querySelector('.remark-text').innerText = document.getElementById(`remark-${vn}`).value || '-';
             });
-
-            captureArea.classList.add('capturing');
-
-            html2canvas(captureArea, { 
-                scale: 2, 
-                useCORS: true,
-                windowWidth: captureArea.scrollWidth,
-                windowHeight: captureArea.scrollHeight 
-            }).then(canvas => {
-                captureArea.classList.remove('capturing');
-                generatedReportCanvas = canvas;
-                const previewContainer = document.getElementById('reportPreviewContainer');
-                previewContainer.innerHTML = '';
-                canvas.style.width = '100%';
-                canvas.style.height = 'auto';
-                canvas.className = 'rounded shadow';
-                previewContainer.appendChild(canvas);
-
+            area.classList.add('capturing');
+            showToast("กำลังประมวลผลรูปภาพ...");
+            html2canvas(area, {scale:2}).then(c => {
+                area.classList.remove('capturing'); generatedReportCanvas = c;
+                const pc = document.getElementById('reportPreviewContainer'); pc.innerHTML=''; c.className='w-full h-auto rounded'; pc.appendChild(c);
                 document.getElementById('exportReportModal').classList.remove('hidden');
-                showToast("สร้างรูปภาพสำเร็จ", "success");
-            }).catch(err => {
-                captureArea.classList.remove('capturing');
-                showToast("ไม่สามารถสร้างรูปภาพได้", "error");
             });
         }
 
-        function closeExportModal() {
-            document.getElementById('exportReportModal').classList.add('hidden');
+        function exportReportImageAction(a) {
+            if(!generatedReportCanvas) return;
+            const l=document.createElement('a'); l.download=`Report_${new Date().getTime()}.png`; l.href=generatedReportCanvas.toDataURL('image/png'); l.click();
         }
 
-        function exportReportImageAction(actionType) {
-            if (!generatedReportCanvas) return;
-            if (actionType === 'save') {
-                const link = document.createElement('a');
-                link.download = `Unisource_Vehicle_Status_Report_${new Date().toISOString().slice(0,10)}.png`;
-                link.href = generatedReportCanvas.toDataURL('image/png');
-                link.click();
-                showToast("ดาวน์โหลดรูปภาพรายงานสำเร็จ", "success");
-            } else if (actionType === 'copy') {
-                generatedReportCanvas.toBlob(blob => {
-                    const item = new ClipboardItem({ "image/png": blob });
-                    navigator.clipboard.write([item]).then(() => {
-                        showToast("คัดลอกรูปภาพรายงานไปยังคลิปบอร์ดแล้ว", "success");
-                    }).catch(err => {
-                        showToast("ไม่สามารถคัดลอกรูปภาพได้", "error");
-                    });
-                });
-            }
-            closeExportModal();
-        }
-
-        function exportToExcel(tabType) {
-            let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-            <head><meta charset="UTF-8"></head><body>`;
-
-            if (tabType === 'vehicles') {
-                htmlContent += `<table border="1"><tr style="background-color:#000066; color:#FFFFFF; font-weight:bold;"><th>ลำดับ</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะ</th><th>อู่ซ่อม</th><th>สาเหตุ</th><th>หมายเหตุ</th><th>ผู้บันทึก</th></tr>`;
-                globalVehicles.forEach((v, index) => {
-                    const status = document.getElementById(`status-${v.vehicleNumber}`).value;
-                    const garage = document.getElementById(`garage-${v.vehicleNumber}`).value || '-';
-                    const cause = document.getElementById(`cause-${v.vehicleNumber}`).value || '-';
-                    const remark = document.getElementById(`remark-${v.vehicleNumber}`).value || '-';
-                    let recorder = document.getElementById(`recorder-${v.vehicleNumber}`).value || '';
-                    if(!recorder) recorder = currentUser ? currentUser.fullName : '-';
-                    htmlContent += `<tr><td>${index + 1}</td><td>${v.vehicleNumber}</td><td>${v.plateNumber}</td><td>${v.driverName}</td><td>${status}</td><td>${garage}</td><td>${cause}</td><td>${remark}</td><td>${recorder}</td></tr>`;
-                });
-            } else if (tabType === 'repairs') {
-                htmlContent += `<table border="1"><tr style="background-color:#000066; color:#FFFFFF; font-weight:bold;"><th>วันเวลาเริ่มซ่อม</th><th>เบอร์รถ</th><th>ทะเบียนรถ</th><th>คนขับ</th><th>สถานะซ่อม</th><th>อู่ซ่อม</th><th>สาเหตุ</th><th>หมายเหตุ</th><th>สถานะหลังซ่อม</th><th>อนุมัติ</th></tr>`;
-                globalRepairs.forEach(r => {
-                    if (r.approvalStatus === 'ยกเลิก/ลบแล้ว') return;
-                    htmlContent += `<tr><td>${r.startDateText}</td><td>${r.vehicleNumber}</td><td>${r.plateNumber}</td><td>${r.driverName}</td><td>${r.repairStatus}</td><td>${r.garage}</td><td>${r.repairCause}</td><td>${r.remark}</td><td>${r.postRepairStatus}</td><td>${r.approvalStatus}</td></tr>`;
-                });
-            } else if (tabType === 'monthly') {
-                htmlContent += `<table border="1">` + document.querySelector('#view-monthlySummary table').outerHTML + `</table>`;
-            }
-
-            htmlContent += `</table></body></html>`;
-            const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Unisource_${tabType}_Export_${new Date().toISOString().slice(0,10)}.xls`;
-            a.click();
-            showToast("Export ไฟล์ Excel สำเร็จ", "success");
-        }
-
-        async function deleteRepair(repairID) {
-            try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "deleteRepair", repairID: repairID, userName: currentUser.fullName, userRole: currentUser.role })
-                });
-                let result = await res.json();
-                if (result.success) {
-                    showToast("ลบเรียบร้อย", "success");
-                    loadRepairsView();
-                } else {
-                    showToast(result.message, "error");
-                }
-            } catch (err) {
-                showToast("ไม่สามารถลบรายการได้", "error");
-            }
-        }
-
+        // ================= REPAIRS =================
         async function loadRepairsView() {
-            try {
-                let res = await fetch(`${API_URL}?action=getRepairs`);
-                let repairs = await res.json();
-                globalRepairs = repairs.reverse();
-                renderRepairsTable(globalRepairs);
-            } catch (err) {
-                showToast("ไม่สามารถดึงข้อมูลรายการซ่อมได้", "error");
-            }
+            let res = await fetch(`${API_URL}?action=getRepairs`); globalRepairs = (await res.json()).reverse();
+            renderRepairsTable(globalRepairs);
         }
 
         function renderRepairsTable(repairs) {
-            let html = '';
+            let h='';
             repairs.forEach(r => {
-                if (r.approvalStatus === 'ยกเลิก/ลบแล้ว') return;
-                const defaultDT = getDatetimeISO(0);
-
-                let statusColor = 'text-emerald-600 font-normal';
-                if (r.repairStatus === 'CM') statusColor = 'text-red-600 font-normal';
-                if (r.repairStatus === 'PM') statusColor = 'text-[#FF9900] font-normal';
-
-                let postColor = 'text-red-600 font-normal';
-                if (r.postRepairStatus === 'เสร็จพร้อมรับงาน') postColor = 'text-emerald-600 font-normal';
-
-                html += `<tr class="hover:bg-slate-50 transition border-b border-slate-100 repair-row" data-search="${r.vehicleNumber} ${r.plateNumber} ${r.driverName} ${r.repairCause} ${r.garage} ${r.remark} ${r.recorder}" data-status="${r.repairStatus}" data-date="${r.startDateISO}">
-                    <td class="p-3 text-[11px] text-slate-500 font-normal">${r.startDateText || '-'}</td>
-                    <td class="p-3">
-                        <div class="font-medium text-slate-800 text-xs">${r.vehicleNumber}</div>
-                        <div class="text-[11px] text-slate-500">${r.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${r.driverName}</div>
-                    </td>
-                    <td class="p-3"><span class="${statusColor} text-xs" id="postStatusText-${r.vehicleNumber}">${r.repairStatus}</span></td>
-                    <td class="p-3 text-slate-500 text-[11px]">
-                        <span class="text-slate-600 font-normal">${formatDurationText(r.duration)}</span><br>
-                        <span class="text-[#4682B4] font-medium">อู่: ${r.garage || '-'}</span><br>
-                        <span class="text-slate-500">สาเหตุ: ${r.repairCause}</span><br>
-                        <span class="text-slate-400">หมายเหตุ: ${r.remark || '-'}</span>
-                    </td>
-                    <td class="p-3 text-[11px]">
-                        <select id="postStatus-${r.repairID}" onchange="togglePostEndTime('${r.repairID}')" class="px-2 py-1 rounded border border-slate-300 text-xs bg-white ${postColor} outline-none">
-                            <option value="กำลังซ่อม" ${r.postRepairStatus === 'กำลังซ่อม' ? 'selected' : ''} class="text-red-600">กำลังซ่อม</option>
-                            <option value="เสร็จพร้อมรับงาน" ${r.postRepairStatus === 'เสร็จพร้อมรับงาน' ? 'selected' : ''} class="text-emerald-600">เสร็จพร้อมรับงาน</option>
-                        </select>
-                        ${r.endDateText ? `<div class="text-[10px] text-emerald-600 mt-1 font-medium">เสร็จ: ${r.endDateText}</div>` : ''}
-                        <div id="postEndTimeContainer-${r.repairID}" class="mt-1 ${r.postRepairStatus === 'เสร็จพร้อมรับงาน' ? 'hidden' : ''}">
-                            <span class="text-[10px] text-slate-400 block">วันเวลาซ่อมเสร็จ:</span>
-                            <input type="datetime-local" id="postEnd-${r.repairID}" value="${defaultDT}" class="px-1.5 py-1 rounded border border-slate-300 text-[10px] bg-white text-slate-600" />
-                            <button id="postBtn-${r.repairID}" onclick="savePostStatus('${r.repairID}')" class="mt-1 text-[11px] text-[#4682B4] hover:text-[#3b6d96] font-medium underline transition">ยืนยัน</button>
-                        </div>
-                    </td>
-                    <td class="p-3">
-                        <select id="app-${r.repairID}" onchange="updateApproval('${r.repairID}')" class="px-2 py-1 rounded border border-slate-300 text-xs bg-white text-slate-700 outline-none">
-                            <option value="โปรดเลือก" ${r.approvalStatus === 'โปรดเลือก' || !r.approvalStatus ? 'selected' : ''}>โปรดเลือก</option>
-                            <option value="อนุมัติ" ${r.approvalStatus === 'อนุมัติ' ? 'selected' : ''}>อนุมัติ</option>
-                            <option value="ไม่อนุมัติ" ${r.approvalStatus === 'ไม่อนุมัติ' ? 'selected' : ''}>ไม่อนุมัติ</option>
-                        </select>
-                    </td>
-                    <td class="p-3 text-center">
-                        <input type="checkbox" ${r.transportAck === 'TRUE' ? 'checked' : ''} onchange="ackRepair('${r.repairID}', this.checked)" class="w-4 h-4 text-emerald-600 rounded border-slate-300" />
-                    </td>
-                    <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="openSingleReport('${r.vehicleNumber}', '${r.plateNumber}', '${r.driverName}', '${r.garage}', '${r.repairCause}', '${r.remark}', '${r.recorder}', '${r.startDateText}', '${r.approvalStatus}')" class="bg-[#4682B4] hover:bg-[#3b6d96] text-white px-2 py-1 rounded text-[11px] font-normal transition shadow-sm mb-1">บันทึกรูป</button><br>
-                        <button onclick="deleteRepair('${r.repairID}')" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded text-[11px] transition">ลบ</button>
-                    </td>
+                if(r.approvalStatus==='ยกเลิก/ลบแล้ว') return;
+                let c = r.repairStatus==='CM'?'text-red-600':r.repairStatus==='PM'?'text-[#FF9900]':'text-emerald-600';
+                h+=`<tr class="hover:bg-slate-50 border-b repair-row" data-search="${r.vehicleNumber} ${r.plateNumber}" data-status="${r.repairStatus}" data-date="${r.startDateISO}">
+                    <td class="p-2 text-[10px] text-slate-500">${r.startDateText}</td>
+                    <td class="p-2"><div class="font-bold text-xs">${r.vehicleNumber}</div><div class="text-[10px] text-slate-500">${r.driverName}</div></td>
+                    <td class="p-2 font-bold ${c} text-xs">${r.repairStatus}</td>
+                    <td class="p-2 text-[10px] text-slate-500">อู่: ${r.garage}<br>สาเหตุ: ${r.repairCause}</td>
+                    <td class="p-2 text-[10px]">${r.postRepairStatus}</td>
+                    <td class="p-2 text-[10px]">${r.approvalStatus}</td>
+                    <td class="p-2 text-center"><button onclick="delRep('${r.repairID}')" class="text-white bg-red-500 px-2 rounded text-[10px]">ลบ</button></td>
                 </tr>`;
             });
-            document.getElementById('repairTableBody').innerHTML = html || `<tr><td colspan="8" class="p-4 text-center text-slate-400">ยังไม่มีรายการซ่อมในระบบ</td></tr>`;
-        }
-
-        function togglePostEndTime(repairID) {
-            const val = document.getElementById(`postStatus-${repairID}`).value;
-            const container = document.getElementById(`postEndTimeContainer-${repairID}`);
-            const btn = document.getElementById(`postBtn-${repairID}`);
-            if (val === 'เสร็จพร้อมรับงาน') {
-                container.classList.remove('hidden');
-                if(btn) btn.style.display = '';
-            } else {
-                container.classList.add('hidden');
-                savePostStatus(repairID);
-            }
-        }
-
-        async function savePostStatus(repairID) {
-            const postStatus = document.getElementById(`postStatus-${repairID}`).value;
-            const endTime = postStatus === 'เสร็จพร้อมรับงาน' ? document.getElementById(`postEnd-${repairID}`).value : null;
-            const btn = document.getElementById(`postBtn-${repairID}`);
-
-            try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "updatePostRepair", repairID: repairID, postStatus: postStatus, endTime: endTime, userName: currentUser.fullName, userRole: currentUser.role })
-                });
-                let result = await res.json();
-                if (result.success) {
-                    showToast("บันทึกเรียบร้อย", "success");
-                    if (btn) btn.style.display = 'none';
-                    loadRepairsView();
-                } else {
-                    showToast(result.message, "error");
-                }
-            } catch (err) {
-                showToast("ไม่สามารถอัปเดตสถานะได้", "error");
-            }
+            document.getElementById('repairTableBody').innerHTML = h||`<tr><td colspan="7" class="p-4 text-center">ไม่มีข้อมูล</td></tr>`;
         }
 
         function filterRepairs() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const dateVal = document.getElementById('dateFilter').value;
-            const selectedStatuses = Array.from(document.querySelectorAll('.status-chk:checked')).map(cb => cb.value);
-            const rows = document.querySelectorAll('.repair-row');
-
-            rows.forEach(row => {
-                const searchData = row.getAttribute('data-search').toLowerCase();
-                const rowStatus = row.getAttribute('data-status');
-                const rowDate = row.getAttribute('data-date');
-                const matchKeyword = searchData.includes(keyword);
-                const matchStatus = selectedStatuses.includes(rowStatus);
-                const matchDate = !dateVal || rowDate === dateVal;
-
-                if (matchKeyword && matchStatus && matchDate) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+            const kw = document.getElementById('searchInput').value.toLowerCase(), ds = document.getElementById('dateStart').value, de = document.getElementById('dateEnd').value;
+            const sts = Array.from(document.querySelectorAll('.status-chk:checked')).map(c=>c.value);
+            document.querySelectorAll('.repair-row').forEach(r => {
+                const dt = r.getAttribute('data-date');
+                r.style.display = (r.getAttribute('data-search').toLowerCase().includes(kw) && sts.includes(r.getAttribute('data-status')) && (!ds||dt>=ds) && (!de||dt<=de)) ? '' : 'none';
             });
         }
+        async function delRep(id) { await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"deleteRepair",repairID:id})}); loadRepairsView(); }
 
-        async function updateApproval(repairID) {
-            const status = document.getElementById(`app-${repairID}`).value;
-            try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "approveRepair", repairID: repairID, status: status, userName: currentUser.fullName, userRole: currentUser.role })
-                });
-                let result = await res.json();
-                if (result.success) {
-                    showToast("บันทึกเรียบร้อย", "success");
-                    loadRepairsView();
-                } else {
-                    showToast(result.message, "error");
-                    loadRepairsView();
-                }
-            } catch (err) {
-                showToast("ไม่สามารถอัปเดตการอนุมัติได้", "error");
-                loadRepairsView();
-            }
-        }
-
-        async function ackRepair(repairID, isChecked) {
-            try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "acknowledgeRepair", repairID: repairID, isChecked: isChecked, userName: currentUser.fullName, userRole: currentUser.role })
-                });
-                let result = await res.json();
-                if (result.success) {
-                    showToast("บันทึกเรียบร้อย", "success");
-                } else {
-                    showToast(result.message, "error");
-                    loadRepairsView();
-                }
-            } catch (err) {
-                showToast("ไม่สามารถบันทึกได้", "error");
-                loadRepairsView();
-            }
-        }
-
-        function initMonthlySummaryView() {
-            const monthSel = document.getElementById('selectMonth');
-            const yearSel = document.getElementById('selectYear');
-            const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
-            let mHtml = '';
-            months.forEach((m, i) => { mHtml += `<option value="${i+1}">${m}</option>`; });
-            monthSel.innerHTML = mHtml;
-            monthSel.value = new Date().getMonth() + 1;
-
-            const currentYear = new Date().getFullYear();
-            let yHtml = '';
-            for (let y = currentYear - 1; y <= currentYear + 1; y++) {
-                yHtml += `<option value="${y}">${y + 543} (${y})</option>`;
-            }
-            yearSel.innerHTML = yHtml;
-            yearSel.value = currentYear;
-            loadMonthlySummary();
-        }
-
+        // ================= MONTHLY SUMMARY =================
         async function loadMonthlySummary() {
-            const month = parseInt(document.getElementById('selectMonth').value);
-            const year = parseInt(document.getElementById('selectYear').value);
-            const daysInMonth = new Date(year, month, 0).getDate();
+            const m = parseInt(document.getElementById('selectMonth').value), y = parseInt(document.getElementById('selectYear').value), d = new Date(y,m,0).getDate();
+            let th=`<tr><th class="p-2 border-r">ทะเบียนรถ</th>`; for(let i=1;i<=d;i++) th+=`<th class="p-1 border-r text-center w-8">${i}</th>`; th+=`</tr>`;
+            document.getElementById('calendarHeader').innerHTML=th;
+            if(!globalVehicles.length) await loadVehiclesView();
+            if(!globalRepairs.length) await loadRepairsView();
+            
+            let tb='';
+            globalVehicles.forEach(v => {
+                tb+=`<tr class="border-b"><td class="p-2 border-r text-left"><div class="font-bold text-xs">${v.vehicleNumber}</div></td>`;
+                for(let i=1;i<=d;i++){
+                    const match = globalRepairs.find(r=>r.vehicleNumber===v.vehicleNumber && r.approvalStatus!=='ยกเลิก/ลบแล้ว' && r.startDay===i && r.startMonth===m && r.startYear===y);
+                    tb+=`<td class="p-1 border-r text-center align-middle">${match?`<div class="text-[9px] font-bold ${match.repairStatus==='CM'?'text-red-600':match.repairStatus==='PM'?'text-[#FF9900]':'text-emerald-600'}">${match.repairStatus}</div>`:(!match&&m===new Date().getMonth()+1&&i===new Date().getDate()?'<span class="text-slate-200">-</span>':'')}</td>`;
+                }
+                tb+=`</tr>`;
+            });
+            document.getElementById('calendarBody').innerHTML=tb;
+        }
 
-            let headerHtml = `<tr><th class="p-2 border-r border-slate-200 w-48 text-left">ทะเบียนรถ / พนักงานขับรถ</th>`;
-            for (let d = 1; d <= daysInMonth; d++) {
-                headerHtml += `<th class="p-1 border-r border-slate-200 w-10 text-center">${d}</th>`;
-            }
-            headerHtml += `</tr>`;
-            document.getElementById('calendarHeader').innerHTML = headerHtml;
+        // ================= PM PLANS (NEW) =================
+        async function loadPMView() {
+            if(!globalVehicles.length) await loadVehiclesView();
+            let res = await fetch(`${API_URL}?action=getPMs`); globalPMs = (await res.json()).reverse();
+            let h='', dt = getISO(0);
+            globalVehicles.forEach((v, i) => {
+                h += `<tr class="hover:bg-slate-50 border-b pm-row-item">
+                    <td class="p-2 text-center text-xs text-slate-500">${i+1}</td>
+                    <td class="p-2"><div class="font-medium text-xs">${v.vehicleNumber}</div><div class="text-[10px] text-slate-500">${v.plateNumber} | 👤 ${v.driverName}</div></td>
+                    <td class="p-2"><input type="datetime-local" id="pmstart-${v.vehicleNumber}" value="${dt}" class="w-full p-1 border rounded text-[10px]"></td>
+                    <td class="p-2"><input type="datetime-local" id="pmend-${v.vehicleNumber}" value="${dt}" class="w-full p-1 border rounded text-[10px]"></td>
+                    <td class="p-2 text-center text-[10px]">-</td>
+                    <td class="p-2"><input type="text" id="pmgar-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"></td>
+                    <td class="p-2"><input type="text" id="pmdet-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"></td>
+                    <td class="p-2"><input type="text" id="pmrem-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"></td>
+                    <td class="p-2 text-center"><button onclick="savePM('${v.vehicleNumber}','${v.plateNumber}','${v.driverName}')" class="bg-[#FF9900] text-white px-2 py-1 rounded text-xs">Save PM</button></td>
+                </tr>`;
+            });
+            document.getElementById('pmTableBody').innerHTML=h;
+        }
 
-            try {
-                let [vRes, rRes] = await Promise.all([
-                    fetch(`${API_URL}?action=getVehicles`),
-                    fetch(`${API_URL}?action=getRepairs`)
-                ]);
-                let vehicles = await vRes.json();
-                let repairs = await rRes.json();
+        async function savePM(veh, pl, dr) {
+            const payload = { vehicleNumber:veh, plateNumber:pl, driverName:dr, startTime:document.getElementById(`pmstart-${veh}`).value, endTime:document.getElementById(`pmend-${veh}`).value, garage:document.getElementById(`pmgar-${veh}`).value, cause:document.getElementById(`pmdet-${veh}`).value, remark:document.getElementById(`pmrem-${veh}`).value };
+            try { await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"savePM", payload:payload, userName:currentUser.fullName})}); showToast("บันทึกแผน PM เรียบร้อย"); loadPMCalendar(); } catch(e){}
+        }
 
-                repairs.reverse();
+        async function loadPMCalendar() {
+            const m = parseInt(document.getElementById('selectMonthPM').value), y = parseInt(document.getElementById('selectYearPM').value), d = new Date(y,m,0).getDate();
+            let th=`<tr><th class="p-2 border-r">ทะเบียนรถ</th>`; for(let i=1;i<=d;i++) th+=`<th class="p-1 border-r text-center w-8">${i}</th>`; th+=`</tr>`;
+            document.getElementById('pmCalendarHeader').innerHTML=th;
+            if(!globalVehicles.length) await loadVehiclesView();
+            let res = await fetch(`${API_URL}?action=getPMs`); globalPMs = (await res.json()).reverse();
+            let tb='';
+            globalVehicles.forEach(v => {
+                tb+=`<tr class="border-b"><td class="p-2 border-r text-left"><div class="font-bold text-xs">${v.vehicleNumber}</div></td>`;
+                for(let i=1;i<=d;i++){
+                    const match = globalPMs.find(p=>p.vehicleNumber===v.vehicleNumber && p.startDay===i && p.startMonth===m && p.startYear===y);
+                    tb+=`<td class="p-1 border-r text-center align-middle">${match?`<div class="text-[9px] font-bold text-[#FF9900] bg-orange-100 rounded">PM</div>`:''}</td>`;
+                }
+                tb+=`</tr>`;
+            });
+            document.getElementById('pmCalendarBody').innerHTML=tb;
+        }
 
-                let bodyHtml = '';
-                vehicles.forEach(v => {
-                    bodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
-                        <td class="p-2 border-r border-slate-200 text-left">
-                            <div class="font-bold text-slate-800 text-xs">${v.vehicleNumber}</div>
-                            <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                            <div class="text-[11px] text-slate-600">👤 ${v.driverName}</div>
-                        </td>`;
-                    for (let d = 1; d <= daysInMonth; d++) {
-                        const matched = repairs.find(r => {
-                            if (String(r.vehicleNumber).trim() !== String(v.vehicleNumber).trim() || r.approvalStatus === 'ยกเลิก/ลบแล้ว') return false;
-                            return r.startDay === d && r.startMonth === month && r.startYear === year;
-                        });
-
-                        if (matched) {
-                            let displayStatus = matched.repairStatus || 'พร้อมใช้งาน';
-                            let causeText = matched.repairCause && matched.repairCause !== '-' ? matched.repairCause : '';
-
-                            let statusCls = 'text-emerald-600 font-normal';
-                            if (displayStatus === 'CM') statusCls = 'text-red-600 font-bold';
-                            if (displayStatus === 'PM') statusCls = 'text-[#FF9900] font-bold';
-
-                            bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle">
-                                <div class="text-xs ${statusCls}">${displayStatus}</div>
-                                <div class="text-[9px] text-slate-500 truncate max-w-[50px]" title="${causeText}">${causeText}</div>
-                            </td>`;
-                        } else {
-                            bodyHtml += `<td class="p-1 border-r border-slate-200 text-center text-slate-300">-</td>`;
-                        }
-                    }
-                    bodyHtml += `</tr>`;
-                });
-                document.getElementById('calendarBody').innerHTML = bodyHtml || `<tr><td colspan="${daysInMonth + 1}" class="p-4 text-center text-slate-400">ไม่พบข้อมูล</td></tr>`;
-            } catch (err) {
-                showToast("ไม่สามารถโหลดข้อมูลสรุปประจำเดือนได้", "error");
-            }
+        function exportToExcel(type) {
+            let tb = '';
+            if(type==='vehicles') tb = document.querySelector('#view-vehicles table').outerHTML;
+            if(type==='repairs') tb = document.querySelector('#view-repairs table').outerHTML; // *มันจะดาวน์โหลดแถวที่โชว์อยู่ (ผ่านการฟิลเตอร์ช่วงวันที่มาแล้ว)
+            if(type==='monthly') tb = document.querySelector('#view-monthlySummary table').outerHTML;
+            if(type==='pm') tb = document.querySelector('#view-pmPlan table').outerHTML;
+            if(type==='pmcal') tb = document.querySelector('#view-pmCalendar table').outerHTML;
+            const html = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>${tb}</body></html>`;
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([html], {type:'application/vnd.ms-excel'}));
+            a.download = `Export_${type}_${new Date().toISOString().slice(0,10)}.xls`; a.click(); showToast("ดาวน์โหลดสำเร็จ");
         }
     </script>
 </body>

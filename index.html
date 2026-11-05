@@ -23,6 +23,12 @@
         .text-replacement { display: none; }
         .capturing .no-print { display: none !important; }
         .capturing { overflow: visible !important; height: auto !important; max-height: none !important; box-shadow: none !important; border: none !important; }
+
+        /* พาดยาวเฉพาะตอนแคปรูป แต่ขนาดตัวอักษรเท่าสถานะปกติ (text-xs) */
+        .capturing .vehicle-row-item.is-ready .col-garage,
+        .capturing .vehicle-row-item.is-ready .col-cause,
+        .capturing .vehicle-row-item.is-ready .col-remark { display: none !important; }
+        .capturing .vehicle-row-item.is-ready .col-merged { display: table-cell !important; }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
@@ -85,14 +91,14 @@
                     <div class="p-3 border-b flex justify-between bg-slate-50 rounded-t-lg"><span class="text-sm font-bold text-[#000066]">รายงานสรุปสถานะรถประจำวัน</span><span class="text-xs font-medium text-slate-500" id="reportTimestamp"></span></div>
                     <table class="w-full text-left border-collapse mt-2">
                         <thead class="bg-slate-100 text-slate-600 text-[11px] uppercase border-b sticky top-0 z-10">
-                            <tr><th class="p-2 w-10 text-center">#</th><th class="p-2 w-32">รถ / ทะเบียน / คนขับ</th><th class="p-2 w-28">สถานะวันนี้</th><th class="p-2 w-32">วันเวลาเริ่ม</th><th class="p-2 w-32">วันเวลาเสร็จ</th><th class="p-2 w-20">ระยะเวลา</th><th class="p-2 w-32">อู่ / ศูนย์บริการ</th><th class="p-2 w-32">สาเหตุการซ่อม</th><th class="p-2 w-32">หมายเหตุ</th><th class="p-2 w-16 text-center no-print">จัดการ</th></tr>
+                            <tr><th class="p-2 w-10 text-center">#</th><th class="p-2 w-36">รถ / ทะเบียน / คนขับ</th><th class="p-2 w-28">สถานะวันนี้</th><th class="p-2 w-32">วันเวลาเริ่ม</th><th class="p-2 w-32">วันเวลาเสร็จ</th><th class="p-2 w-20">ระยะเวลา</th><th class="p-2 w-32 col-garage">อู่ / ศูนย์บริการ</th><th class="p-2 w-32 col-cause">สาเหตุการซ่อม</th><th class="p-2 w-32 col-remark">หมายเหตุ</th><th class="p-2 w-16 text-center no-print">จัดการ</th></tr>
                         </thead>
                         <tbody id="vehicleTableBody" class="text-xs divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- TAB 2: REPAIRS (ORIGINAL RESTORED + DATE RANGE FILTER) -->
+            <!-- TAB 2: REPAIRS -->
             <div id="view-repairs" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border flex-wrap gap-4">
                     <h2 class="font-medium text-slate-800 text-base">รายการบันทึกการซ่อมและการอนุมัติ</h2>
@@ -120,7 +126,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: MONTHLY SUMMARY (ORIGINAL UNTOUCHED DESIGN) -->
+            <!-- TAB 3: MONTHLY SUMMARY -->
             <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน (ปฏิทินซ่อม 1-31)</h2>
@@ -147,7 +153,7 @@
                 <div class="bg-white rounded-xl shadow-sm border flex-1 overflow-auto p-3">
                     <table class="w-full text-left border-collapse mt-2">
                         <thead class="bg-slate-100 text-slate-600 text-[11px] uppercase border-b sticky top-0 z-10">
-                            <tr><th class="p-2 w-10 text-center">#</th><th class="p-2 w-32">รถ / ทะเบียน / คนขับ</th><th class="p-2 w-32">วันเวลาเริ่ม PM</th><th class="p-2 w-32">คาดว่าเสร็จ</th><th class="p-2 w-20">ระยะเวลา</th><th class="p-2 w-32">อู่ / ศูนย์บริการ</th><th class="p-2 w-32">รายการ PM</th><th class="p-2 w-32">หมายเหตุ</th><th class="p-2 w-16 text-center">จัดการ</th></tr>
+                            <tr><th class="p-2 w-10 text-center">#</th><th class="p-2 w-36">รถ / ทะเบียน / คนขับ</th><th class="p-2 w-32">วันเวลาเริ่ม PM</th><th class="p-2 w-32">คาดว่าเสร็จ</th><th class="p-2 w-20">ระยะเวลา</th><th class="p-2 w-32">อู่ / ศูนย์บริการ</th><th class="p-2 w-32">รายการ PM</th><th class="p-2 w-32">หมายเหตุ</th><th class="p-2 w-16 text-center">จัดการ</th></tr>
                         </thead>
                         <tbody id="pmTableBody" class="text-xs divide-y divide-slate-100"></tbody>
                     </table>
@@ -213,7 +219,7 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycby246X7Am4M8wy4l2gFGeeF39fnw-uE1gCqA_LmpRUumcaXSGnCF9zYR5yqqf9QjRYELg/exec";
-        let currentUser = null, globalVehicles = [], globalRepairs = [], globalPMs = [], currentPlanTarget = 'today', generatedReportCanvas = null, singleReportCanvas = null;
+        let currentUser = null, globalVehicles = [], globalRepairs = [], globalPMs = [], currentPlanTarget = 'today', generatedReportCanvas = null;
 
         function showToast(msg, type = 'success') {
             const cont = document.getElementById('toastContainer');
@@ -264,7 +270,7 @@
                     document.getElementById('appContainer').classList.remove('hidden');
                     showToast("เข้าสู่ระบบสำเร็จ"); initDateSelectors(); loadVehiclesView();
                 } else { err.innerText = result.message; err.classList.remove('hidden'); }
-            } catch (error) { err.innerText = "Error connecting to API"; err.classList.remove('hidden'); }
+            } catch (error) { err.innerText = "Error connecting to API"; err.classList.add('hidden'); }
         }
         function handleLogout() { localStorage.removeItem('unisource_user'); location.reload(); }
 
@@ -321,7 +327,11 @@
             globalVehicles.forEach((v, i) => {
                 h += `<tr class="hover:bg-slate-50 border-b vehicle-row-item" data-veh="${v.vehicleNumber}">
                     <td class="p-2 text-center text-xs text-slate-500">${i+1}</td>
-                    <td class="p-2"><div class="font-medium text-xs">${v.vehicleNumber}</div><div class="text-[10px] text-slate-500">${v.plateNumber} | 👤 ${v.driverName}</div></td>
+                    <td class="p-2">
+                        <div class="font-medium text-xs text-slate-800">${v.vehicleNumber}</div>
+                        <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
+                    </td>
                     <td class="p-2">
                         <select id="status-${v.vehicleNumber}" class="w-full px-1.5 py-1 rounded border text-xs bg-white outline-none font-bold text-emerald-600" onchange="updateSelectColor(this)">
                             <option value="พร้อมใช้งาน" class="text-emerald-600 font-bold">พร้อมใช้งาน</option>
@@ -333,9 +343,10 @@
                     <td class="p-2"><input type="datetime-local" id="start-${v.vehicleNumber}" value="${dt}" onchange="calcDur('${v.vehicleNumber}')" class="w-full p-1 border rounded text-[10px]"><span class="text-replacement start-text text-[10px]">-</span></td>
                     <td class="p-2"><input type="datetime-local" id="end-${v.vehicleNumber}" value="${dt}" onchange="calcDur('${v.vehicleNumber}')" class="w-full p-1 border rounded text-[10px]"><span class="text-replacement end-text text-[10px]">-</span></td>
                     <td class="p-2 text-center text-[10px]"><span id="dur-${v.vehicleNumber}">0 นาที</span><span class="text-replacement dur-text">-</span></td>
-                    <td class="p-2"><input type="text" id="garage-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"><span class="text-replacement garage-text text-xs">-</span></td>
-                    <td class="p-2"><input type="text" id="cause-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"><span class="text-replacement cause-text text-xs">-</span></td>
-                    <td class="p-2"><input type="text" id="remark-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"><span class="text-replacement remark-text text-xs">-</span></td>
+                    <td class="p-2 col-garage"><input type="text" id="garage-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"><span class="text-replacement garage-text text-xs">-</span></td>
+                    <td class="p-2 col-cause"><input type="text" id="cause-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"><span class="text-replacement cause-text text-xs">-</span></td>
+                    <td class="p-2 col-remark"><input type="text" id="remark-${v.vehicleNumber}" class="w-full p-1 border rounded text-xs"><span class="text-replacement remark-text text-xs">-</span></td>
+                    <td class="p-2 col-merged hidden text-center text-emerald-600 font-bold text-xs bg-white/50" colspan="3">พร้อมใช้งาน</td>
                     <td class="p-2 text-center no-print"><button onclick="saveRow('${v.vehicleNumber}','${v.plateNumber}','${v.driverName}')" class="bg-[#4682B4] text-white px-2.5 py-1.5 rounded text-xs">บันทึก</button></td>
                 </tr>`;
             });
@@ -368,6 +379,7 @@
                 const stEl = r.querySelector('.status-text');
                 stEl.innerText = st;
                 stEl.className = `text-replacement status-text font-bold ${st==='พร้อมใช้งาน'?'text-emerald-600':st==='CM'?'text-red-600':'text-[#FF9900]'}`;
+                if(st === 'พร้อมใช้งาน') r.classList.add('is-ready'); else r.classList.remove('is-ready');
 
                 r.querySelector('.start-text').innerText = new Date(document.getElementById(`start-${vn}`).value).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
                 r.querySelector('.end-text').innerText = new Date(document.getElementById(`end-${vn}`).value).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
@@ -390,7 +402,7 @@
             const l=document.createElement('a'); l.download=`Report_${new Date().getTime()}.png`; l.href=generatedReportCanvas.toDataURL('image/png'); l.click();
         }
 
-        // ================= REPAIRS (ORIGINAL RESTORED) =================
+        // ================= REPAIRS =================
         async function loadRepairsView() {
             let res = await fetch(`${API_URL}?action=getRepairs`); globalRepairs = (await res.json()).reverse();
             renderRepairsTable(globalRepairs);
@@ -410,7 +422,11 @@
 
                 h+=`<tr class="hover:bg-slate-50 border-b repair-row" data-search="${r.vehicleNumber} ${r.plateNumber} ${r.driverName} ${r.repairCause} ${r.garage} ${r.remark}" data-status="${r.repairStatus}" data-date="${r.startDateISO}">
                     <td class="p-3 text-[11px] text-slate-500">${r.startDateText}</td>
-                    <td class="p-3"><div class="font-medium text-xs">${r.vehicleNumber}</div><div class="text-[10px] text-slate-500">${r.plateNumber}</div><div class="text-[10px] text-slate-600">👤 ${r.driverName}</div></td>
+                    <td class="p-2">
+                        <div class="font-medium text-xs text-slate-800">${r.vehicleNumber}</div>
+                        <div class="text-[11px] text-slate-500">${r.plateNumber}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${r.driverName}</div>
+                    </td>
                     <td class="p-3"><span class="${statusColor} font-bold text-xs" id="postStatusText-${r.vehicleNumber}">${r.repairStatus}</span></td>
                     <td class="p-3 text-slate-500 text-[10px]">
                         <span class="text-slate-600 font-normal">${formatDuration(r.duration)}</span><br>
@@ -513,7 +529,7 @@
             });
         }
 
-        // ================= MONTHLY SUMMARY (ORIGINAL UNTOUCHED DESIGN) =================
+        // ================= MONTHLY SUMMARY =================
         async function loadMonthlySummary() {
             const m = parseInt(document.getElementById('selectMonth').value);
             const y = parseInt(document.getElementById('selectYear').value);
@@ -534,7 +550,8 @@
                 bodyHtml += `<tr class="hover:bg-slate-50 border-b border-slate-100">
                     <td class="p-2 border-r border-slate-200 text-left">
                         <div class="font-bold text-slate-800 text-xs">${v.vehicleNumber}</div>
-                        <div class="text-[10px] text-slate-500">${v.plateNumber} | 👤 ${v.driverName}</div>
+                        <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
                     </td>`;
                 for (let d = 1; d <= daysInMonth; d++) {
                     const matched = globalRepairs.find(r => String(r.vehicleNumber).trim() === String(v.vehicleNumber).trim() && r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startDay === d && r.startMonth === m && r.startYear === y);
@@ -559,7 +576,11 @@
             globalVehicles.forEach((v, i) => {
                 h += `<tr class="hover:bg-slate-50 border-b pm-row-item">
                     <td class="p-2 text-center text-xs text-slate-500">${i+1}</td>
-                    <td class="p-2"><div class="font-medium text-xs">${v.vehicleNumber}</div><div class="text-[10px] text-slate-500">${v.plateNumber} | 👤 ${v.driverName}</div></td>
+                    <td class="p-2">
+                        <div class="font-medium text-xs text-slate-800">${v.vehicleNumber}</div>
+                        <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
+                    </td>
                     <td class="p-2"><input type="datetime-local" id="pmstart-${v.vehicleNumber}" value="${dt}" class="w-full p-1 border rounded text-[10px]"></td>
                     <td class="p-2"><input type="datetime-local" id="pmend-${v.vehicleNumber}" value="${dt}" class="w-full p-1 border rounded text-[10px]"></td>
                     <td class="p-2 text-center text-[10px]">-</td>
@@ -579,13 +600,18 @@
 
         async function loadPMCalendar() {
             const m = parseInt(document.getElementById('selectMonthPM').value), y = parseInt(document.getElementById('selectYearPM').value), d = new Date(y,m,0).getDate();
-            let th=`<tr><th class="p-2 border-r w-48 text-left">ทะเบียนรถ</th>`; for(let i=1;i<=d;i++) th+=`<th class="p-1 border-r text-center w-8">${i}</th>`; th+=`</tr>`;
+            let th=`<tr><th class="p-2 border-r w-48 text-left">ทะเบียนรถ / พนักงานขับรถ</th>`; for(let i=1;i<=d;i++) th+=`<th class="p-1 border-r text-center w-8">${i}</th>`; th+=`</tr>`;
             document.getElementById('pmCalendarHeader').innerHTML=th;
             if(!globalVehicles.length) await loadVehiclesView();
             let res = await fetch(`${API_URL}?action=getPMs`); globalPMs = (await res.json()).reverse();
             let tb='';
             globalVehicles.forEach(v => {
-                tb+=`<tr class="border-b"><td class="p-2 border-r text-left"><div class="font-bold text-xs">${v.vehicleNumber}</div></td>`;
+                tb+=`<tr class="border-b">
+                    <td class="p-2 border-r text-left">
+                        <div class="font-bold text-slate-800 text-xs">${v.vehicleNumber}</div>
+                        <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
+                    </td>`;
                 for(let i=1;i<=d;i++){
                     const match = globalPMs.find(p=>String(p.vehicleNumber).trim()===String(v.vehicleNumber).trim() && p.startDay===i && p.startMonth===m && p.startYear===y);
                     tb+=`<td class="p-1 border-r text-center align-middle">${match?`<div class="text-[9px] font-bold text-[#FF9900] bg-orange-100 rounded">PM</div>`:''}</td>`;

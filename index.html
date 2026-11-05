@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แดชบอร์ด & ระบบแจ้งแผนงานซ่อม - Unisource Land Fill</title>
+    <title>Dashboard & Repair Management - Unisource Land Fill</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -55,7 +55,7 @@
             <div class="flex items-center gap-6 whitespace-nowrap">
                 <div><h1 class="text-lg font-bold tracking-wider">UNISOURCE</h1><p class="text-[#FF9900] text-[10px] font-bold tracking-widest text-center">LAND FILL</p></div>
                 <nav class="flex items-center gap-1 ml-4">
-                    <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="menu-item px-3 py-2 text-sm text-[#FF9900] font-medium transition">แดชบอร์ดภาพรวม</a>
+                    <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="menu-item px-3 py-2 text-sm text-[#FF9900] font-medium transition">Dashboard</a>
                     <a href="#" onclick="switchTab('vehicles')" id="nav-vehicles" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">สถานะรถ</a>
                     <a href="#" onclick="switchTab('repairs')" id="nav-repairs" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">บันทึกเหตุการณ์ซ่อม</a>
                     <a href="#" onclick="switchTab('monthlySummary')" id="nav-monthlySummary" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">ปฏิทินซ่อมรายเดือน</a>
@@ -70,55 +70,94 @@
 
         <main class="flex-1 flex flex-col overflow-hidden bg-slate-100 p-4 lg:p-6">
             
-            <!-- TAB 0: DASHBOARD (DEFAULT FIRST PAGE) -->
-            <div id="view-dashboard" class="space-y-4 view-section flex-1 flex flex-col overflow-auto">
-                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 shrink-0 flex-wrap gap-3">
-                    <h2 class="font-bold text-slate-800 text-base">ภาพรวมระบบ (Dashboard)</h2>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-slate-500 font-medium">เลือกเดือนประจำข้อมูล:</span>
-                        <select id="dashMonth" onchange="loadDashboard()" class="px-3 py-1.5 rounded-lg border text-xs bg-white text-slate-700"></select>
-                        <select id="dashYear" onchange="loadDashboard()" class="px-3 py-1.5 rounded-lg border text-xs bg-white text-slate-700"></select>
+            <!-- TAB 0: DASHBOARD (PROFESSIONAL ENTERPRISE VIEW) -->
+            <div id="view-dashboard" class="space-y-6 view-section flex-1 flex flex-col overflow-auto">
+                <div class="flex justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-slate-200 shrink-0 flex-wrap gap-4">
+                    <div>
+                        <h2 class="font-bold text-slate-900 text-lg">Executive Dashboard</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">สรุปสถิติการซ่อมบำรุงและแผนงาน PM ประจำเดือน</p>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-600 font-medium pl-2">เลือกเดือน:</span>
+                        <select id="dashMonth" onchange="loadDashboard()" class="px-3 py-1.5 rounded-lg border text-xs bg-white text-slate-800 font-medium outline-none"></select>
+                        <select id="dashYear" onchange="loadDashboard()" class="px-3 py-1.5 rounded-lg border text-xs bg-white text-slate-800 font-medium outline-none"></select>
                     </div>
                 </div>
 
-                <!-- Section 1: Repair Dashboard -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
-                    <h3 class="text-sm font-bold text-[#000066] border-b pb-2">📊 ส่วนที่ 1: แดชบอร์ดสถานะการซ่อมประจำเดือน</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-                            <div class="text-xs text-slate-500 font-medium">ประเด็นซ่อมทั้งหมด (CM)</div>
-                            <div class="text-2xl font-bold text-[#000066] mt-1" id="dashTotalCM">0</div>
+                <!-- Repair Statistics Section -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-[#000066] uppercase tracking-wide flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-[#000066]"></span> สถิติการซ่อมบำรุงรถบรรทุก (CM Maintenance)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-blue-600"></div>
+                            <span class="text-xs font-medium text-slate-500">เหตุการณ์ซ่อมทั้งหมด (CM)</span>
+                            <div class="flex items-baseline gap-2 mt-3">
+                                <span class="text-3xl font-extrabold text-slate-900" id="dashTotalCM">0</span>
+                                <span class="text-xs text-slate-500">รายการ</span>
+                            </div>
                         </div>
-                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
-                            <div class="text-xs text-slate-500 font-medium">ซ่อมเสร็จพร้อมรับงาน</div>
-                            <div class="text-2xl font-bold text-emerald-600 mt-1" id="dashDoneCM">0</div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-emerald-500"></div>
+                            <span class="text-xs font-medium text-slate-500">ซ่อมเสร็จพร้อมรับงาน</span>
+                            <div class="flex items-baseline gap-2 mt-3">
+                                <span class="text-3xl font-extrabold text-emerald-600" id="dashDoneCM">0</span>
+                                <span class="text-xs text-slate-500">รายการ</span>
+                            </div>
                         </div>
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-                            <div class="text-xs text-slate-500 font-medium">กำลังดำเนินการซ่อม</div>
-                            <div class="text-2xl font-bold text-amber-600 mt-1" id="dashOngoingCM">0</div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-amber-500"></div>
+                            <span class="text-xs font-medium text-slate-500">กำลังดำเนินการซ่อม</span>
+                            <div class="flex items-baseline gap-2 mt-3">
+                                <span class="text-3xl font-extrabold text-amber-600" id="dashOngoingCM">0</span>
+                                <span class="text-xs text-slate-500">รายการ</span>
+                            </div>
                         </div>
-                        <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
-                            <div class="text-xs text-slate-500 font-medium">อนุมัติซ่อมแล้ว</div>
-                            <div class="text-2xl font-bold text-purple-600 mt-1" id="dashApprovedCM">0</div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-purple-600"></div>
+                            <span class="text-xs font-medium text-slate-500">อนุมัติซ่อมเรียบร้อย</span>
+                            <div class="flex items-baseline gap-2 mt-3">
+                                <span class="text-3xl font-extrabold text-purple-600" id="dashApprovedCM">0</span>
+                                <span class="text-xs text-slate-500">รายการ</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 2: PM Plan Dashboard -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
-                    <h3 class="text-sm font-bold text-[#FF9900] border-b pb-2">📅 ส่วนที่ 2: แดชบอร์ดแผนการ PM ประจำเดือน</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
-                            <div class="text-xs text-slate-500 font-medium">แผน PM ทั้งหมดในเดือนนี้</div>
-                            <div class="text-2xl font-bold text-[#FF9900] mt-1" id="dashTotalPM">0</div>
+                <!-- PM Planning & Fleet Status Section -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-[#FF9900] uppercase tracking-wide flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-[#FF9900]"></span> แผนงานบำรุงรักษาเชิงป้องกัน (PM Plan) และสถานะฟลีทรถ
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-orange-500"></div>
+                            <span class="text-xs font-medium text-slate-500">แผน PM ทั้งหมดในเดือนนี้</span>
+                            <div class="flex items-baseline gap-2 mt-3">
+                                <span class="text-3xl font-extrabold text-[#FF9900]" id="dashTotalPM">0</span>
+                                <span class="text-xs text-slate-500">คัน / รอบ</span>
+                            </div>
                         </div>
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
-                            <div class="text-xs text-slate-500 font-medium">รถทั้งหมดในระบบ</div>
-                            <div class="text-2xl font-bold text-slate-700 mt-1" id="dashTotalVehicles">0</div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-slate-700"></div>
+                            <span class="text-xs font-medium text-slate-500">จำนวนรถทั้งหมดในระบบ</span>
+                            <div class="flex items-baseline gap-2 mt-3">
+                                <span class="text-3xl font-extrabold text-slate-800" id="dashTotalVehicles">0</span>
+                                <span class="text-xs text-slate-500">คัน</span>
+                            </div>
                         </div>
-                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-                            <div class="text-xs text-slate-500 font-medium">อัตราความพร้อมใช้งาน</div>
-                            <div class="text-2xl font-bold text-blue-600 mt-1" id="dashReadyRate">100%</div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-blue-500"></div>
+                            <span class="text-xs font-medium text-slate-500">อัตราความพร้อมใช้งานฟลีทรถ (Availability)</span>
+                            <div class="flex items-baseline gap-2 mt-3">
+                                <span class="text-3xl font-extrabold text-blue-600" id="dashReadyRate">100%</span>
+                                <span class="text-xs text-slate-500">เฉลี่ยเดือนนี้</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -180,7 +219,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: MONTHLY SUMMARY (INTEGRATED WITH PM OVERLAY) -->
+            <!-- TAB 3: MONTHLY SUMMARY -->
             <div id="view-monthlySummary" class="space-y-4 view-section hidden flex-1 flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border shrink-0">
                     <h2 class="font-medium text-slate-800 text-base">สรุปแผนซ่อมประจำเดือน (ปฏิทินซ่อม 1-31)</h2>
@@ -307,7 +346,7 @@
                 document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
                 initDateSelectors();
-                switchTab('dashboard'); // เปิดหน้า Dashboard เป็นหน้าแรกสุด
+                switchTab('dashboard');
             }
             document.getElementById('reportTimestamp').innerText = `ข้อมูล ณ วันที่: ${new Date().toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})}`;
         });

@@ -76,92 +76,91 @@
             <div id="view-dashboard" class="space-y-5 view-section flex flex-col">
                 
                 <!-- HEADER TITLE & DROPDOWNS -->
-                <div class="bg-white px-6 py-4 rounded-xl shadow-sm border border-slate-200/80 flex justify-between items-center shrink-0 flex-wrap gap-4 relative overflow-hidden">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#4682B4]"></div>
+                <div class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-slate-200/80 flex justify-between items-center shrink-0 flex-wrap gap-4 relative overflow-hidden">
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#FF9900]"></div>
                     <div>
-                        <h2 class="font-bold text-slate-900 text-base tracking-tight">Executive Dashboard</h2>
+                        <h2 class="font-bold text-slate-900 text-lg tracking-tight">Executive Dashboard</h2>
                         <p class="text-xs text-slate-500 mt-0.5">สรุปสถานะการซ่อมบำรุงและแผนงาน PM ประจำเดือน</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
-                            <select id="dashMonth" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
+                        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
+                            📅 <select id="dashMonth" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
-                        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
-                            <select id="dashYear" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
+                        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
+                            📅 <select id="dashYear" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
                     </div>
                 </div>
 
                 <!-- TOP 4 KPI CARDS -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">งานซ่อมทั้งหมด</div>
-                            <div class="flex items-baseline gap-1.5 mt-1.5">
-                                <span class="text-2xl font-bold text-slate-900" id="dashTotalCM">0</span>
-                                <span class="text-xs text-slate-500">งาน</span>
+                            <div class="flex items-baseline gap-1.5 mt-2">
+                                <span class="text-3xl font-bold text-slate-900" id="dashTotalCM">0</span>
+                                <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-lg bg-slate-900 flex items-center justify-center text-white text-sm shadow-sm">🔧</div>
+                        <div class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-xl shadow-md">🔧</div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">ซ่อมเสร็จรอรับงาน</div>
-                            <div class="flex items-baseline gap-1.5 mt-1.5">
-                                <span class="text-2xl font-bold text-emerald-600" id="dashDoneCM">0</span>
-                                <span class="text-xs text-slate-500">งาน</span>
+                            <div class="flex items-baseline gap-1.5 mt-2">
+                                <span class="text-3xl font-bold text-emerald-600" id="dashDoneCM">0</span>
+                                <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center text-white text-sm shadow-sm">✅</div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center text-white text-xl shadow-md">✅</div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">กำลังซ่อม</div>
-                            <div class="flex items-baseline gap-1.5 mt-1.5">
-                                <span class="text-2xl font-bold text-[#FF9900]" id="dashOngoingCM">0</span>
-                                <span class="text-xs text-slate-500">งาน</span>
+                            <div class="flex items-baseline gap-1.5 mt-2">
+                                <span class="text-3xl font-bold text-[#FF9900]" id="dashOngoingCM">0</span>
+                                <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-lg bg-[#FF9900] flex items-center justify-center text-white text-sm shadow-sm">⚙️</div>
+                        <div class="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-white text-xl shadow-md">⚙️</div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-medium text-slate-500">อนุมัติเรียบร้อย</div>
-                            <div class="flex items-baseline gap-1.5 mt-1.5">
-                                <span class="text-2xl font-bold text-purple-600" id="dashApprovedCM">0</span>
-                                <span class="text-xs text-slate-500">รายการ</span>
+                            <div class="flex items-baseline gap-1.5 mt-2">
+                                <span class="text-3xl font-bold text-purple-600" id="dashApprovedCM">0</span>
+                                <span class="text-xs text-slate-500 font-medium">รายการ</span>
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center text-white text-sm shadow-sm">🛡️</div>
+                        <div class="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white text-xl shadow-md">🛡️</div>
                     </div>
                 </div>
 
-                <!-- MIDDLE ROW: CM DONUT CHART (LEGEND BELOW) & PM PLAN WITH LIST -->
+                <!-- MIDDLE ROW: CM DONUT CHART & PM PLAN -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- Left: CM Chart with Legend Below -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col">
-                        <div class="bg-[#1e293b] text-white px-4 py-2.5 text-xs font-bold tracking-wide">
-                            สถานะงานซ่อม CM
+                    <!-- Left: CM Chart (Clean White Card, No Header Box) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+                        <div class="text-sm font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+                            📊 สถานะงานซ่อม CM
                         </div>
-                        <div class="p-5 flex flex-col items-center justify-center my-auto gap-4">
-                            <div id="chartContainerCM" class="relative w-36 h-36 rounded-full flex flex-col items-center justify-center shadow-inner bg-white">
-                                <div class="absolute inset-2.5 bg-white rounded-full flex flex-col items-center justify-center shadow-sm z-10">
-                                    <div class="text-3xl font-black text-slate-900" id="chartTotalCM">0</div>
-                                    <div class="text-[10px] text-slate-500 font-medium">งาน</div>
+                        <div class="flex flex-col items-center justify-center my-auto gap-5">
+                            <div id="chartContainerCM" class="relative w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-inner bg-white">
+                                <div class="absolute inset-3 bg-white rounded-full flex flex-col items-center justify-center shadow-sm z-10">
+                                    <div class="text-4xl font-black text-slate-900" id="chartTotalCM">0</div>
+                                    <div class="text-xs text-slate-500 font-medium">งาน</div>
                                 </div>
                             </div>
-                            <!-- Legend Below -->
-                            <div class="flex items-center gap-6 text-xs border-t border-slate-100 pt-3 w-full justify-center">
+                            <div class="flex items-center gap-6 text-xs pt-2">
                                 <div class="flex items-center gap-2">
-                                    <span class="w-3 h-3 rounded-full bg-[#FF9900]"></span>
+                                    <span class="w-3.5 h-3.5 rounded-full bg-[#FF9900]"></span>
                                     <span class="text-slate-600 font-medium">กำลังซ่อม:</span>
                                     <span class="font-bold text-slate-900" id="legendOngoing">0 (0%)</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="w-3 h-3 rounded-full bg-[#4682B4]"></span>
+                                    <span class="w-3.5 h-3.5 rounded-full bg-[#4682B4]"></span>
                                     <span class="text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน:</span>
                                     <span class="font-bold text-slate-900" id="legendDone">0 (0%)</span>
                                 </div>
@@ -169,32 +168,30 @@
                         </div>
                     </div>
 
-                    <!-- Right: PM Plan (Number + Date list) -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col">
-                        <div class="bg-[#1e293b] text-white px-4 py-2.5 text-xs font-bold tracking-wide">
-                            แผน PM เดือนนี้
+                    <!-- Right: PM Plan (Clean White Card, No Header Box) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+                        <div class="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
+                            📅 แผน PM เดือนนี้
                         </div>
-                        <div class="p-5 flex flex-col justify-between flex-1">
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-                                <span class="text-xs text-slate-500 font-medium">รวมแผน PM เดือนนี้</span>
-                                <div class="flex items-baseline gap-1">
-                                    <span class="text-3xl font-black text-[#FF9900]" id="dashTotalPM">0</span>
-                                    <span class="text-xs text-slate-400 font-bold uppercase">คัน / รอบ</span>
-                                </div>
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                            <span class="text-xs text-slate-500 font-medium">รวมแผน PM เดือนนี้</span>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-4xl font-black text-[#FF9900]" id="dashTotalPM">0</span>
+                                <span class="text-xs text-slate-400 font-bold uppercase">คัน / รอบ</span>
                             </div>
-                            <div class="flex-1 overflow-auto max-h-36 pr-1">
-                                <table class="w-full text-xs text-left">
-                                    <thead>
-                                        <tr class="text-slate-400 border-b border-slate-100">
-                                            <th class="pb-1.5 font-semibold">ทะเบียน / เบอร์รถ</th>
-                                            <th class="pb-1.5 font-semibold text-right">วันที่แผน PM</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-50" id="dashPMListTable">
-                                        <tr><td colspan="2" class="py-3 text-center text-slate-400">ไม่มีข้อมูลแผน PM ในเดือนนี้</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                        </div>
+                        <div class="flex-1 overflow-auto max-h-40 pr-1">
+                            <table class="w-full text-xs text-left">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-100">
+                                        <th class="pb-2 font-semibold">ทะเบียน / เบอร์รถ</th>
+                                        <th class="pb-2 font-semibold text-right">วันที่แผน PM</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50" id="dashPMListTable">
+                                    <tr><td colspan="2" class="py-4 text-center text-slate-400">ไม่มีข้อมูลแผน PM ในเดือนนี้</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -202,11 +199,11 @@
                 <!-- BOTTOM ROW: TOP 5 CM VEHICLES & SUMMARY TABLE -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <!-- Bottom Left: Top 5 CM Vehicles -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col">
-                        <div class="bg-[#1e293b] text-white px-4 py-2.5 text-xs font-bold tracking-wide">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+                        <div class="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">
                             5 อันดับรถที่มีสถานะ CM มากที่สุด
                         </div>
-                        <div class="p-4 flex-1 flex flex-col justify-center">
+                        <div class="flex-1 flex flex-col justify-center">
                             <table class="w-full text-xs text-left">
                                 <thead>
                                     <tr class="text-slate-400 border-b border-slate-100">
@@ -216,18 +213,18 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100" id="dashTopCMTable">
-                                    <tr><td colspan="3" class="py-3 text-center text-slate-400">ยังไม่มีข้อมูลสถิติ CM</td></tr>
+                                    <tr><td colspan="3" class="py-4 text-center text-slate-400">ยังไม่มีข้อมูลสถิติ CM</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
                     <!-- Bottom Right: Summary Table -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col">
-                        <div class="bg-[#1e293b] text-white px-4 py-2.5 text-xs font-bold tracking-wide">
-                            สรุปสถานะโดยรวม
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+                        <div class="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">
+                            📋 สรุปสถานะโดยรวม
                         </div>
-                        <div class="p-4 flex-1 flex flex-col justify-center">
+                        <div class="flex-1 flex flex-col justify-center">
                             <table class="w-full text-xs text-left">
                                 <thead>
                                     <tr class="text-slate-400 border-b border-slate-100">
@@ -237,8 +234,8 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100" id="dashSummaryTable">
-                                    <tr><td class="py-2.5 text-slate-600 font-medium">กำลังซ่อม</td><td class="py-2.5 text-center font-bold text-slate-900">0</td><td class="py-2.5 text-right font-semibold text-slate-700">0%</td></tr>
-                                    <tr><td class="py-2.5 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-2.5 text-center font-bold text-slate-900">0</td><td class="py-2.5 text-right font-semibold text-slate-700">0%</td></tr>
+                                    <tr><td class="py-3 text-slate-600 font-medium">กำลังซ่อม</td><td class="py-3 text-center font-bold text-slate-900">0</td><td class="py-3 text-right font-semibold text-slate-700">0%</td></tr>
+                                    <tr><td class="py-3 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-3 text-center font-bold text-slate-900">0</td><td class="py-3 text-right font-semibold text-slate-700">0%</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -532,15 +529,15 @@
                 monthPMs.forEach(p => {
                     let dateOnly = '-';
                     if (p.startDateText) {
-                        dateOnly = p.startDateText.split(' ')[0]; // Take only date part
+                        dateOnly = p.startDateText.split(' ')[0];
                     }
                     pmListHtml += `<tr>
-                        <td class="py-2 font-medium text-slate-800">${p.vehicleNumber} (${p.plateNumber || ''})</td>
-                        <td class="py-2 text-right text-slate-600">${dateOnly}</td>
+                        <td class="py-2.5 font-medium text-slate-800">${p.vehicleNumber} (${p.plateNumber || ''})</td>
+                        <td class="py-2.5 text-right text-slate-600">${dateOnly}</td>
                     </tr>`;
                 });
             } else {
-                pmListHtml = `<tr><td colspan="2" class="py-3 text-center text-slate-400">ไม่มีข้อมูลแผน PM ในเดือนนี้</td></tr>`;
+                pmListHtml = `<tr><td colspan="2" class="py-4 text-center text-slate-400">ไม่มีข้อมูลแผน PM ในเดือนนี้</td></tr>`;
             }
             document.getElementById('dashPMListTable').innerHTML = pmListHtml;
 
@@ -557,13 +554,13 @@
             if (sortedCM.length > 0) {
                 sortedCM.forEach((item, index) => {
                     topCmHtml += `<tr>
-                        <td class="py-2.5 text-center font-bold text-slate-500">${index + 1}</td>
-                        <td class="py-2.5 font-medium text-slate-800">${item[0]}</td>
-                        <td class="py-2.5 text-right font-bold text-red-600">${item[1]} ครั้ง</td>
+                        <td class="py-3 text-center font-bold text-slate-500">${index + 1}</td>
+                        <td class="py-3 font-medium text-slate-800">${item[0]}</td>
+                        <td class="py-3 text-right font-bold text-red-600">${item[1]} ครั้ง</td>
                     </tr>`;
                 });
             } else {
-                topCmHtml = `<tr><td colspan="3" class="py-3 text-center text-slate-400">ยังไม่มีข้อมูลสถิติ CM</td></tr>`;
+                topCmHtml = `<tr><td colspan="3" class="py-4 text-center text-slate-400">ยังไม่มีข้อมูลสถิติ CM</td></tr>`;
             }
             document.getElementById('dashTopCMTable').innerHTML = topCmHtml;
 
@@ -584,8 +581,8 @@
             }
 
             document.getElementById('dashSummaryTable').innerHTML = `
-                <tr><td class="py-2.5 text-slate-600 font-medium">กำลังซ่อม</td><td class="py-2.5 text-center font-bold text-slate-900">${ongoingCM}</td><td class="py-2.5 text-right font-semibold text-slate-700">${ongoingPct}%</td></tr>
-                <tr><td class="py-2.5 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-2.5 text-center font-bold text-slate-900">${doneCM}</td><td class="py-2.5 text-right font-semibold text-slate-700">${donePct}%</td></tr>
+                <tr><td class="py-3 text-slate-600 font-medium">กำลังซ่อม</td><td class="py-3 text-center font-bold text-slate-900">${ongoingCM}</td><td class="py-3 text-right font-semibold text-slate-700">${ongoingPct}%</td></tr>
+                <tr><td class="py-3 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-3 text-center font-bold text-slate-900">${doneCM}</td><td class="py-3 text-right font-semibold text-slate-700">${donePct}%</td></tr>
             `;
         }
 
@@ -620,7 +617,7 @@
                     <td class="p-2">
                         <div class="font-medium text-xs text-slate-800">${v.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">${v.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
                     </td>
                     <td class="p-2">
                         <select id="status-${v.vehicleNumber}" class="w-full px-1.5 py-1 rounded border text-xs bg-white outline-none font-bold text-emerald-600" onchange="updateSelectColor(this)">
@@ -727,7 +724,7 @@
                     <td class="p-2">
                         <div class="font-medium text-xs text-slate-800">${r.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${r.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">${r.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${r.driverName}</div>
                     </td>
                     <td class="p-3"><span class="${statusColor} font-bold text-xs" id="postStatusText-${r.vehicleNumber}">${r.repairStatus}</span></td>
                     <td class="p-3 text-slate-500 text-[10px]">
@@ -866,7 +863,7 @@
                     <td class="p-2 border-r border-slate-200 text-left">
                         <div class="font-bold text-slate-800 text-xs">${v.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">${v.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
                     </td>`;
                 for (let d = 1; d <= daysInMonth; d++) {
                     const matchedRepair = globalRepairs.find(r => String(r.vehicleNumber).trim() === String(v.vehicleNumber).trim() && r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startDay === d && r.startMonth === m && r.startYear === y);
@@ -902,7 +899,7 @@
                     <td class="p-2">
                         <div class="font-medium text-xs text-slate-800">${v.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">${v.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
                     </td>
                     <td class="p-2"><input type="datetime-local" id="pmstart-${v.vehicleNumber}" value="${dt}" class="w-full p-1 border rounded text-[10px]"></td>
                     <td class="p-2"><input type="datetime-local" id="pmend-${v.vehicleNumber}" value="${dt}" class="w-full p-1 border rounded text-[10px]"></td>
@@ -937,7 +934,7 @@
                     <td class="p-2 border-r text-left">
                         <div class="font-bold text-slate-800 text-xs">${v.vehicleNumber}</div>
                         <div class="text-[11px] text-slate-500">${v.plateNumber}</div>
-                        <div class="text-[11px] text-slate-600 mt-0.5">${v.driverName}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
                     </td>`;
                 for(let i=1;i<=d;i++){
                     const match = globalPMs.find(p=>String(p.vehicleNumber).trim()===String(v.vehicleNumber).trim() && p.startDay===i && p.startMonth===m && p.startYear===y);

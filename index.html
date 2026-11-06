@@ -30,7 +30,6 @@
         .capturing .vehicle-row-item.is-ready .col-merged { display: table-cell !important; }
     </style>
 </head>
-<!-- จุดที่ 1: เปลี่ยนสีพื้นหลังเป็น #F4F6F9 -->
 <body class="bg-[#F4F6F9] text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
@@ -80,7 +79,6 @@
                         <h2 class="font-bold text-slate-900 text-lg tracking-tight">Executive Dashboard</h2>
                         <p class="text-xs text-slate-500 mt-0.5">สรุปสถานะการซ่อมบำรุงและแผนงาน PM ประจำเดือน</p>
                     </div>
-                    <!-- จุดที่ 1: เอาอิโมจิรูปปฏิทินออก -->
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
                             <select id="dashMonth" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
@@ -91,7 +89,7 @@
                     </div>
                 </div>
 
-                <!-- การ์ดสรุป 4 ช่อง (จุดที่ 1: เปลี่ยนชื่อเป็น รถทั้งหมด & จุดที่ 5: เอาสีพื้นหลังกล่องอิโมจิออก) -->
+                <!-- การ์ดสรุป 4 ช่อง -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-white p-5 rounded-2xl border border-slate-100 flex items-center justify-between shadow-sm">
                         <div>
@@ -135,7 +133,7 @@
                     </div>
                 </div>
 
-                <!-- จุดที่ 2: สรุปสถานะรถ (คิดแบบเรียลไทม์ตามการบันทึกล่าสุด) -->
+                <!-- สรุปสถานะรถ & แผน PM -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
                         <div class="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">📋 สรุปสถานะรถ</div>
@@ -167,17 +165,17 @@
                     </div>
                 </div>
 
-                <!-- จุดที่ 5: 5 อันดับรถที่มี CM มากที่สุด + ฟิลเตอร์วันที่ + สาเหตุซ่อมล่าสุด (พร้อม Popup ดูเพิ่มเติม) -->
+                <!-- จุดที่ 2: 5 อันดับรถที่มี CM มากที่สุด - จัดรูปเล่มใหม่กระชับ + เรียงคอลัมน์ใหม่ -->
                 <div class="grid grid-cols-1 gap-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
-                        <div class="flex flex-wrap items-center justify-between mb-4 pb-2 border-b border-slate-100 gap-3">
-                            <div class="text-sm font-bold text-slate-800">5 อันดับรถที่มีสถานะ CM มากที่สุด</div>
-                            <div class="flex items-center gap-2 text-xs bg-slate-50 border border-slate-200 p-1.5 rounded-xl">
-                                <span class="text-slate-500 ml-1">ตั้งแต่วันที่:</span>
-                                <input type="date" id="topCmStart" onchange="renderTopCMTable()" class="px-2 py-1 bg-white rounded border text-xs outline-none cursor-pointer">
-                                <span class="text-slate-500">ถึง:</span>
-                                <input type="date" id="topCmEnd" onchange="renderTopCMTable()" class="px-2 py-1 bg-white rounded border text-xs outline-none cursor-pointer">
-                                <button onclick="resetTopCmFilter()" class="text-[10px] text-slate-500 hover:text-slate-700 underline ml-1">รีเซ็ต</button>
+                        <div class="flex flex-wrap items-center justify-between mb-3 pb-3 border-b border-slate-100 gap-2">
+                            <h3 class="text-sm font-bold text-slate-800">5 อันดับรถที่มีสถานะ CM มากที่สุด</h3>
+                            <div class="flex items-center gap-1.5 text-xs">
+                                <span class="text-slate-400 text-[11px]">ตั้งแต่วันที่:</span>
+                                <input type="date" id="topCmStart" onchange="renderTopCMTable()" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none cursor-pointer">
+                                <span class="text-slate-400 text-[11px]">ถึง:</span>
+                                <input type="date" id="topCmEnd" onchange="renderTopCMTable()" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none cursor-pointer">
+                                <button onclick="resetTopCmFilter()" class="text-[11px] text-slate-500 hover:text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg transition ml-1">รีเซ็ต</button>
                             </div>
                         </div>
                         <div class="flex-1 flex flex-col justify-center overflow-x-auto">
@@ -185,13 +183,14 @@
                                 <thead>
                                     <tr class="text-slate-400 border-b border-slate-100">
                                         <th class="pb-2 font-semibold w-12 text-center">อันดับ</th>
-                                        <th class="pb-2 font-semibold w-32">เบอร์รถ</th>
-                                        <th class="pb-2 font-semibold w-28 text-center">จำนวนครั้ง (CM)</th>
+                                        <th class="pb-2 font-semibold w-24">เบอร์รถ</th>
+                                        <th class="pb-2 font-semibold w-48">ทะเบียน / พนักงานขับรถ</th>
+                                        <th class="pb-2 font-semibold w-32 text-center">จำนวนครั้ง (CM)</th>
                                         <th class="pb-2 font-semibold">สาเหตุการซ่อมล่าสุด</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100" id="dashTopCMTable">
-                                    <tr><td colspan="4" class="py-4 text-center text-slate-400">ยังไม่มีข้อมูลสถิติ CM</td></tr>
+                                    <tr><td colspan="5" class="py-4 text-center text-slate-400">ยังไม่มีข้อมูลสถิติ CM</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -347,7 +346,7 @@
         </div>
     </div>
 
-    <!-- จุดที่ 5: MODAL POPUP แสดงสาเหตุการซ่อมแบบเต็ม (มืออาชีพ) -->
+    <!-- MODAL POPUP แสดงสาเหตุการซ่อมแบบเต็ม -->
     <div id="causeDetailModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100">
             <div class="bg-[#000066] px-5 py-4 flex justify-between items-center text-white">
@@ -408,7 +407,7 @@
             return r.trim();
         }
 
-        // ล็อกใช้เวลาท้องถิ่นเครื่องฝั่งผู้ใช้จริง ไม่คำนวณสุ่ม/เพี้ยน
+        // เวลาท้องถิ่นเครื่องฝั่งผู้ใช้จริง
         function getISO(offsetDays = 0) {
             const n = new Date(); n.setDate(n.getDate() + offsetDays);
             const y = n.getFullYear();
@@ -492,7 +491,7 @@
             if(id==='pmCalendar') loadPMCalendar();
         }
 
-        // ================= DASHBOARD (จุดที่ 1 & 2: Real-time คิดคำนวณตามการบันทึกล่าสุด) =================
+        // ================= DASHBOARD =================
         async function loadDashboard() {
             const m = parseInt(document.getElementById('dashMonth').value);
             const y = parseInt(document.getElementById('dashYear').value);
@@ -501,15 +500,12 @@
             globalRepairs = await fetchAPI('getRepairs');
             globalPMs = await fetchAPI('getPMs');
 
-            // จุดที่ 2: นับจำนวนรถทั้งหมดจากระบบจริง
             const totalVehiclesCount = globalVehicles.length;
 
-            // หารถคันที่มีการบันทึกล่าสุดเป็น CM หรือ PM (กำลังซ่อม)
             const latestStatusMap = {};
             globalRepairs.forEach(r => {
                 if (r.approvalStatus !== 'ยกเลิก/ลบแล้ว') {
                     const vn = String(r.vehicleNumber).trim();
-                    // บันทึกล่าสุดเนื่องจากรายการเรียงตามลำดับเดิม/เวลา
                     latestStatusMap[vn] = r;
                 }
             });
@@ -521,7 +517,6 @@
                 if (lastRep) {
                     const st = lastRep.repairStatus;
                     const postSt = lastRep.postRepairStatus;
-                    // ถ้าบันทึกล่าสุดเป็น CM/PM และยังไม่ใช่ "เสร็จพร้อมรับงาน"
                     if ((st === 'CM' || st === 'PM') && postSt !== 'เสร็จพร้อมรับงาน') {
                         ongoingCount++;
                     }
@@ -532,14 +527,12 @@
             const monthPMs = globalPMs.filter(p => p.startMonth === m && p.startYear === y);
             const approvedCM = globalRepairs.filter(r => r.approvalStatus === 'อนุมัติ' && r.startMonth === m && r.startYear === y).length;
 
-            // อัปเดตตัวเลขการ์ดสรุป 4 ช่อง
             document.getElementById('dashTotalCM').innerText = totalVehiclesCount;
             document.getElementById('dashDoneCM').innerText = doneCount;
             document.getElementById('dashOngoingCM').innerText = ongoingCount;
             document.getElementById('dashApprovedCM').innerText = approvedCM;
             document.getElementById('dashTotalPM').innerText = monthPMs.length;
 
-            // ตารางรายการ PM เดือนนี้
             let pmListHtml = '';
             if (monthPMs.length > 0) {
                 monthPMs.forEach(p => {
@@ -551,7 +544,6 @@
             }
             document.getElementById('dashPMListTable').innerHTML = pmListHtml;
 
-            // สรุปสัดส่วนตารางสถานะรถ
             const ongoingPct = totalVehiclesCount > 0 ? Math.round((ongoingCount / totalVehiclesCount) * 100) : 0;
             const donePct = totalVehiclesCount > 0 ? Math.round((doneCount / totalVehiclesCount) * 100) : 0;
 
@@ -563,12 +555,12 @@
             renderTopCMTable();
         }
 
-        // จุดที่ 5: ฟังก์ชันสร้างตาราง 5 อันดับ CM + ฟิลเตอร์ช่วงวันที่ + แสดงสาเหตุการซ่อมล่าสุด (พร้อม Popup)
+        // จุดที่ 2: 5 อันดับรถที่มี CM มากที่สุด (เรียง 5 คอลัมน์ + สวยงามกระชับ)
         function renderTopCMTable() {
             const ds = document.getElementById('topCmStart').value;
             const de = document.getElementById('topCmEnd').value;
 
-            const cmDataMap = {}; // { vehNum: { count: x, latestCause: text, latestDate: ISO } }
+            const cmDataMap = {};
 
             globalRepairs.forEach(r => {
                 if (r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.repairStatus === 'CM') {
@@ -578,7 +570,14 @@
                     if (matchDate) {
                         const vn = String(r.vehicleNumber).trim();
                         if (!cmDataMap[vn]) {
-                            cmDataMap[vn] = { vehicleNumber: vn, count: 0, latestCause: '-', latestDate: '' };
+                            cmDataMap[vn] = { 
+                                vehicleNumber: vn, 
+                                plateNumber: r.plateNumber || '-', 
+                                driverName: r.driverName || '-', 
+                                count: 0, 
+                                latestCause: '-', 
+                                latestDate: '' 
+                            };
                         }
                         cmDataMap[vn].count += 1;
                         if (!cmDataMap[vn].latestDate || (r.startDateISO && r.startDateISO > cmDataMap[vn].latestDate)) {
@@ -595,13 +594,17 @@
             if (sortedCM.length > 0) {
                 sortedCM.forEach((item, index) => {
                     const fullCause = item.latestCause;
-                    const isLong = fullCause.length > 35;
-                    const displayCause = isLong ? fullCause.substring(0, 35) + '...' : fullCause;
+                    const isLong = fullCause.length > 30;
+                    const displayCause = isLong ? fullCause.substring(0, 30) + '...' : fullCause;
                     const safeCause = encodeURIComponent(fullCause);
 
                     topCmHtml += `<tr>
                         <td class="py-3 text-center font-bold text-slate-500">${index + 1}</td>
-                        <td class="py-3 font-medium text-slate-800">${item.vehicleNumber}</td>
+                        <td class="py-3 font-bold text-slate-800">${item.vehicleNumber}</td>
+                        <td class="py-3 text-slate-600">
+                            <div class="font-medium text-slate-800">${item.plateNumber}</div>
+                            <div class="text-[11px] text-slate-400">👤 ${item.driverName}</div>
+                        </td>
                         <td class="py-3 text-center font-bold text-red-600">${item.count} ครั้ง</td>
                         <td class="py-3 text-slate-600">
                             <span>${displayCause}</span>
@@ -610,7 +613,7 @@
                     </tr>`;
                 });
             } else {
-                topCmHtml = `<tr><td colspan="4" class="py-4 text-center text-slate-400">ยังไม่มีข้อมูลสถิติ CM ในช่วงเวลานี้</td></tr>`;
+                topCmHtml = `<tr><td colspan="5" class="py-4 text-center text-slate-400">ยังไม่มีข้อมูลสถิติ CM ในช่วงเวลานี้</td></tr>`;
             }
             document.getElementById('dashTopCMTable').innerHTML = topCmHtml;
         }
@@ -687,7 +690,7 @@
             d.innerText = (s&&e) ? formatDuration(Math.floor((new Date(e)-new Date(s))/60000)) : '0 นาที';
         }
 
-        // จุดที่ 3: บันทึกรายคัน -> ถ้าพร้อมใช้งาน จะลง "เสร็จพร้อมรับงาน" + เวลาปัจจุบันท้องถิ่นทันที / ถ้า CM หรือ PM จะลง "กำลังซ่อม"
+        // จุดที่ 1: บันทึกรายคัน -> พร้อมใช้งานส่ง "เสร็จพร้อมรับงาน" ทันที
         async function saveRow(veh, pl, dr) {
             const statusVal = document.getElementById(`status-${veh}`).value;
             let postStatusVal = 'กำลังซ่อม';
@@ -695,7 +698,7 @@
 
             if (statusVal === 'พร้อมใช้งาน') {
                 postStatusVal = 'เสร็จพร้อมรับงาน';
-                endTimeVal = getISO(0); // บันทึกวันเวลาปัจจุบันฝั่งเครื่องผู้ใช้ทันที
+                endTimeVal = getISO(0);
             }
 
             const payload = { 
@@ -717,7 +720,7 @@
             } catch(e){ showToast("Error","error"); }
         }
 
-        // จุดที่ 3: กดบันทึกทั้งหมด -> พร้อมใช้งานเป็นเสร็จพร้อมรับงานทันที / CM PM เป็นกำลังซ่อม
+        // จุดที่ 1: บันทึกทั้งหมด -> พร้อมใช้งานส่ง "เสร็จพร้อมรับงาน" ทันที
         async function saveAllRows() {
             let items = globalVehicles.map(v => {
                 const statusVal = document.getElementById(`status-${v.vehicleNumber}`).value;
@@ -795,6 +798,7 @@
             renderRepairsTable(globalRepairs);
         }
 
+        // จุดที่ 1: แสดงผล Dropdown ช่องสถานะหลังซ่อม (เจ้าหน้าที่) ให้เลือก "เสร็จพร้อมรับงาน" ตามข้อมูลที่ถูกบันทึกมาจริง
         function renderRepairsTable(repairs) {
             let h='';
             if(!repairs || !repairs.length) {
@@ -808,8 +812,10 @@
                 if(r.repairStatus==='CM') statusColor = 'text-red-600';
                 if(r.repairStatus==='PM') statusColor = 'text-[#FF9900]';
 
-                let postColor = 'text-red-600';
-                if(r.postRepairStatus==='เสร็จพร้อมรับงาน') postColor = 'text-emerald-600';
+                // ตรวจสอบสถานะหลังซ่อมเพื่อเลือกสีและค่า Default
+                const isDone = (r.postRepairStatus === 'เสร็จพร้อมรับงาน') || (r.repairStatus === 'พร้อมใช้งาน');
+                const postVal = isDone ? 'เสร็จพร้อมรับงาน' : (r.postRepairStatus || 'กำลังซ่อม');
+                const postColor = isDone ? 'text-emerald-600 font-bold' : 'text-red-600 font-bold';
 
                 h+=`<tr class="hover:bg-slate-50 border-b repair-row" data-search="${r.vehicleNumber} ${r.plateNumber} ${r.driverName} ${r.repairCause} ${r.garage} ${r.remark}" data-status="${r.repairStatus}" data-date="${r.startDateISO}">
                     <td class="p-3 text-[11px] text-slate-500">${r.startDateText}</td>
@@ -827,11 +833,11 @@
                     </td>
                     <td class="p-3 text-[11px]">
                         <select id="postStatus-${r.repairID}" onchange="togglePostEndTime('${r.repairID}')" class="px-2 py-1 rounded border text-xs bg-white ${postColor} outline-none">
-                            <option value="กำลังซ่อม" ${r.postRepairStatus==='กำลังซ่อม'?'selected':''} class="text-red-600">กำลังซ่อม</option>
-                            <option value="เสร็จพร้อมรับงาน" ${r.postRepairStatus==='เสร็จพร้อมรับงาน'?'selected':''} class="text-emerald-600">เสร็จพร้อมรับงาน</option>
+                            <option value="กำลังซ่อม" ${postVal==='กำลังซ่อม'?'selected':''} class="text-red-600 font-bold">กำลังซ่อม</option>
+                            <option value="เสร็จพร้อมรับงาน" ${postVal==='เสร็จพร้อมรับงาน'?'selected':''} class="text-emerald-600 font-bold">เสร็จพร้อมรับงาน</option>
                         </select>
-                        ${r.endDateText?`<div class="text-[10px] text-emerald-600 mt-1">เสร็จ: ${r.endDateText}</div>`:''}
-                        <div id="postEndTimeContainer-${r.repairID}" class="mt-1 ${r.postRepairStatus==='เสร็จพร้อมรับงาน'?'hidden':''}">
+                        ${r.endDateText?`<div class="text-[10px] text-emerald-600 font-medium mt-1">เสร็จ: ${r.endDateText}</div>`:''}
+                        <div id="postEndTimeContainer-${r.repairID}" class="mt-1 ${postVal==='เสร็จพร้อมรับงาน'?'hidden':''}">
                             <span class="text-[9px] text-slate-400 block">วันเวลาซ่อมเสร็จ:</span>
                             <input type="datetime-local" id="postEnd-${r.repairID}" value="${defaultDT}" class="p-1 border rounded text-[10px] bg-white"><br>
                             <button id="postBtn-${r.repairID}" onclick="savePostStatus('${r.repairID}')" class="mt-1 text-[10px] text-[#4682B4] underline">ยืนยัน</button>
@@ -927,7 +933,7 @@
             });
         }
 
-        // ================= MONTHLY SUMMARY (จุดที่ 4: แสดง CM/PM ค้างเสมอถ้ารูปแบบวันนั้นเคยถูกบันทึก CM/PM) =================
+        // ================= MONTHLY SUMMARY =================
         async function loadMonthlySummary() {
             const m = parseInt(document.getElementById('selectMonth').value);
             const y = parseInt(document.getElementById('selectYear').value);
@@ -977,7 +983,6 @@
                         p.startDay === d && p.startMonth === m && p.startYear === y
                     );
 
-                    // จุดที่ 4: ถ้าวันนั้นเคยมี CM หรือ PM แสดง CM/PM ค้างไว้เสมอ
                     if (matchedRepairCMorPM) {
                         let st = matchedRepairCMorPM.repairStatus;
                         let cls = st === 'CM' ? 'text-red-600 font-bold' : 'text-[#FF9900] font-bold';
@@ -985,7 +990,6 @@
                     } else if (matchedPM) {
                         bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-orange-50 align-middle"><div class="text-[9px] font-bold text-[#FF9900]">PM</div></td>`;
                     } else if (matchedRepairReady) {
-                        // ถ้าไม่เคยมี CM/PM เลย แต่วันนั้นมีบันทึกพร้อมใช้งาน ให้โชว์พร้อมใช้งาน
                         bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-emerald-50 align-middle"><div class="text-[9px] font-bold text-emerald-600">พร้อมใช้งาน</div></td>`;
                     } else {
                         bodyHtml += `<td class="p-1 border-r border-slate-200 text-center text-slate-300">-</td>`;

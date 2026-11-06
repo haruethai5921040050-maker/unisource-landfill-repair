@@ -165,7 +165,7 @@
                     </div>
                 </div>
 
-                <!-- จุดที่ 2: 5 อันดับรถที่มี CM มากที่สุด - จัดรูปเล่มใหม่กระชับ + เรียงคอลัมน์ใหม่ -->
+                <!-- 5 อันดับรถที่มี CM มากที่สุด -->
                 <div class="grid grid-cols-1 gap-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
                         <div class="flex flex-wrap items-center justify-between mb-3 pb-3 border-b border-slate-100 gap-2">
@@ -555,7 +555,6 @@
             renderTopCMTable();
         }
 
-        // จุดที่ 2: 5 อันดับรถที่มี CM มากที่สุด (เรียง 5 คอลัมน์ + สวยงามกระชับ)
         function renderTopCMTable() {
             const ds = document.getElementById('topCmStart').value;
             const de = document.getElementById('topCmEnd').value;
@@ -690,7 +689,6 @@
             d.innerText = (s&&e) ? formatDuration(Math.floor((new Date(e)-new Date(s))/60000)) : '0 นาที';
         }
 
-        // จุดที่ 1: บันทึกรายคัน -> พร้อมใช้งานส่ง "เสร็จพร้อมรับงาน" ทันที
         async function saveRow(veh, pl, dr) {
             const statusVal = document.getElementById(`status-${veh}`).value;
             let postStatusVal = 'กำลังซ่อม';
@@ -720,7 +718,6 @@
             } catch(e){ showToast("Error","error"); }
         }
 
-        // จุดที่ 1: บันทึกทั้งหมด -> พร้อมใช้งานส่ง "เสร็จพร้อมรับงาน" ทันที
         async function saveAllRows() {
             let items = globalVehicles.map(v => {
                 const statusVal = document.getElementById(`status-${v.vehicleNumber}`).value;
@@ -798,7 +795,6 @@
             renderRepairsTable(globalRepairs);
         }
 
-        // จุดที่ 1: แสดงผล Dropdown ช่องสถานะหลังซ่อม (เจ้าหน้าที่) ให้เลือก "เสร็จพร้อมรับงาน" ตามข้อมูลที่ถูกบันทึกมาจริง
         function renderRepairsTable(repairs) {
             let h='';
             if(!repairs || !repairs.length) {
@@ -812,7 +808,6 @@
                 if(r.repairStatus==='CM') statusColor = 'text-red-600';
                 if(r.repairStatus==='PM') statusColor = 'text-[#FF9900]';
 
-                // ตรวจสอบสถานะหลังซ่อมเพื่อเลือกสีและค่า Default
                 const isDone = (r.postRepairStatus === 'เสร็จพร้อมรับงาน') || (r.repairStatus === 'พร้อมใช้งาน');
                 const postVal = isDone ? 'เสร็จพร้อมรับงาน' : (r.postRepairStatus || 'กำลังซ่อม');
                 const postColor = isDone ? 'text-emerald-600 font-bold' : 'text-red-600 font-bold';
@@ -933,7 +928,7 @@
             });
         }
 
-        // ================= MONTHLY SUMMARY =================
+        // ================= MONTHLY SUMMARY (ปรับเพิ่มแสดงสาเหตุการซ่อมแบบย่อในปฏิทิน 1-31) =================
         async function loadMonthlySummary() {
             const m = parseInt(document.getElementById('selectMonth').value);
             const y = parseInt(document.getElementById('selectYear').value);
@@ -983,12 +978,25 @@
                         p.startDay === d && p.startMonth === m && p.startYear === y
                     );
 
+                    // แสดงผลสถานะ + สาเหตุการซ่อมแบบย่อในปฏิทิน
                     if (matchedRepairCMorPM) {
                         let st = matchedRepairCMorPM.repairStatus;
                         let cls = st === 'CM' ? 'text-red-600 font-bold' : 'text-[#FF9900] font-bold';
-                        bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle"><div class="text-[9px] ${cls}">${st}</div></td>`;
+                        let causeText = matchedRepairCMorPM.repairCause || '';
+                        let shortCause = causeText.length > 12 ? causeText.substring(0, 12) + '...' : causeText;
+                        
+                        bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle">
+                            <div class="text-[9px] ${cls}">${st}</div>
+                            ${shortCause ? `<div class="text-[8px] text-slate-500 leading-tight mt-0.5" title="${causeText}">${shortCause}</div>` : ''}
+                        </td>`;
                     } else if (matchedPM) {
-                        bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-orange-50 align-middle"><div class="text-[9px] font-bold text-[#FF9900]">PM</div></td>`;
+                        let pmCauseText = matchedPM.cause || '';
+                        let shortPmCause = pmCauseText.length > 12 ? pmCauseText.substring(0, 12) + '...' : pmCauseText;
+
+                        bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-orange-50 align-middle">
+                            <div class="text-[9px] font-bold text-[#FF9900]">PM</div>
+                            ${shortPmCause ? `<div class="text-[8px] text-slate-500 leading-tight mt-0.5" title="${pmCauseText}">${shortPmCause}</div>` : ''}
+                        </td>`;
                     } else if (matchedRepairReady) {
                         bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-emerald-50 align-middle"><div class="text-[9px] font-bold text-emerald-600">พร้อมใช้งาน</div></td>`;
                     } else {

@@ -30,7 +30,8 @@
         .capturing .vehicle-row-item.is-ready .col-merged { display: table-cell !important; }
     </style>
 </head>
-<body class="bg-white text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
+<!-- จุดที่ 1: เปลี่ยนสีพื้นหลังเป็น #F4F6F9 -->
+<body class="bg-[#F4F6F9] text-slate-800 antialiased h-screen flex flex-col overflow-hidden relative">
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -70,7 +71,7 @@
             </div>
         </header>
 
-        <main class="flex-1 flex flex-col overflow-auto bg-white p-4 lg:p-6 gap-5">
+        <main class="flex-1 flex flex-col overflow-auto bg-[#F4F6F9] p-4 lg:p-6 gap-5">
             
             <!-- TAB 0: DASHBOARD -->
             <div id="view-dashboard" class="space-y-6 view-section flex flex-col">
@@ -80,17 +81,18 @@
                         <p class="text-xs text-slate-500 mt-0.5">สรุปสถานะการซ่อมบำรุงและแผนงาน PM ประจำเดือน</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
+                        <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
                             📅 <select id="dashMonth" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
-                        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
+                        <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 shadow-sm">
                             📅 <select id="dashYear" onchange="loadDashboard()" class="bg-transparent outline-none cursor-pointer font-medium"></select>
                         </div>
                     </div>
                 </div>
 
+                <!-- การ์ดสรุป 4 ช่อง (จุดที่ 5: เอาสีพื้นหลังกล่องอิโมจิออก) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-slate-50/70 p-5 rounded-2xl flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 flex items-center justify-between shadow-sm">
                         <div>
                             <div class="text-xs font-medium text-slate-500">งานซ่อมทั้งหมด</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -98,9 +100,9 @@
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-xl shadow-md">🔧</div>
+                        <div class="text-3xl">🔧</div>
                     </div>
-                    <div class="bg-slate-50/70 p-5 rounded-2xl flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 flex items-center justify-between shadow-sm">
                         <div>
                             <div class="text-xs font-medium text-slate-500">ซ่อมเสร็จรอรับงาน</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -108,9 +110,9 @@
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center text-white text-xl shadow-md">✅</div>
+                        <div class="text-3xl">✅</div>
                     </div>
-                    <div class="bg-slate-50/70 p-5 rounded-2xl flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 flex items-center justify-between shadow-sm">
                         <div>
                             <div class="text-xs font-medium text-slate-500">กำลังซ่อม</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -118,9 +120,9 @@
                                 <span class="text-xs text-slate-500 font-medium">งาน</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-white text-xl shadow-md">⚙️</div>
+                        <div class="text-3xl">⚙️</div>
                     </div>
-                    <div class="bg-slate-50/70 p-5 rounded-2xl flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 flex items-center justify-between shadow-sm">
                         <div>
                             <div class="text-xs font-medium text-slate-500">อนุมัติเรียบร้อย</div>
                             <div class="flex items-baseline gap-1.5 mt-2">
@@ -128,29 +130,28 @@
                                 <span class="text-xs text-slate-500 font-medium">รายการ</span>
                             </div>
                         </div>
-                        <div class="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white text-xl shadow-md">🛡️</div>
+                        <div class="text-3xl">🛡️</div>
                     </div>
                 </div>
 
+                <!-- จุดที่ 2: เอากราฟโดนัทออก ปรับเป็นตารางสรุปสถานะและแผน PM -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-transparent p-2 flex flex-col justify-between">
-                        <div class="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">📊 สถานะงานซ่อม CM</div>
-                        <div class="flex flex-col items-center justify-center my-auto gap-5 bg-white p-6 rounded-2xl">
-                            <div id="chartContainerCM" class="relative w-40 h-40 rounded-full flex flex-col items-center justify-center shadow-inner bg-white">
-                                <div class="absolute inset-3 bg-white rounded-full flex flex-col items-center justify-center shadow-sm z-10">
-                                    <div class="text-4xl font-black text-slate-900" id="chartTotalCM">0</div>
-                                    <div class="text-xs text-slate-500 font-medium">งาน</div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-6 text-xs pt-2">
-                                <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-full bg-[#FF9900]"></span><span class="text-slate-600 font-medium">กำลังซ่อม:</span><span class="font-bold text-slate-900" id="legendOngoing">0 (0%)</span></div>
-                                <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-full bg-[#4682B4]"></span><span class="text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน:</span><span class="font-bold text-slate-900" id="legendDone">0 (0%)</span></div>
-                            </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                        <div class="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">📋 สรุปสถานะรถคงเหลือ</div>
+                        <div class="flex-1 flex flex-col justify-center">
+                            <table class="w-full text-xs text-left">
+                                <thead><tr class="text-slate-400 border-b border-slate-100"><th class="pb-2 font-semibold">สถานะรถ</th><th class="pb-2 font-semibold text-center">จำนวนรถ (คัน)</th><th class="pb-2 font-semibold text-right">สัดส่วน</th></tr></thead>
+                                <tbody class="divide-y divide-slate-100" id="dashSummaryTable">
+                                    <tr><td class="py-3 text-slate-600 font-medium">กำลังซ่อม (CM/PM ค้างอยู่)</td><td class="py-3 text-center font-bold text-[#FF9900]">0</td><td class="py-3 text-right font-semibold text-slate-700">0%</td></tr>
+                                    <tr><td class="py-3 text-slate-600 font-medium">ซ่อมเสร็จ/พร้อมใช้งาน</td><td class="py-3 text-center font-bold text-emerald-600">0</td><td class="py-3 text-right font-semibold text-slate-700">0%</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="bg-transparent p-2 flex flex-col justify-between">
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
                         <div class="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">📅 แผน PM เดือนนี้</div>
-                        <div class="bg-white p-6 rounded-2xl flex flex-col justify-between h-full">
+                        <div class="flex flex-col justify-between h-full">
                             <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
                                 <span class="text-xs text-slate-500 font-medium">รวมแผน PM เดือนนี้</span>
                                 <div class="flex items-baseline gap-1"><span class="text-4xl font-black text-[#FF9900]" id="dashTotalPM">0</span><span class="text-xs text-slate-400 font-bold uppercase">คัน / รอบ</span></div>
@@ -165,25 +166,13 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-transparent p-2 flex flex-col justify-between">
+                <div class="grid grid-cols-1 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
                         <div class="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">5 อันดับรถที่มีสถานะ CM มากที่สุด</div>
-                        <div class="bg-white p-6 rounded-2xl flex-1 flex flex-col justify-center">
+                        <div class="flex-1 flex flex-col justify-center">
                             <table class="w-full text-xs text-left">
                                 <thead><tr class="text-slate-400 border-b border-slate-100"><th class="pb-2 font-semibold w-12 text-center">อันดับ</th><th class="pb-2 font-semibold">เบอร์รถ</th><th class="pb-2 font-semibold text-right">จำนวนครั้ง (CM)</th></tr></thead>
                                 <tbody class="divide-y divide-slate-100" id="dashTopCMTable"><tr><td colspan="3" class="py-4 text-center text-slate-400">ยังไม่มีข้อมูลสถิติ CM</td></tr></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="bg-transparent p-2 flex flex-col justify-between">
-                        <div class="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">📋 สรุปสถานะโดยรวม</div>
-                        <div class="bg-white p-6 rounded-2xl flex-1 flex flex-col justify-center">
-                            <table class="w-full text-xs text-left">
-                                <thead><tr class="text-slate-400 border-b border-slate-100"><th class="pb-2 font-semibold">สถานะ</th><th class="pb-2 font-semibold text-center">จำนวน</th><th class="pb-2 font-semibold text-right">สัดส่วน</th></tr></thead>
-                                <tbody class="divide-y divide-slate-100" id="dashSummaryTable">
-                                    <tr><td class="py-3 text-slate-600 font-medium">กำลังซ่อม</td><td class="py-3 text-center font-bold text-slate-900">0</td><td class="py-3 text-right font-semibold text-slate-700">0%</td></tr>
-                                    <tr><td class="py-3 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-3 text-center font-bold text-slate-900">0</td><td class="py-3 text-right font-semibold text-slate-700">0%</td></tr>
-                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -368,9 +357,15 @@
             return r.trim();
         }
 
+        // ใช้เวลาท้องถิ่นเครื่องผู้ใช้จริง
         function getISO(offsetDays = 0) {
             const n = new Date(); n.setDate(n.getDate() + offsetDays);
-            return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}T${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+            const y = n.getFullYear();
+            const m = String(n.getMonth() + 1).padStart(2, '0');
+            const d = String(n.getDate()).padStart(2, '0');
+            const h = String(n.getHours()).padStart(2, '0');
+            const min = String(n.getMinutes()).padStart(2, '0');
+            return `${y}-${m}-${d}T${h}:${min}`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -455,35 +450,37 @@
             globalRepairs = await fetchAPI('getRepairs');
             globalPMs = await fetchAPI('getPMs');
 
-            // 1. ดึงจำนวนรถจริงทั้งหมดในระบบ
+            // จุดที่ 2: นับจำนวนรถจริงในระบบทั้งหมด (ไม่เอางานซ่อมมาคิดเป็นจำนวนรถ)
             const totalVehiclesCount = globalVehicles.length;
 
-            // 2. หารถคันที่มีสถานะ CM และ "กำลังซ่อมอยู่" (ยังไม่มีการใส่วันเวลาซ่อมเสร็จ) ในเดือน/ปีที่เลือก
-            const ongoingCMRollingVehicles = new Set();
+            // งานซ่อม = รถที่มีสถานะ CM/PM และยังไม่ได้ถูกเปลี่ยนเป็น "เสร็จพร้อมรับงาน"
+            const activeRepairVehicles = new Set();
             
             globalRepairs.forEach(r => {
                 if (
                     r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && 
-                    r.repairStatus === 'CM' && 
+                    (r.repairStatus === 'CM' || r.repairStatus === 'PM') && 
                     r.startMonth === m && 
                     r.startYear === y
                 ) {
-                    const hasEnded = (r.endDateText && r.endDateText.trim() !== '') || (r.endDateISO && r.endDateISO.trim() !== '');
-                    if (!hasEnded && r.postRepairStatus !== 'เสร็จพร้อมรับงาน') {
-                        ongoingCMRollingVehicles.add(String(r.vehicleNumber).trim());
+                    const isDone = (r.postRepairStatus === 'เสร็จพร้อมรับงาน') || 
+                                   (r.endDateText && r.endDateText.trim() !== '') || 
+                                   (r.endDateISO && r.endDateISO.trim() !== '');
+                    if (!isDone) {
+                        activeRepairVehicles.add(String(r.vehicleNumber).trim());
                     }
                 }
             });
 
-            // 3. สรุปจำนวนรถจริงตามสถานะ
-            const ongoingCM = ongoingCMRollingVehicles.size; 
-            const doneCM = totalVehiclesCount > 0 ? Math.max(0, totalVehiclesCount - ongoingCM) : 0; 
+            // คำนวณสถานะงานซ่อม
+            const ongoingCM = activeRepairVehicles.size; // งานซ่อมค้างอยู่ (กำลังซ่อม)
+            const doneCM = totalVehiclesCount > 0 ? Math.max(0, totalVehiclesCount - ongoingCM) : 0; // ที่เหลือคือซ่อมเสร็จ/พร้อมใช้งาน
             const totalCM = totalVehiclesCount; 
 
             const monthPMs = globalPMs.filter(p => p.startMonth === m && p.startYear === y);
-            const approvedCM = globalRepairs.filter(r => r.approvalStatus === 'อนุมัติ' && r.repairStatus === 'CM' && r.startMonth === m && r.startYear === y).length;
+            const approvedCM = globalRepairs.filter(r => r.approvalStatus === 'อนุมัติ' && r.startMonth === m && r.startYear === y).length;
 
-            // 4. อัปเดตการ์ดสรุปตัวเลขด้านบน
+            // อัปเดตการ์ดสรุปตัวเลขด้านบน
             document.getElementById('dashTotalCM').innerText = totalCM;
             document.getElementById('dashDoneCM').innerText = doneCM;
             document.getElementById('dashOngoingCM').innerText = ongoingCM;
@@ -521,25 +518,13 @@
             }
             document.getElementById('dashTopCMTable').innerHTML = topCmHtml;
 
-            // 5. วาดกราฟวงกลมและสรุปสัดส่วนตามจำนวนรถจริง
-            document.getElementById('chartTotalCM').innerText = totalCM;
+            // คำนวณสัดส่วนตารางสรุป
             const ongoingPct = totalCM > 0 ? Math.round((ongoingCM / totalCM) * 100) : 0;
             const donePct = totalCM > 0 ? Math.round((doneCM / totalCM) * 100) : 0;
-            
-            document.getElementById('legendOngoing').innerText = `${ongoingCM} (${ongoingPct}%)`;
-            document.getElementById('legendDone').innerText = `${doneCM} (${donePct}%)`;
-
-            const ongoingAngle = (ongoingCM / (totalCM || 1)) * 360;
-            const chartDiv = document.getElementById('chartContainerCM');
-            if (totalCM > 0) {
-                chartDiv.style.background = `conic-gradient(#FF9900 0deg ${ongoingAngle}deg, #4682B4 ${ongoingAngle}deg 360deg)`;
-            } else {
-                chartDiv.style.background = `#e2e8f0`;
-            }
 
             document.getElementById('dashSummaryTable').innerHTML = `
-                <tr><td class="py-3 text-slate-600 font-medium">กำลังซ่อม</td><td class="py-3 text-center font-bold text-slate-900">${ongoingCM}</td><td class="py-3 text-right font-semibold text-slate-700">${ongoingPct}%</td></tr>
-                <tr><td class="py-3 text-slate-600 font-medium">ซ่อมเสร็จ/รอรับงาน</td><td class="py-3 text-center font-bold text-slate-900">${doneCM}</td><td class="py-3 text-right font-semibold text-slate-700">${donePct}%</td></tr>
+                <tr><td class="py-3 text-slate-600 font-medium">กำลังซ่อม (CM/PM ค้างอยู่)</td><td class="py-3 text-center font-bold text-[#FF9900]">${ongoingCM}</td><td class="py-3 text-right font-semibold text-slate-700">${ongoingPct}%</td></tr>
+                <tr><td class="py-3 text-slate-600 font-medium">ซ่อมเสร็จ/พร้อมใช้งาน</td><td class="py-3 text-center font-bold text-emerald-600">${doneCM}</td><td class="py-3 text-right font-semibold text-slate-700">${donePct}%</td></tr>
             `;
         }
 
@@ -602,16 +587,66 @@
             d.innerText = (s&&e) ? formatDuration(Math.floor((new Date(e)-new Date(s))/60000)) : '0 นาที';
         }
 
+        // จุดที่ 3: ถ้าสถานะวันนี้เป็น "พร้อมใช้งาน" ให้ปรับสถานะหลังซ่อมเป็น "เสร็จพร้อมรับงาน" + บันทึกเวลาขณะนั้นทันที
         async function saveRow(veh, pl, dr) {
-            const payload = { vehicleNumber:veh, plateNumber:pl, driverName:dr, repairStatus:document.getElementById(`status-${veh}`).value, startTime:document.getElementById(`start-${veh}`).value, endTime:document.getElementById(`end-${veh}`).value, garage:document.getElementById(`garage-${veh}`).value, repairCause:document.getElementById(`cause-${veh}`).value, remark:document.getElementById(`remark-${veh}`).value, recorder:currentUser.fullName };
-            try { await fetch(API_URL, { method:"POST", body:JSON.stringify({action:"saveRepair", payload:payload, userName:currentUser.fullName})}); showToast("บันทึกเรียบร้อย"); loadRepairsView(); loadMonthlySummary(); } 
-            catch(e){ showToast("Error","error"); }
+            const statusVal = document.getElementById(`status-${veh}`).value;
+            let postStatusVal = 'กำลังซ่อม';
+            let endTimeVal = document.getElementById(`end-${veh}`).value;
+
+            if (statusVal === 'พร้อมใช้งาน') {
+                postStatusVal = 'เสร็จพร้อมรับงาน';
+                endTimeVal = getISO(0); // บันทึกวันเวลาปัจจุบันท้องถิ่นทันที
+            }
+
+            const payload = { 
+                vehicleNumber: veh, 
+                plateNumber: pl, 
+                driverName: dr, 
+                repairStatus: statusVal, 
+                postRepairStatus: postStatusVal,
+                startTime: document.getElementById(`start-${veh}`).value, 
+                endTime: endTimeVal, 
+                garage: document.getElementById(`garage-${veh}`).value, 
+                repairCause: document.getElementById(`cause-${veh}`).value, 
+                remark: document.getElementById(`remark-${veh}`).value, 
+                recorder: currentUser.fullName 
+            };
+            try { 
+                await fetch(API_URL, { method:"POST", body:JSON.stringify({action:"saveRepair", payload:payload, userName:currentUser.fullName})}); 
+                showToast("บันทึกเรียบร้อย"); loadRepairsView(); loadMonthlySummary(); 
+            } catch(e){ showToast("Error","error"); }
         }
 
+        // จุดที่ 3: บันทึกทั้งหมดกรณีเลือก "พร้อมใช้งาน"
         async function saveAllRows() {
-            let items = globalVehicles.map(v => ({ vehicleNumber:v.vehicleNumber, plateNumber:v.plateNumber, driverName:v.driverName, repairStatus:document.getElementById(`status-${v.vehicleNumber}`).value, startTime:document.getElementById(`start-${v.vehicleNumber}`).value, endTime:document.getElementById(`end-${v.vehicleNumber}`).value, garage:document.getElementById(`garage-${v.vehicleNumber}`).value, repairCause:document.getElementById(`cause-${v.vehicleNumber}`).value, remark:document.getElementById(`remark-${v.vehicleNumber}`).value, recorder:currentUser.fullName }));
-            try { await fetch(API_URL, { method:"POST", body:JSON.stringify({action:"saveMultipleRepairs", payload:items, userName:currentUser.fullName})}); showToast("บันทึกสำเร็จ"); loadRepairsView(); loadMonthlySummary(); } 
-            catch(e){ showToast("Error","error"); }
+            let items = globalVehicles.map(v => {
+                const statusVal = document.getElementById(`status-${v.vehicleNumber}`).value;
+                let postStatusVal = 'กำลังซ่อม';
+                let endTimeVal = document.getElementById(`end-${v.vehicleNumber}`).value;
+
+                if (statusVal === 'พร้อมใช้งาน') {
+                    postStatusVal = 'เสร็จพร้อมรับงาน';
+                    endTimeVal = getISO(0);
+                }
+
+                return { 
+                    vehicleNumber: v.vehicleNumber, 
+                    plateNumber: v.plateNumber, 
+                    driverName: v.driverName, 
+                    repairStatus: statusVal, 
+                    postRepairStatus: postStatusVal,
+                    startTime: document.getElementById(`start-${v.vehicleNumber}`).value, 
+                    endTime: endTimeVal, 
+                    garage: document.getElementById(`garage-${v.vehicleNumber}`).value, 
+                    repairCause: document.getElementById(`cause-${v.vehicleNumber}`).value, 
+                    remark: document.getElementById(`remark-${v.vehicleNumber}`).value, 
+                    recorder: currentUser.fullName 
+                };
+            });
+            try { 
+                await fetch(API_URL, { method:"POST", body:JSON.stringify({action:"saveMultipleRepairs", payload:items, userName:currentUser.fullName})}); 
+                showToast("บันทึกสำเร็จ"); loadRepairsView(); loadMonthlySummary(); 
+            } catch(e){ showToast("Error","error"); }
         }
 
         function generateReportPreview() {
@@ -793,6 +828,7 @@
         }
 
         // ================= MONTHLY SUMMARY =================
+        // จุดที่ 4: ล็อกการแสดงผลในปฏิทิน หากวันนั้นเคยบันทึก CM/PM ไปแล้ว ให้คง CM/PM ไว้เสมอ
         async function loadMonthlySummary() {
             const m = parseInt(document.getElementById('selectMonth').value);
             const y = parseInt(document.getElementById('selectYear').value);
@@ -823,12 +859,23 @@
                         <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
                     </td>`;
                 for (let d = 1; d <= daysInMonth; d++) {
-                    const matchedRepair = globalRepairs.find(r => String(r.vehicleNumber).trim() === String(v.vehicleNumber).trim() && r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && r.startDay === d && r.startMonth === m && r.startYear === y);
-                    const matchedPM = globalPMs.find(p => String(p.vehicleNumber).trim() === String(v.vehicleNumber).trim() && p.startDay === d && p.startMonth === m && p.startYear === y);
+                    // กรองหาประวัติ CM/PM ของรถคันนั้นในวันนั้น (ค้นเฉพาะรายการที่ไม่ยกเลิก และเน้นสถานะ CM/PM ก่อน)
+                    const matchedRepair = globalRepairs.find(r => 
+                        String(r.vehicleNumber).trim() === String(v.vehicleNumber).trim() && 
+                        r.approvalStatus !== 'ยกเลิก/ลบแล้ว' && 
+                        (r.repairStatus === 'CM' || r.repairStatus === 'PM') &&
+                        r.startDay === d && r.startMonth === m && r.startYear === y
+                    );
+                    
+                    const matchedPM = globalPMs.find(p => 
+                        String(p.vehicleNumber).trim() === String(v.vehicleNumber).trim() && 
+                        p.startDay === d && p.startMonth === m && p.startYear === y
+                    );
 
+                    // หากมีประวัติ CM หรือ PM ให้แสดงสถานะ CM/PM ค้างไว้เสมอ
                     if (matchedRepair) {
-                        let st = matchedRepair.repairStatus || 'พร้อมใช้งาน';
-                        let cls = st === 'CM' ? 'text-red-600 font-bold' : st === 'PM' ? 'text-[#FF9900] font-bold' : 'text-emerald-600 font-bold';
+                        let st = matchedRepair.repairStatus;
+                        let cls = st === 'CM' ? 'text-red-600 font-bold' : 'text-[#FF9900] font-bold';
                         bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-slate-50 align-middle"><div class="text-[9px] ${cls}">${st}</div></td>`;
                     } else if (matchedPM) {
                         bodyHtml += `<td class="p-1 border-r border-slate-200 text-center bg-orange-50 align-middle"><div class="text-[9px] font-bold text-[#FF9900]">PM</div></td>`;

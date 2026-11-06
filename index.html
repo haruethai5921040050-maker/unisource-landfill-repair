@@ -377,9 +377,32 @@
         </div>
     </div>
 
+    <!-- MODAL POPUP ยืนยันการยกเลิก/ลบแผน PM จากปฏิทิน PM -->
+    <div id="confirmDeletePmModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-100">
+            <div class="bg-red-600 px-5 py-4 flex justify-between items-center text-white">
+                <h3 class="font-bold text-sm tracking-wide flex items-center gap-2">⚠️ ยืนยันการยกเลิกแผน PM</h3>
+                <button onclick="closeDeletePmModal()" class="text-white hover:text-slate-200 text-lg font-bold">✕</button>
+            </div>
+            <div class="p-5 space-y-3">
+                <p class="text-xs text-slate-600 font-medium">คุณต้องการยกเลิกการแสดงผลแผน PM รายการนี้จากปฏิทินหรือไม่?</p>
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs space-y-1.5">
+                    <div class="flex justify-between"><span class="text-slate-400">เบอร์รถ:</span><span class="font-bold text-slate-800" id="delPmVeh">-</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">วันที่แจ้ง PM:</span><span class="font-semibold text-slate-700" id="delPmDate">-</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">รายการ PM:</span><span class="font-semibold text-slate-700" id="delPmCause">-</span></div>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-100 flex justify-end gap-2">
+                <button onclick="closeDeletePmModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-300 transition">ยกเลิก</button>
+                <button id="btnConfirmDeletePm" onclick="executeDeletePm()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-red-700 transition">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycby246X7Am4M8wy4l2gFGeeF39fnw-uE1gCqA_LmpRUumcaXSGnCF9zYR5yqqf9QjRYELg/exec";
         let currentUser = null, globalVehicles = [], globalRepairs = [], globalPMs = [], currentPlanTarget = 'today', generatedReportCanvas = null;
+        let selectedPmIdToDelete = null;
 
         function showToast(msg, type = 'success') {
             const cont = document.getElementById('toastContainer');
@@ -524,7 +547,7 @@
             });
 
             const doneCount = totalVehiclesCount > 0 ? Math.max(0, totalVehiclesCount - ongoingCount) : 0;
-            const monthPMs = globalPMs.filter(p => p.startMonth === m && p.startYear === y);
+            const monthPMs = globalPMs.filter(p => p.approvalStatus !== 'ยกเลิก/ลบแล้ว' && p.startMonth === m && p.startYear === y);
             const approvedCM = globalRepairs.filter(r => r.approvalStatus === 'อนุมัติ' && r.startMonth === m && r.startYear === y).length;
 
             document.getElementById('dashTotalCM').innerText = totalVehiclesCount;
@@ -928,7 +951,7 @@
             });
         }
 
-        // ================= MONTHLY SUMMARY (ปรับเพิ่มแสดงสาเหตุการซ่อมแบบย่อในปฏิทิน 1-31) =================
+        // ================= MONTHLY SUMMARY =================
         async function loadMonthlySummary() {
             const m = parseInt(document.getElementById('selectMonth').value);
             const y = parseInt(document.getElementById('selectYear').value);
@@ -974,11 +997,11 @@
                     );
                     
                     const matchedPM = globalPMs.find(p => 
+                        p.approvalStatus !== 'ยกเลิก/ลบแล้ว' &&
                         String(p.vehicleNumber).trim() === String(v.vehicleNumber).trim() && 
                         p.startDay === d && p.startMonth === m && p.startYear === y
                     );
 
-                    // แสดงผลสถานะ + สาเหตุการซ่อมแบบย่อในปฏิทิน
                     if (matchedRepairCMorPM) {
                         let st = matchedRepairCMorPM.repairStatus;
                         let cls = st === 'CM' ? 'text-red-600 font-bold' : 'text-[#FF9900] font-bold';
@@ -1042,6 +1065,7 @@
             try { await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"savePM", payload:payload, userName:currentUser.fullName})}); showToast("บันทึกแผน PM เรียบร้อย"); loadPMCalendar(); } catch(e){}
         }
 
+        // ================= PM CALENDAR (จุดลบ PM มีปุ่ม ✕ ที่มุมขวา + Popup ยืนยัน) =================
         async function loadPMCalendar() {
             const m = parseInt(document.getElementById('selectMonthPM').value), y = parseInt(document.getElementById('selectYearPM').value), d = new Date(y,m,0).getDate();
             let th=`<tr><th class="p-2 border-r w-48 text-left">ทะเบียนรถ / พนักงานขับรถ</th>`; for(let i=1;i<=d;i++) th+=`<th class="p-1 border-r text-center w-8">${i}</th>`; th+=`</tr>`;
@@ -1061,12 +1085,60 @@
                         <div class="text-[11px] text-slate-600 mt-0.5">👤 ${v.driverName}</div>
                     </td>`;
                 for(let i=1;i<=d;i++){
-                    const match = globalPMs.find(p=>String(p.vehicleNumber).trim()===String(v.vehicleNumber).trim() && p.startDay===i && p.startMonth===m && p.startYear===y);
-                    tb+=`<td class="p-1 border-r text-center align-middle">${match?`<div class="text-[9px] font-bold text-[#FF9900] bg-orange-100 rounded">PM</div>`:''}</td>`;
+                    const match = globalPMs.find(p=> p.approvalStatus !== 'ยกเลิก/ลบแล้ว' && String(p.vehicleNumber).trim()===String(v.vehicleNumber).trim() && p.startDay===i && p.startMonth===m && p.startYear===y);
+                    if(match) {
+                        const safeVeh = encodeURIComponent(match.vehicleNumber || v.vehicleNumber);
+                        const safeDate = encodeURIComponent(match.startDateText || `${i}/${m}/${y}`);
+                        const safeCause = encodeURIComponent(match.cause || '-');
+                        tb+=`<td class="p-1 border-r text-center align-middle relative">
+                            <div class="relative inline-block bg-orange-100 text-[#FF9900] px-1.5 py-0.5 rounded text-[9px] font-bold pr-4 shadow-sm border border-orange-200">
+                                PM
+                                <button onclick="openDeletePmModal('${match.pmID}', '${safeVeh}', '${safeDate}', '${safeCause}')" title="ยกเลิกแผน PM" class="absolute -top-1 -right-1 bg-red-500 text-white hover:bg-red-700 rounded-full w-3.5 h-3.5 flex items-center justify-center text-[8px] font-bold leading-none shadow transition">✕</button>
+                            </div>
+                        </td>`;
+                    } else {
+                        tb+=`<td class="p-1 border-r text-center align-middle text-slate-300">-</td>`;
+                    }
                 }
                 tb+=`</tr>`;
             });
             document.getElementById('pmCalendarBody').innerHTML=tb;
+        }
+
+        function openDeletePmModal(pmId, vehEnc, dateEnc, causeEnc) {
+            selectedPmIdToDelete = pmId;
+            document.getElementById('delPmVeh').innerText = decodeURIComponent(vehEnc);
+            document.getElementById('delPmDate').innerText = decodeURIComponent(dateEnc);
+            document.getElementById('delPmCause').innerText = decodeURIComponent(causeEnc);
+            document.getElementById('confirmDeletePmModal').classList.remove('hidden');
+        }
+
+        function closeDeletePmModal() {
+            selectedPmIdToDelete = null;
+            document.getElementById('confirmDeletePmModal').classList.add('hidden');
+        }
+
+        async function executeDeletePm() {
+            if (!selectedPmIdToDelete) return;
+            const btn = document.getElementById('btnConfirmDeletePm');
+            btn.innerText = "กำลังลบ..."; btn.disabled = true;
+
+            try {
+                // ส่งคำสั่งลบ/ยกเลิกแผน PM (ไม่ลบแถวใน sheet)
+                await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "deletePM", pmID: selectedPmIdToDelete })
+                });
+                showToast("ยกเลิกแผน PM เรียบร้อยแล้ว");
+                closeDeletePmModal();
+                loadPMCalendar();
+                loadMonthlySummary();
+                loadDashboard();
+            } catch (err) {
+                showToast("เกิดข้อผิดพลาดในการยกเลิก PM", "error");
+            } finally {
+                btn.innerText = "ยืนยัน"; btn.disabled = false;
+            }
         }
 
         // ================= EXPORT EXCEL =================

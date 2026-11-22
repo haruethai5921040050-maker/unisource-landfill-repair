@@ -370,6 +370,21 @@
         .cal-detail .am-text em { font-size:8.5px; padding:2px 5px; }
         .cal-detail .am-text em.b { background:#7c3aed; color:#fff; } .cal-detail .am-text em.e { background:#e08a00; color:#fff; }
         .cal-detail .cal-veh .cv-1 b { font-size:13px; }
+        /* ทะเบียนรถ */
+        .fleet-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+        .fleet-table th { position:sticky; top:0; background:#f5f6fb; color:#475569; font-weight:600; text-align:left; padding:10px 12px; border-bottom:1px solid #e2e8f0; z-index:1; }
+        .fleet-table td { padding:9px 12px; border-bottom:1px solid #f1f3f8; vertical-align:middle; }
+        .fleet-table td b { color:#000066; font-size:13px; }
+        .fleet-table tr.off td { color:#94a3b8; background:#fafafa; } .fleet-table tr.off td b { color:#94a3b8; }
+        .ft-type { background:#eef4fb; color:#2f6fa3; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:600; }
+        .ft-edit { color:#4682B4; font-weight:600; font-size:12px; } .ft-edit:hover { text-decoration:underline; }
+        .sw { display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; font-weight:600; }
+        .sw input { display:none; }
+        .sw i { width:34px; height:19px; border-radius:99px; background:#cbd5e1; position:relative; transition:background .2s; flex:none; }
+        .sw i::after { content:""; position:absolute; top:2px; left:2px; width:15px; height:15px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.2); transition:left .2s; }
+        .sw input:checked + i { background:#10B981; } .sw input:checked + i::after { left:17px; }
+        .sw input:checked ~ span { color:#0e8a5f; } .sw span { color:#94a3b8; }
+        .vf { display:flex; flex-direction:column; gap:4px; } .vf span { color:#64748b; font-weight:600; }
         .cc-del { position:absolute; top:1px; right:1px; width:13px; height:13px; border-radius:50%; background:#fff; color:#c4262c; font-size:8px; font-weight:700; line-height:13px; text-align:center; box-shadow:0 0 0 1px #f3b7b9; opacity:.75; }
         .cc-del:hover { opacity:1; background:#c4262c; color:#fff; }
         .cc .pl { position:absolute; right:2px; bottom:2px; width:6px; height:6px; border-radius:50%; background:#f2b21b; }
@@ -482,6 +497,7 @@
                     <a href="#" onclick="switchTab('monthlySummary')" id="nav-monthlySummary" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">ปฏิทินซ่อมรายเดือน</a>
                     <a href="#" onclick="switchTab('pmPlan')" id="nav-pmPlan" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">แจ้งแผน PM</a>
                     <a href="#" onclick="switchTab('pmCalendar')" id="nav-pmCalendar" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">ปฏิทิน PM</a>
+                    <a href="#" onclick="switchTab('fleet')" id="nav-fleet" class="menu-item px-3 py-2 text-sm text-slate-300 hover:text-[#FF9900] transition">ทะเบียนรถ</a>
                 </nav>
             </div>
             <div class="flex items-center gap-4 shrink-0">
@@ -725,6 +741,26 @@
                     </table>
                 </div>
             </div>
+            <!-- TAB 6: ทะเบียนรถ -->
+            <div id="view-fleet" class="space-y-3 view-section hidden flex-1 flex flex-col overflow-hidden">
+                <div class="cal-head shrink-0">
+                    <h2>ทะเบียนรถ</h2>
+                    <div id="fleetSum" class="cal-sum" style="cursor:default"></div>
+                    <div class="cal-head-r">
+                        <input id="fleetSearch" oninput="renderFleet()" placeholder="ค้นหาเบอร์รถ / ทะเบียน / คนขับ / ประเภท" class="px-3 py-1.5 rounded-lg border text-xs w-56">
+                        <select id="fleetFilter" onchange="renderFleet()" class="px-2.5 py-1.5 rounded-lg border text-xs bg-white">
+                            <option value="all">ทั้งหมด</option><option value="on">ใช้งาน</option><option value="off">ไม่ใช้งาน</option>
+                        </select>
+                        <button onclick="openVehicleForm()" class="bg-[#000066] text-white px-3 py-1.5 rounded-lg text-xs font-semibold">+ เพิ่มรถ</button>
+                    </div>
+                </div>
+                <div class="cal-wrap">
+                    <table class="fleet-table">
+                        <thead><tr><th style="width:60px">#</th><th>เบอร์รถ</th><th>ทะเบียน</th><th>พนักงานขับรถ</th><th>ประเภทรถ</th><th>สถานะซ่อมล่าสุด</th><th style="width:150px">สถานะการใช้งาน</th><th style="width:80px"></th></tr></thead>
+                        <tbody id="fleetBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -746,6 +782,25 @@
         </div>
     </div>
     <div id="rpHost" aria-hidden="true"></div>
+    <!-- MODAL: เพิ่ม/แก้ไขรถ -->
+    <div id="vehicleModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="aud-m-head"><div><small id="vfMode">เพิ่มรถใหม่</small><b>ข้อมูลรถ</b></div><button onclick="document.getElementById('vehicleModal').classList.add('hidden')" aria-label="ปิด">✕</button></div>
+            <div class="p-4 grid grid-cols-2 gap-3 text-xs">
+                <label class="vf"><span>เบอร์รถ *</span><input id="vfNumber" class="border rounded-lg px-3 py-2" placeholder="เช่น 1, U-25"></label>
+                <label class="vf"><span>ทะเบียน *</span><input id="vfPlate" class="border rounded-lg px-3 py-2" placeholder="เช่น 84-6828"></label>
+                <label class="vf col-span-2"><span>พนักงานขับรถ</span><input id="vfDriver" class="border rounded-lg px-3 py-2" placeholder="ชื่อ-นามสกุล"></label>
+                <label class="vf"><span>ประเภทรถ</span><input id="vfType" list="dlVehType" class="border rounded-lg px-3 py-2" placeholder="เช่น รถน้ำ, หัวลาก"></label>
+                <label class="vf"><span>สถานะการใช้งาน</span><select id="vfActive" class="border rounded-lg px-3 py-2 bg-white"><option value="ใช้งาน">ใช้งาน</option><option value="ไม่ใช้งาน">ไม่ใช้งาน</option></select></label>
+                <p id="vfNote" class="col-span-2 text-[11px] text-slate-400"></p>
+            </div>
+            <div class="px-4 pb-4 flex justify-end gap-2">
+                <button onclick="document.getElementById('vehicleModal').classList.add('hidden')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs">ปิด</button>
+                <button id="vfSaveBtn" onclick="saveVehicleForm()" class="px-4 py-2 bg-[#000066] text-white rounded-lg text-xs font-semibold">บันทึก</button>
+            </div>
+        </div>
+    </div>
+    <datalist id="dlVehType"></datalist>
     <!-- MODAL: รายการที่ต้องตรวจสอบ -->
     <div id="auditListModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 hidden" onclick="if(event.target===this)this.classList.add('hidden')">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[88vh] flex flex-col overflow-hidden">
@@ -831,6 +886,10 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycby246X7Am4M8wy4l2gFGeeF39fnw-uE1gCqA_LmpRUumcaXSGnCF9zYR5yqqf9QjRYELg/exec";
         let currentUser = null, globalVehicles = [], globalRepairs = [], globalPMs = [], currentPlanTarget = 'today';
+        // รถทั้งหมดจากชีต Vehicles (รวมคันที่ไม่ใช้งาน) / globalVehicles = เฉพาะคันที่ใช้งาน ใช้ในทุกหน้าทำงาน
+        let allVehicles = [], currentTab = 'dashboard';
+        function isActiveVeh(v) { return v && v.active !== false && String(v.activeText || '').trim() !== 'ไม่ใช้งาน'; }
+        function setVehicles(list) { allVehicles = Array.isArray(list) ? list : []; globalVehicles = allVehicles.filter(isActiveVeh); return globalVehicles; }
         let selectedPmIdToDelete = null;
 
         function showToast(msg, type = 'success') {
@@ -845,7 +904,7 @@
 
         async function fetchAPI(action) {
             try {
-                const res = await fetch(`${API_URL}?action=${action}`);
+                const res = await fetch(`${API_URL}?action=${action}&_=${Date.now()}`, { cache: 'no-store' });
                 const text = await res.text();
                 try { return JSON.parse(text); } catch (e) { return []; }
             } catch (err) { return []; }
@@ -937,7 +996,16 @@
             document.getElementById('selectMonthPM').value = new Date().getMonth()+1; document.getElementById('selectYearPM').value = yr;
         }
 
-        function switchTab(id) {
+        // บันทึกที่ค้างอยู่ (ซิงค์อัตโนมัติที่ยังไม่ถึงเวลา / กำลังส่ง) ต้องเสร็จก่อนโหลดหน้าอื่น ข้อมูลจึงตรงกันทุกหน้า
+        const inflightSaves = new Set();
+        function trackSave(p) { inflightSaves.add(p); p.finally(() => inflightSaves.delete(p)); return p; }
+        async function flushPendingSaves() {
+            Object.keys(syncTimers).forEach(vn => { if (syncTimers[vn]) { clearTimeout(syncTimers[vn]); syncTimers[vn] = null; saveRowUpsert(vn, true); } });
+            if (inflightSaves.size) { showToast('กำลังบันทึกข้อมูลล่าสุด...'); await Promise.allSettled([...inflightSaves]); }
+        }
+        async function switchTab(id) {
+            await flushPendingSaves();
+            currentTab = id;
             document.querySelectorAll('.view-section').forEach(e=>e.classList.add('hidden'));
             document.querySelectorAll('.menu-item').forEach(e=>e.classList.replace('text-[#FF9900]','text-slate-300'));
             document.getElementById(`view-${id}`).classList.remove('hidden');
@@ -948,6 +1016,7 @@
             if(id==='monthlySummary') loadMonthlySummary();
             if(id==='pmPlan') loadPMView();
             if(id==='pmCalendar') loadPMCalendar();
+            if(id==='fleet') loadFleetView();
         }
 
         // ================= DASHBOARD =================
@@ -966,7 +1035,7 @@
             const y = parseInt(document.getElementById('dashYear').value);
 
             const [veh, rep, pms] = await Promise.all([fetchAPI('getVehicles'), fetchAPI('getRepairs'), fetchAPI('getPMs')]);
-            globalVehicles = Array.isArray(veh) ? veh : [];
+            setVehicles(veh);
             globalRepairs = Array.isArray(rep) ? rep : [];
             globalPMs = Array.isArray(pms) ? pms : [];
 
@@ -1023,7 +1092,8 @@
             }
 
             // ---- ตัวเลขประจำเดือน ----
-            const monthRep = globalRepairs.filter(r => !isCancelled(r) && r.startMonth === m && r.startYear === y && (r.repairStatus === 'CM' || r.repairStatus === 'PM'));
+            const activeSet = new Set(globalVehicles.map(v => String(v.vehicleNumber).trim()));
+            const monthRep = globalRepairs.filter(r => !isCancelled(r) && activeSet.has(String(r.vehicleNumber).trim()) && r.startMonth === m && r.startYear === y && (r.repairStatus === 'CM' || r.repairStatus === 'PM'));
             const mCM = monthRep.filter(r => r.repairStatus === 'CM').length;
             const mVeh = new Set(monthRep.map(r => String(r.vehicleNumber).trim())).size;
             document.getElementById('dashMonthJobs').innerText = monthRep.length;
@@ -1196,7 +1266,7 @@
 
         async function loadVehiclesView() {
             const [veh, rep] = await Promise.all([fetchAPI('getVehicles'), fetchAPI('getRepairs')]);
-            globalVehicles = Array.isArray(veh) ? veh : [];
+            setVehicles(veh);
             vehRepairs = Array.isArray(rep) ? rep : [];
             buildHistoryLists();
             renderVehicleTable();
@@ -1290,7 +1360,8 @@
                 assessment: r.assessment,
                 symptom: r.symptom,
                 repairItems: r.items.map(t => ({ text: t, done: false })),
-                planDate: planDateISO(),
+                // วันที่ของรายการ = วันที่ในช่อง "วันเวลาเริ่ม" (ใส่ย้อนหลัง/ล่วงหน้าได้ แต่ละวันเป็นคนละรายการ)
+                planDate: /^\d{4}-\d{2}-\d{2}/.test(r.start || '') ? r.start.slice(0, 10) : planDateISO(),
                 recorder: currentUser.fullName
             };
         }
@@ -1301,7 +1372,7 @@
             const items = globalVehicles.map(v => buildRepairPayload(v));
             globalVehicles.forEach(v => { clearTimeout(syncTimers[v.vehicleNumber]); setSyncState(v.vehicleNumber, 'saving'); });
             try {
-                await postUpsert('upsertMultipleRepairs', items);
+                await trackSave(postUpsert('upsertMultipleRepairs', items));
                 const t = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
                 globalVehicles.forEach(v => setSyncState(v.vehicleNumber, 'saved', `✓ บันทึก ${t}`));
                 showToast("บันทึกทั้งหมดเรียบร้อย");
@@ -1453,10 +1524,10 @@
 
         async function saveRowUpsert(vn, silent) {
             const v = globalVehicles.find(x => sameVeh(x.vehicleNumber, vn)); if (!v) return;
-            clearTimeout(syncTimers[vn]);
+            clearTimeout(syncTimers[vn]); syncTimers[vn] = null;
             setSyncState(vn, 'saving');
             try {
-                await postUpsert('upsertRepair', buildRepairPayload(v));
+                await trackSave(postUpsert('upsertRepair', buildRepairPayload(v)));
                 setSyncState(vn, 'saved', `✓ บันทึก ${new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`);
                 if (!silent) showToast("บันทึกเรียบร้อย");
             } catch (e) {
@@ -1582,6 +1653,7 @@
             let res = await fetchAPI('getRepairs'); 
             globalRepairs = (res || []).reverse();
             renderRepairsTable(globalRepairs);
+            try { filterRepairs(); } catch (e) {}
         }
 
         function renderRepairsTable(repairs) {
@@ -1915,7 +1987,7 @@
             table.style.minWidth = `${CALC_VEH_W + days * CALD_MIN_DAY}px`;
             document.getElementById('calendarHeader').innerHTML = calCompactHeader(m, y, days);
 
-            globalVehicles = await fetchAPI('getVehicles');
+            setVehicles(await fetchAPI('getVehicles'));
             let resR = await fetchAPI('getRepairs'); globalRepairs = (resR || []).reverse();
             let resP = await fetchAPI('getPMs'); globalPMs = (resP || []).reverse();
 
@@ -2099,7 +2171,7 @@
 
         // ================= PM PLANS =================
         async function loadPMView() {
-            globalVehicles = await fetchAPI('getVehicles');
+            setVehicles(await fetchAPI('getVehicles'));
             let res = await fetchAPI('getPMs'); globalPMs = (res || []).reverse();
             let h='', dt = getISO(0);
             if(!globalVehicles || !globalVehicles.length) {
@@ -2138,7 +2210,7 @@
             table.style.width = '100%';
             table.style.minWidth = `${CALC_VEH_W + days * CALC_MIN_DAY}px`;
             document.getElementById('pmCalendarHeader').innerHTML = calCompactHeader(m, y, days);
-            globalVehicles = await fetchAPI('getVehicles');
+            setVehicles(await fetchAPI('getVehicles'));
             let res = await fetchAPI('getPMs'); globalPMs = (res || []).reverse();
             if (!globalVehicles || !globalVehicles.length) {
                 document.getElementById('pmCalendarBody').innerHTML = `<tr><td colspan="${days + 1}" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรถในระบบ</td></tr>`;
@@ -2206,6 +2278,107 @@
                 btn.innerText = "ยืนยัน"; btn.disabled = false;
             }
         }
+
+        // ================= ทะเบียนรถ (เพิ่มรถ / ตั้งสถานะ ใช้งาน-ไม่ใช้งาน) =================
+        let fleetEditing = null;
+        async function loadFleetView() {
+            const [veh, rep] = await Promise.all([fetchAPI('getVehicles'), fetchAPI('getRepairs')]);
+            setVehicles(veh);
+            vehRepairs = Array.isArray(rep) ? rep : [];
+            const types = [...new Set(allVehicles.map(v => String(v.vehicleType || '').trim()).filter(Boolean))];
+            document.getElementById('dlVehType').innerHTML = types.map(t => `<option value="${esc(t)}"></option>`).join('');
+            renderFleet();
+        }
+        function renderFleet() {
+            const kw = (document.getElementById('fleetSearch').value || '').toLowerCase().trim();
+            const f = document.getElementById('fleetFilter').value;
+            const on = allVehicles.filter(isActiveVeh).length;
+            document.getElementById('fleetSum').innerHTML = `<span>รถทั้งหมด <b>${allVehicles.length}</b></span><span><i style="background:#dff3e9;border-color:#a9dcc3"></i>ใช้งาน <b>${on}</b></span><span><i style="background:#eef0f5;border-color:#cbd5e1"></i>ไม่ใช้งาน <b>${allVehicles.length - on}</b></span><span style="color:#94a3b8">คันที่ไม่ใช้งานจะไม่แสดงในหน้าสถานะรถ ปฏิทิน และ Dashboard</span>`;
+            const rows = allVehicles.filter(v => {
+                if (f === 'on' && !isActiveVeh(v)) return false;
+                if (f === 'off' && isActiveVeh(v)) return false;
+                return !kw || `${v.vehicleNumber} ${v.plateNumber} ${v.driverName} ${v.vehicleType || ''}`.toLowerCase().includes(kw);
+            });
+            document.getElementById('fleetBody').innerHTML = rows.length ? rows.map((v, i) => {
+                const act = isActiveVeh(v), last = latestRepairOf(v.vehicleNumber), vn = esc(v.vehicleNumber);
+                return `<tr class="${act ? '' : 'off'}">
+                    <td class="text-slate-400">${i + 1}</td>
+                    <td><b>${vn}</b></td>
+                    <td>${esc(v.plateNumber || '-')}</td>
+                    <td>${esc(v.driverName || '-')}</td>
+                    <td>${v.vehicleType ? `<span class="ft-type">${esc(v.vehicleType)}</span>` : '<span class="text-slate-300">-</span>'}</td>
+                    <td class="latest-hint text-[11px]">${latestHint(last)}</td>
+                    <td><label class="sw"><input type="checkbox" ${act ? 'checked' : ''} onchange="toggleVehicleActive(this, '${encodeURIComponent(v.vehicleNumber)}')"><i></i><span>${act ? 'ใช้งาน' : 'ไม่ใช้งาน'}</span></label></td>
+                    <td><button class="ft-edit" onclick="openVehicleForm('${encodeURIComponent(v.vehicleNumber)}')">แก้ไข</button></td>
+                </tr>`;
+            }).join('') : `<tr><td colspan="8" class="p-6 text-center text-slate-400">ไม่พบรถ</td></tr>`;
+        }
+        function openVehicleForm(vnEnc) {
+            const vn = vnEnc ? decodeURIComponent(vnEnc) : null;
+            const v = vn ? allVehicles.find(x => sameVeh(x.vehicleNumber, vn)) : null;
+            fleetEditing = v ? v.vehicleNumber : null;
+            document.getElementById('vfMode').innerText = v ? `แก้ไขรถเบอร์ ${v.vehicleNumber}` : 'เพิ่มรถใหม่';
+            document.getElementById('vfNumber').value = v ? v.vehicleNumber : '';
+            document.getElementById('vfNumber').readOnly = !!v;
+            document.getElementById('vfNumber').classList.toggle('bg-slate-50', !!v);
+            document.getElementById('vfPlate').value = v ? (v.plateNumber || '') : '';
+            document.getElementById('vfDriver').value = v ? (v.driverName || '') : '';
+            document.getElementById('vfType').value = v ? (v.vehicleType || '') : '';
+            document.getElementById('vfActive').value = v && !isActiveVeh(v) ? 'ไม่ใช้งาน' : 'ใช้งาน';
+            document.getElementById('vfNote').innerText = v ? 'เบอร์รถแก้ไม่ได้ เพื่อให้ประวัติการซ่อมยังผูกกับรถคันนี้ ถ้าเบอร์ผิด ให้ตั้งคันเดิมเป็น "ไม่ใช้งาน" แล้วเพิ่มคันใหม่' : 'รถใหม่จะต่อท้ายรายการ ถ้าต้องการเรียงลำดับ ให้ย้ายแถวในชีต Vehicles ได้เลย';
+            document.getElementById('vehicleModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById(v ? 'vfPlate' : 'vfNumber').focus(), 50);
+        }
+        async function postVehicle(body) {
+            const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ userName: currentUser.fullName }, body)) });
+            const out = JSON.parse(await res.text());
+            if (!out || !out.success) throw new Error(out && out.message || 'บันทึกไม่สำเร็จ');
+            return out;
+        }
+        async function saveVehicleForm() {
+            const p = {
+                originalNumber: fleetEditing,
+                vehicleNumber: document.getElementById('vfNumber').value.trim(),
+                plateNumber: document.getElementById('vfPlate').value.trim(),
+                driverName: document.getElementById('vfDriver').value.trim(),
+                vehicleType: document.getElementById('vfType').value.trim(),
+                activeText: document.getElementById('vfActive').value
+            };
+            if (!p.vehicleNumber || !p.plateNumber) { showToast('กรุณากรอกเบอร์รถและทะเบียน', 'error'); return; }
+            if (!fleetEditing && allVehicles.some(v => sameVeh(v.vehicleNumber, p.vehicleNumber))) { showToast(`มีรถเบอร์ ${p.vehicleNumber} อยู่แล้ว`, 'error'); return; }
+            const btn = document.getElementById('vfSaveBtn'); btn.disabled = true; btn.style.opacity = '.6';
+            try {
+                await postVehicle({ action: 'saveVehicle', payload: p });
+                document.getElementById('vehicleModal').classList.add('hidden');
+                showToast(fleetEditing ? 'แก้ไขข้อมูลรถแล้ว' : `เพิ่มรถเบอร์ ${p.vehicleNumber} แล้ว`);
+                await loadFleetView();
+            } catch (e) { showToast(e.message, 'error'); }
+            finally { btn.disabled = false; btn.style.opacity = ''; }
+        }
+        async function toggleVehicleActive(cb, vnEnc) {
+            const vn = decodeURIComponent(vnEnc), on = cb.checked;
+            cb.nextElementSibling.nextElementSibling.innerText = on ? 'ใช้งาน' : 'ไม่ใช้งาน';
+            cb.closest('tr').classList.toggle('off', !on);
+            try {
+                await postVehicle({ action: 'setVehicleActive', vehicleNumber: vn, activeText: on ? 'ใช้งาน' : 'ไม่ใช้งาน' });
+                const v = allVehicles.find(x => sameVeh(x.vehicleNumber, vn));
+                if (v) { v.activeText = on ? 'ใช้งาน' : 'ไม่ใช้งาน'; v.active = on; }
+                setVehicles(allVehicles); renderFleet();
+                showToast(`รถเบอร์ ${vn}: ${on ? 'ใช้งาน' : 'ไม่ใช้งาน'}`);
+            } catch (e) { cb.checked = !on; renderFleet(); showToast(e.message, 'error'); }
+        }
+
+        // ข้อมูลอัปเดตเองทุก 60 วินาที (เฉพาะหน้าที่ดูอย่างเดียว และไม่มี Popup เปิดอยู่) ทุกคนเห็นข้อมูลล่าสุดตรงกัน
+        setInterval(() => {
+            if (!currentUser || document.visibilityState !== 'visible') return;
+            if (document.querySelector('.fixed.inset-0:not(.hidden)')) return;
+            const ae = document.activeElement;
+            if (ae && /INPUT|SELECT|TEXTAREA/.test(ae.tagName)) return;
+            if (currentTab === 'dashboard') loadDashboard();
+            else if (currentTab === 'monthlySummary') loadMonthlySummary();
+            else if (currentTab === 'pmCalendar') loadPMCalendar();
+            else if (currentTab === 'repairs') loadRepairsView();
+        }, 60000);
 
         // ================= EXPORT EXCEL (.xlsx จัดรูปแบบสวย ด้วย ExcelJS) =================
         const XL = { navy:'FF000066', navy2:'FF1B1B78', orange:'FFFF9900', white:'FFFFFFFF', ink:'FF0F1640', muted:'FF64748B', line:'FFD9DEE8',
